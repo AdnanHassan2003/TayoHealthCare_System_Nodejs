@@ -1,0 +1,356 @@
+<% include header.html %>
+  <!-- Main content -->
+  <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
+  <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+
+  <section class="content">
+    <% if (typeof msg !='undefined' ) { %>
+      <div class="alert alert-success alert-dismissible fade show" style="text-align: center;" role="alert">
+        <strong>
+          <%= msg %>
+        </strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <% } %>
+
+        <% if(typeof admin_data !='undefined' ){ %>
+          <form class="form-data" role="form" method="post" action="/update_admin_details"
+            enctype="multipart/form-data">
+            <div class="row">
+              <input type="hidden" name="admin_id" value="<%= admin_data._id %>" />
+              <div class="col-md-8">
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <%= process.env.edit_admin %>
+                    </h3>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                        title="Collapse">
+                        <i class="fas fa-minus"></i></button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <input type="hidden" class="form-control" value="<%= admin_data.picture %>" name="picture" />
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6">
+                          <img class="profile-user-img img-fluid img-circle" style="width: 250px; height: 250px;"
+                            src="<%= admin_data.picture != '' ? admin_data.picture : 'default.png' %>"
+                            alt="User profile picture" id="profile_image">
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                      </div>
+
+                      <div class="row col-md-4 float-right" style="margin-bottom: 10px;">
+                        <input type="button" id="loadFileXml" value="Select Profile Image" style="border-radius:12px;border-width:2px;padding:2px 10px; background:transparent;
+                  color:#656d78;" onclick="document.getElementById('profile_file').click();" />
+                        <input type="file" style="display:none;  " id="profile_file" name="profile_file" />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="name">
+                        <%= process.env.title_name %>
+                      </label>
+                      <input type="text" id="name" name="name" style="text-transform: capitalize;" class="form-control"
+                        value="<%= admin_data.name %>" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="phone">
+                        <%= process.env.phone %>
+                      </label>
+                      <input type="text" id="phone" name="phone" class="form-control" value="<%= admin_data.phone %>"
+                        onkeypress="return isNumberKey(event);" required>
+                    </div>                    
+                    <div class="form-group" name="status">
+                      <label for="status">
+                        <%=process.env.title_status %>
+                      </label>
+                      <select class="form-control custom-select" id="status" name="status" required>
+                        <% if(admin_data.status=="1" ) { %>
+                          <option value="1" selected="selected">
+                            <%= process.env.active %>
+                          </option>
+                          <option value="0">
+                            <%= process.env.inactive %>
+                          </option>
+                          <% } else{ %>
+                            <option value="1">
+                              <%= process.env.active %>
+                            </option>
+                            <option value="0" selected="selected">
+                              <%= process.env.inactive %>
+                            </option>
+                            <% } %>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="status">
+                        <%= process.env.title_type %>
+                      </label>
+                      <select class="form-control custom-select" id="admin_type" name="type" required>
+                        <% if(admin_data.type=="1" ) { %>
+                          <option value="1" selected="selected">
+                            <%= process.env.title_subadmin %>
+                          </option>
+                          <option value="0">
+                            <%= process.env.title_admin %>
+                          </option>
+                          <% } else{ %>
+                            <option value="1">
+                              <%= process.env.title_subadmin %>
+                            </option>
+                            <option value="0" selected="selected">
+                              <%= process.env.title_admin %>
+                            </option>
+                            <% } %>
+                      </select>
+                    </div>
+                    <div class="form-group" id="allowed_urls">
+                      <label for="status">
+                        <%= process.env.allowed_urls %>
+                      </label>
+                      <div class="col-12">
+                        <select id="fselectMulti" class="my-select-box" style="overflow-y:scroll" name="allowed_urls[]"
+                          multiple="multiple">
+                          <optgroup label="URL List">
+                            <% systen_urls.forEach(function(menu){ %>
+                              <% if(admin_data.allowed_urls.indexOf(menu) !==-1){ %>
+                                <option value="<%= menu %>" selected>
+                                  <%= menu %>
+                                </option>
+                                <% } else{ %>
+                                  <option value="<%= menu %>">
+                                    <%= menu %>
+                                  </option>
+                                  <% } %>
+                                    <% }) %>
+                          </optgroup>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="email">
+                        <%= process.env.email %>
+                      </label>
+                      <input type="email" id="email" name="email" class="form-control" value="<%= admin_data.email %>"
+                        required>
+                    </div>
+                    <div class="form-group">
+                      <label for="user_name">
+                        <%= process.env.user_name %>
+                      </label>
+                      <input type="text" id="user_name" name="user_name" class="form-control"
+                        value="<%= admin_data.user_name %>">
+                    </div>                 
+                    <div class="form-group">
+                      <label for="extra_detail">
+                        <%= process.env.extra_detail %>
+                      </label>
+                      <textarea id="extra_detail" name="extra_detail" class="form-control"
+                        rows="4"><%= admin_data.extra_detail %></textarea>
+                    </div>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+                <div class="col-12">
+                  <input type="submit" value="<%= process.env.edit_admin %>" class="btn system-bottons float-right">
+                </div>
+              </div>
+
+            </div>
+
+          </form>
+          <% }else{ %>
+            <form class="form-data" role="form" method="post" action="/save_admin_details"
+              enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="card card-primary">
+                    <div class="card-header">
+                      <h3 class="card-title">
+                        <%= process.env.add_admin %>
+                      </h3>
+
+                      <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                          title="Collapse">
+                          <i class="fas fa-minus"></i></button>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <input type="hidden" class="form-control" name="picture" />
+                      <div class="row">
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-6">
+                          <img class="profile-user-img img-fluid img-circle" style="width: 250px; height: 250px;"
+                            src="default.png" alt="User profile picture" id="profile_image">
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                      </div>
+
+                      <div class="row col-md-4 float-right" style="margin-bottom: 10px;">
+                        <input type="button" id="loadFileXml" value="Select Profile Image" style="border-radius:12px;border-width:2px;padding:2px 10px; background:transparent;
+                  color:#656d78;" onclick="document.getElementById('profile_file').click();" />
+                        <input type="file" style="display:none;  " id="profile_file" name="profile_file" />
+                      </div>
+                      <div class="form-group">
+                        <label for="name">
+                          <%= process.env.title_name %>
+                        </label>
+                        <input type="text" id="name" name="name" style="text-transform: capitalize;"
+                          class="form-control" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="phone">
+                          <%= process.env.phone %>
+                        </label>
+                        <input type="text" id="phone" name="phone" class="form-control"
+                          onkeypress="return isNumberKey(event);" required>
+                      </div>                                     
+                      <div class="form-group">
+                        <label for="status">
+                          <%= process.env.title_type %>
+                        </label>
+                        <select class="form-control custom-select" id="admin_type" name="type" required>
+                          <option value="">
+                            <%= process.env.select_one %>
+                          </option>
+                          <option value="0">
+                            <%= process.env.title_admin %>
+                          </option>
+                          <option value="1">
+                            <%= process.env.title_subadmin %>
+                          </option>
+                        </select>
+                      </div>
+                      <div class="form-group" id="allowed_urls">
+                        <label for="status">
+                          <%= process.env.allowed_urls %>
+                        </label>
+                        <div class="col-12">
+                          <select id="fselectMulti" class="my-select-box" style="overflow-y:scroll" multiple="multiple"
+                            name="allowed_urls[]">
+                            <optgroup label="URL List">
+                              <% menu.forEach(function(item){ %>
+                                <option value="<%= item._id %>">
+                                  <%= item.title%>
+                                </option>
+                                <% }) %>
+                            </optgroup>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="email">
+                          <%= process.env.email %>
+                        </label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="user_name">
+                          <%= process.env.user_name %>
+                        </label>
+                        <input type="text" id="user_name" name="user_name" class="form-control">
+                      </div>
+                      <div class="form-group">
+                        <label for="password">
+                          <%= process.env.password %>
+                        </label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                      </div>                  
+                      <div class="form-group">
+                        <label for="extra_detail">
+                          <%= process.env.extra_detail %>
+                        </label>
+                        <textarea id="extra_detail" name="extra_detail" class="form-control" rows="4"></textarea>
+                      </div>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+                  <!-- /.card -->
+                  <div class="col-12">
+                    <input type="submit" value="<%= process.env.add_admin %>" class="btn system-bottons float-right">
+                  </div>
+                </div>
+              </div>
+
+              </div>
+            </form>
+            <% } %>
+  </section>
+
+  <script>
+    $(function () {
+      // $('.my-select-box').fSelect({});
+
+      var dateToday = new Date();
+      //Date range picker with time picker
+      $('#passport_expire_date').datepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        minDate: dateToday,
+        changeMonth: true,
+        changeYear: true,
+      });
+    });
+
+    document.getElementById("profile_file").onchange = function () {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        // get loaded data and render thumbnail.
+        document.getElementById("profile_image").src = e.target.result;
+      };
+
+      // read the image file as a data URL.
+      reader.readAsDataURL(this.files[0]);
+    };
+
+
+    $(document).ready(function () {
+      $('#fselectMulti').multiselect({
+        enableFiltering: true,
+        maxHeight: 350,
+        dropRight: false,
+      });
+
+      if ($("#admin_type option:selected").val() == "1") {
+        $("#allowed_urls").css("display", "block");
+      } else {
+        $("#allowed_urls").css("display", "none");
+      }
+
+      $("#admin_type").change(function (e) {
+        if (this.value == 1) {
+          $("#allowed_urls").css("display", "block");
+        } else {
+          $("#allowed_urls").css("display", "none");
+        }
+      });
+
+    });
+
+
+    function isNumberKey(evt) {
+      var charCode = (evt.which) ? evt.which : evt.keyCode;
+      if (charCode != 46 && charCode > 31
+        && (charCode < 48 || charCode > 57))
+        return false;
+
+      return true;
+    }
+
+  </script>
+  <!-- /.content -->
+  <% include footer.html %>

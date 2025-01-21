@@ -1,0 +1,93 @@
+<style>
+  .pagination {
+    width: 100%;
+    margin: 0px 0px;
+  }
+
+  .pagination>li>a,
+  .pagination>li>span {
+    margin-left: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    color: #656d78;
+    border-color: #E5E5E5;
+  }
+
+  .pagination>li>a:hover,
+  .pagination>li>span:hover {
+    color: #222;
+  }
+
+  .pagination>li.active>a,
+  .pagination>li.active>a:hover {
+    background: #33414e;
+    color: #FFF;
+    border-color: #33414e;
+  }
+
+  .curser_pointer {
+    cursor: pointer;
+  }
+  a.menu_links {
+    cursor: pointer;
+}
+</style>
+
+
+<% if(pages > 0) { %>
+	<li><a id="pre" class="btn menu_links"><%= process.env.button_pre %></a></li>
+	<li><a id="current_page" class="btn" style="background: #33414e;color: #FFF;border-color: #33414e;"><%= Number(current_page) +1%></a></li>
+	<li><a id="dots" class="btn">...</a></li>
+	<li><a id="num_page" class="btn"><%= pages %></a></li>
+	<li><a id="next" class="btn menu_links"><%= process.env.button_next %></a></li>
+	<style>
+	  .noclick{
+		pointer-events:none;
+		}
+	</style>
+	<script type="text/javascript">
+	
+	  $(document).ready(function () {
+		var current_page = <%= current_page %> + 1;
+		var pages = <%= pages %>;
+	
+		if (current_page == '<%= pages %>') {
+		   $("#next").addClass("noclick");
+		   $("#num_page").addClass("noclick");
+		}
+		if (pages == 1) {
+		  $('#dots').hide();
+		  $('#num_page').hide();
+		}
+		if (current_page == 1) {
+		  $("#pre").addClass("noclick");
+		}
+	
+		$('#num_page').click(function (event) {
+		  document.getElementById('page').value = "<%= pages %>" - 1;
+		  var button = document.getElementById('apply_filter');
+		  button.form.submit();
+		});
+	
+		$('#pre').click(function (event) {
+		  document.getElementById('page').value = "<%= pre %>";
+		  var button = document.getElementById('apply_filter');
+		  button.form.submit();
+		});
+	
+		$('#next').click(function (event) {
+		  document.getElementById('page').value = "<%= next %>";
+		  var button = document.getElementById('apply_filter');
+		  button.form.submit();
+		});
+	  });
+	
+	  function isNumberKey(evt) {
+		var charCode = (evt.which) ? evt.which : event.keyCode
+		if (charCode > 31 && (charCode < 48 || charCode > 57))
+		  return false;
+		return true;
+	  }
+	</script>
+	<% } %>

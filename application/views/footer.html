@@ -1,0 +1,48 @@
+</div>
+<!-- /.content-wrapper -->
+<script>
+  var url = window.location;
+  // for sidebar menu entirely but not cover treeview
+  $('ul.nav-sidebar a').filter(function () {
+    return this.href == url;
+  }).addClass('active');
+
+  // for treeview
+  $('ul.nav-treeview a').filter(function () {
+    return this.href == url;
+  }).parentsUntil(".nav-sidebar > .nav-treeview").addClass('menu-open').prev('a');
+
+  $(function () {
+    $("#tbl_data").DataTable({
+      "searching": false,
+      "lengthChange": false,
+      "ordering": false,
+      "buttons": ["copy", "excel", "pdf", "print"]
+    }).buttons().container().appendTo('#tbl_parent_div .col-md-6:eq(0)');
+
+    $('.textarea').summernote()
+  });
+  
+  $(document).ready(function () {
+    $(".datepicker").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      todayHighlight: true
+    })
+  });
+
+</script>
+<footer class="main-footer">
+  <div class="float-right d-none d-sm-block">
+    Developed by <b>Habsamo</b> Version 1.0.0
+  </div>
+  <strong>Copyright &copy;
+    <script>document.write(new Date().getFullYear());</script> <a>
+      <%= process.env.app_name %>.
+    </a>
+  </strong> All rights
+  reserved.
+</footer>
+</body>
+
+</html>
