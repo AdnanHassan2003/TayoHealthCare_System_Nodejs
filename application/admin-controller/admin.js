@@ -1,6 +1,7 @@
 var Admin = require('mongoose').model('admin')
 var User = require('mongoose').model('users')
 var Doctor = require('mongoose').model('doctor')
+var Patient = require('mongoose').model('patient')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -476,6 +477,97 @@ exports.doctor_list = function (req, res) {
 
 
 
+
+
+
+exports.patient_list = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            if (req.body.search_item == undefined) {
+                search_item = "sequence_id";
+                search_value = req.body.search_value;
+                start_date = "";
+                end_date = "";
+            } else {
+                search_item = req.body.search_item;
+                search_value = req.body.search_value;
+                start_date = req.body.start_date;
+                end_date = req.body.end_date;
+            }
+            if (req.body.start_date == undefined && req.body.end_date == undefined) {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else if (req.body.start_date == "" || req.body.end_date == "") {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else {
+                var sdate = new Date(req.body.start_date);
+                start_date = sdate.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                var edate = new Date(req.body.end_date);
+                end_date = edate.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            }
+
+            //var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+
+            f_start_date = moment(start_date).format("YYYY-MM-DD");
+            f_end_date = moment(end_date).format("YYYY-MM-DD");
+
+            //order by sequecy number
+            var sort = { "$sort": {} };
+            sort["$sort"]["_id"] = parseInt(-1);
+
+            //query search
+            var query_search = { "$match": {} };
+
+            if (search_item == 'email') {
+                if (search_value != undefined && search_value != '') {
+                    search_value = search_value.replace(/^\s+|\s+$/g, '');
+                    search_value = search_value.replace(/ +(?= )/g, '');
+                    query_search["$match"][search_item] = { $regex: new RegExp(search_value, 'i') };
+                }
+            } else if (search_item == 'phone') {
+                if (search_value != undefined && search_value != '') {
+                    search_value = search_value.replace(/\D/g, '');
+                    query_search["$match"][search_item] = { $regex: new RegExp(search_value, 'i') };
+                }
+            } else {
+                if (search_value != undefined && search_value != '') {
+                    query_search["$match"][search_item] = search_value;
+                }
+            }
+            Patient.aggregate([
+                query_search,
+                sort
+            ]).then((patient)=>{
+                res.render('patient_list', {
+                    url_data: req.session.menu_array,
+                    detail: patient,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+            })
+        } else {
+
+            Utils.redirect_login(req, res);
+        }
+    })
+}
+
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -541,6 +633,25 @@ exports.add_doctor = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
             res.render("add_doctor",
+                {
+                    systen_urls: systen_urls, msg: req.session.error
+                })
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+
+
+/// Add a patient
+exports.add_patient = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            res.render("add_patient",
                 {
                     systen_urls: systen_urls, msg: req.session.error
                 })
@@ -806,6 +917,78 @@ exports.save_doctor_data = function (req, res) {
 
 };
 
+
+
+
+
+exports.save_patient_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+            Patient.findOne({ "phone": req.body.phone }).then((patient) => {
+                console.log("user", patient)
+                if (patient) {
+                    req.session.error = "Sorry, There is an patient with this phone, please check the phone";
+                    Utils.redirect_login(req, res);
+                } else {
+                    // Create a schema
+                    var schema = new passwordValidator();
+                    schema.is().min(8)                                 // Minimum length 8
+                        .is().max(30)                                  // Maximum length 100
+                        .has().lowercase()                             // Must have lowercase letters
+                        .has().digits()                                // Must have at least 2 digits
+                        .has().not().spaces();                         // Blacklist these values
+                    // Validate against a password string
+                    if (schema.validate(req.body.password)) {
+                        var profile_file = req.files;
+                        var name = req.body.name
+                        var patient = new Patient({
+                            name: name,
+                            sequence_id: Utils.get_unique_id(),
+                            email: req.body.email,
+                            address:req.body.address,
+                            gender:req.body.gender,
+                            age:req.body.age,
+                            license_number:Utils.get_unique_id(),
+                            phone: req.body.phone,
+                            status: 1,
+                            extra_detail: req.body.extra_detail,
+                            picture: "",
+                            user_name: req.body.user_name,
+                            PassWord: req.body.password,
+                            password: Bcrypt.hashSync(req.body.password, 10)
+                        });
+                        if (profile_file != undefined && profile_file.length > 0) {
+                            image_name = Utils.tokenGenerator(29) + '.jpg';
+                            url = "./uploads/admin_profile/" + image_name;
+                            liner = "admin_profile/" + image_name;
+
+                            fs.readFile(req.files[0].path, function (err, data) {
+                                fs.writeFile(url, data, 'binary', function (err) { });
+                                fs.unlink(req.files[0].path, function (err, file) {
+
+                                });
+                            });
+
+                            patient.picture = liner;
+                        }
+                        patient.save().then((admin) => {
+                            req.session.error = "Congrates, patient was created successfully.........";
+                            res.redirect("/patient_list");
+                        });
+                    } else {
+                        req.session.error = "Please use strong password that contains latrers and Digitals";
+                        res.redirect("/add_patient")
+                    }
+                }
+            })
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -870,6 +1053,25 @@ exports.edit_doctor = function (req, res) {
 
 
 
+
+
+
+exports.edit_patient = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Patient.findOne({ _id: req.body.patient_id }, { password: 0 }).then((patient) => {
+                if (patient) {
+                    // console.log(admin)
+                    res.render("add_patient", { patient_data: patient, systen_urls: systen_urls })
+                } else {
+                    res.redirect("/patient_list")
+                }
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 
 //---------------------------------------------------------------------------------------------------
 
@@ -1016,6 +1218,52 @@ exports.update_doctor_detail = function (req, res) {
 };
 
 
+
+
+
+
+exports.update_patient_detail = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            var profile_file = req.files;
+            req.body.name = req.body.name.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ');
+            if (profile_file == '' || profile_file == 'undefined') {
+                Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
+                    if (data._id.equals(req.session.admin.patient_id)) {
+                        Utils.redirect_login(req, res);
+                    } else {
+                        res.redirect("/patient_list");
+                    }
+                }, (err) => {
+                    res.redirect("/patient_list");
+                });
+            } else {
+                Patient.findById(req.body.patient_id).then((user) => {
+                    if (user.picture) {
+                        Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+                    }
+                    var image_name = user._id + Utils.tokenGenerator(4);
+                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
+                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
+                    req.body.picture = url;
+                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                    Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
+                        if (data._id.equals(req.session.admin.patient_id)) {
+                            Utils.redirect_login(req, res);
+                        } else {
+                            res.redirect("/patient_list");
+                        }
+                    }, (err) => {
+                        res.redirect("/patient_list");
+                    });
+                });
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1074,6 +1322,20 @@ exports.delete_doctor = function (req, res) {
 };
 
 
+
+
+
+exports.delete_patient = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Patient.deleteOne({ _id: req.body.patient_id }).then((user) => {
+                res.redirect("/patient_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 
 //---------------------------------------------------------------------------------------------------
 

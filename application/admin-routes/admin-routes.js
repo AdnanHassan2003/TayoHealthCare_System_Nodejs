@@ -53,6 +53,20 @@ module.exports = function (app) {
   app.route('/edit_doctor').post(adminController.edit_doctor)
   app.route('/update_doctor_detail').post(adminController.update_doctor_detail)
   app.route('/delete_doctor').post(adminController.delete_doctor);
+
+
+
+
+
+  app.route('/patient_list').get(adminController.patient_list);
+  app.route('/patient_list').post(adminController.patient_list);
+  app.route('/add_patient').get(adminController.add_patient);
+  app.route('/add_patient').post(adminController.add_patient);
+  app.route('/save_patient_data').post(adminController.save_patient_data)
+  app.route('/edit_patient').post(adminController.edit_patient)
+  app.route('/update_patient_detail').post(adminController.update_patient_detail)
+  app.route('/delete_patient').post(adminController.delete_patient);
+  
   
   
 
