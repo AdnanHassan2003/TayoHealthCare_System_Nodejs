@@ -20,6 +20,7 @@ module.exports = function () {
     require("../application/model/doctor");
     require("../application/model/patient"); 
     require("../application/model/appointment"); 
+    require("../application/model/hospital"); 
     
     
 

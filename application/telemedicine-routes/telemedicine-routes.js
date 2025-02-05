@@ -83,8 +83,15 @@ module.exports = function (app) {
   
   
 
+  app.route('/hospital_list').get(adminController.hospital_list);
+  app.route('/hospital_list').post(adminController.hospital_list);
+  app.route('/add_hospital').get(adminController.add_hospital);
+  app.route('/add_hospital').post(adminController.add_hospital);
+  app.route('/save_hospital_data').post(adminController.save_hospital_data)
+  app.route('/edit_hospital').post(adminController.edit_hospital)
+  app.route('/update_hospital_detail').post(adminController.update_hospital_detail)
+  app.route('/delete_hospital').post(adminController.delete_hospital);
   
-
 
     
 }

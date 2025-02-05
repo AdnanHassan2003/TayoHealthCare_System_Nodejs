@@ -3,6 +3,7 @@ var User = require('mongoose').model('users')
 var Doctor = require('mongoose').model('doctor')
 var Patient = require('mongoose').model('patient')
 var Appointment = require('mongoose').model('appointment')
+var Hospital = require('mongoose').model('hospital')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -726,6 +727,32 @@ exports.appointment_list = function(req, res){
 }
 
 
+
+
+
+exports.hospital_list = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+
+            Hospital.find({}).then((data_hospital)=>{
+                res.render('hospital_list', {
+                    url_data: req.session.menu_array,
+                    detail: data_hospital,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+
+            })
+        
+        } else {
+
+            Utils.redirect_login(req, res);
+        }
+    })
+}
+
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -866,6 +893,31 @@ exports.add_appointment = function (req, res) {
         }
     });
 };
+
+
+
+
+
+
+/// Add a patient
+exports.add_hospital = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            res.render("add_hospital",
+                {
+                    systen_urls: systen_urls, 
+                    msg: req.session.error,
+                    url_data: req.session.menu_array,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                })
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
 
 //---------------------------------------------------------------------------------------------------
 
@@ -1223,6 +1275,61 @@ exports.save_appointment_data = function (req, res) {
 
 };
 
+
+
+
+
+exports.save_hospital_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+            Hospital.findOne({ "phone": req.body.phone }).then((hospital) => {
+                console.log("user", hospital)
+                if (hospital) {
+                    req.session.error = "Sorry, There is an hospital with this phone, please check the phone";
+                    Utils.redirect_login(req, res);
+                } else {
+
+                        var profile_file = req.files;
+                        var name = req.body.name
+                        var hospital = new Hospital({
+                            name: name,
+                            sequence_id: Utils.get_unique_id(),
+                            email: req.body.email,
+                            address:req.body.address,
+                            phone: req.body.phone,
+                            extra_detail: req.body.extra_detail,
+                            picture: "",
+                           
+                        });
+                        if (profile_file != undefined && profile_file.length > 0) {
+                            image_name = Utils.tokenGenerator(29) + '.jpg';
+                            url = "./uploads/admin_profile/" + image_name;
+                            liner = "admin_profile/" + image_name;
+
+                            fs.readFile(req.files[0].path, function (err, data) {
+                                fs.writeFile(url, data, 'binary', function (err) { });
+                                fs.unlink(req.files[0].path, function (err, file) {
+
+                                });
+                            });
+
+                            hospital.picture = liner;
+                        }
+                        hospital.save().then((admin) => {
+                            req.session.error = "Congrates, hospital was created successfully.........";
+                            res.redirect("/hospital_list");
+                        });
+                
+                }
+            })
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1344,6 +1451,25 @@ exports.edit_appointment = function (req, res) {
     });
 };
 
+
+
+
+exports.edit_hospital = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Hospital.findOne({ _id: req.body.hospital_id }, { password: 0 }).then((hospital) => {
+                if (hospital) {
+                    // console.log(admin)
+                    res.render("add_hospital", { hospital_data: hospital, systen_urls: systen_urls })
+                } else {
+                    res.redirect("/hospital_list")
+                }
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1582,6 +1708,54 @@ exports.update_appointment_detail = function (req, res) {
         }
     });
 };
+
+
+
+
+
+
+exports.update_hospital_detail = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            var profile_file = req.files;
+            req.body.name = req.body.name.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ');
+            if (profile_file == '' || profile_file == 'undefined') {
+                Hospital.findByIdAndUpdate(req.body.hospital_id, req.body, { useFindAndModify: false }).then((data) => {
+                    if (data._id.equals(req.session.admin.hospital_id)) {
+                        Utils.redirect_login(req, res);
+                    } else {
+                        res.redirect("/hospital_list");
+                    }
+                }, (err) => {
+                    res.redirect("/hospital_list");
+                });
+            } else {
+                Hospital.findById(req.body.hospital_id).then((user) => {
+                    if (user.picture) {
+                        Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+                    }
+                    var image_name = user._id + Utils.tokenGenerator(4);
+                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
+                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
+                    req.body.picture = url;
+                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                    Hospital.findByIdAndUpdate(req.body.hospital_id, req.body, { useFindAndModify: false }).then((data) => {
+                        if (data._id.equals(req.session.admin.hospital_id)) {
+                            Utils.redirect_login(req, res);
+                        } else {
+                            res.redirect("/hospital_list");
+                        }
+                    }, (err) => {
+                        res.redirect("/hospital_list");
+                    });
+                });
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1662,6 +1836,21 @@ exports.delete_appointment = function (req, res) {
         if (response.success) {
             Appointment.deleteOne({ _id: req.body.appointment_id }).then((user) => {
                 res.redirect("/appointment_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+exports.delete_hospital = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Hospital.deleteOne({ _id: req.body.hospital_id }).then((user) => {
+                res.redirect("/hospital_list")
             });
         } else {
             Utils.redirect_login(req, res);
