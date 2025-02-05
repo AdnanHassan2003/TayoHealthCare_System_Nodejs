@@ -19,6 +19,7 @@ module.exports = function () {
     require("../application/model/users"); 
     require("../application/model/doctor");
     require("../application/model/patient"); 
+    require("../application/model/appointment"); 
     
     
 

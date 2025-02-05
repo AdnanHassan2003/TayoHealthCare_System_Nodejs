@@ -1,4 +1,4 @@
-var adminController = require('../admin-controller/admin');// admin routes
+var adminController = require('../telemedicine-controller/telemedicine-controller');// admin routes
 
 
 module.exports = function (app) {
@@ -66,6 +66,19 @@ module.exports = function (app) {
   app.route('/edit_patient').post(adminController.edit_patient)
   app.route('/update_patient_detail').post(adminController.update_patient_detail)
   app.route('/delete_patient').post(adminController.delete_patient);
+
+
+
+
+
+  app.route('/appointment_list').get(adminController.appointment_list);
+  app.route('/appointment_list').post(adminController.appointment_list);
+  app.route('/add_appointment').get(adminController.add_appointment);
+  app.route('/add_appointment').post(adminController.add_appointment);
+  app.route('/save_appointment_data').post(adminController.save_appointment_data)
+  app.route('/edit_appointment').post(adminController.edit_appointment)
+  app.route('/update_appointment_detail').post(adminController.update_appointment_detail)
+  app.route('/delete_appointment').post(adminController.delete_appointment);
   
   
   

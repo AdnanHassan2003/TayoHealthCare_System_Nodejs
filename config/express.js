@@ -36,6 +36,6 @@ module.exports = function () {
     app.set('view engine', 'html');
 
 
-    require('../application/admin-routes/admin-routes')(app);
+    require('../application/telemedicine-routes/telemedicine-routes')(app);
     return app;
 };
