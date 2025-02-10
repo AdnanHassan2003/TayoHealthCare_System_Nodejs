@@ -1,0 +1,311 @@
+<% include header.html %>
+  <!-- Main content -->
+  <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
+  <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+
+  <section class="content">
+    <% if (typeof msg !='undefined' ) { %>
+      <div class="alert alert-success alert-dismissible fade show" style="text-align: center;" role="alert">
+        <strong>
+          <%= msg %>
+        </strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <% } %>
+
+        <% if(typeof payment_data !='undefined' ){ %>
+          <form class="form-data" role="form" method="post" action="/update_payment_detail"
+            enctype="multipart/form-data">
+            <div class="row">
+              <input type="hidden" name="payment_id" value="<%= payment_data._id %>" />
+              <div class="col-md-8">
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                    Edit Payment
+                    </h3>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                        title="Collapse">
+                        <i class="fas fa-minus"></i></button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <input type="hidden" class="form-control" value="<%= payment_data.picture %>" name="picture" />
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group" name = "doctor">
+                        <label for="doctor_id">
+                          Doctor
+                        </label>
+                        <select class="form-control custom-select"  id="doctor_id" name="doctor_id" required>
+                          <option value=""> All</option>
+                          <% if(Doctor.length > 0){  %>
+                          
+                            <% Doctor.forEach(function(data){%>
+                
+    
+                              <%if(doctor_id == data._id){%>
+                                
+                                <option value="<%=data._id%>"  selected><%=data.name%></option>
+                                
+                              <%}else{%>
+                                <option value="<%=data._id%>"  ><%=data.name%></option>
+                              <%}%>
+                             
+                               
+                        <%})%>
+                        <%}%>
+                        </select>
+                      </div>
+                      <div class="form-group" name =  "patient">
+                        <label for="patient">
+                          Patient
+                        </label>
+                        <select class="form-control custom-select"  id="patient_id" name="patient_id" required>
+                          <option value=""> All</option>
+                          <% if(Patient.length > 0){  %>
+                          
+                            <% Patient.forEach(function(data){%>
+                
+    
+                              <%if(patient_id == data._id){%>
+                                
+                                <option value="<%=data._id%>"  selected><%=data.name%></option>
+                                
+                              <%}else{%>
+                                <option value="<%=data._id%>"  ><%=data.name%></option>
+                              <%}%>          
+                        <%})%>
+                        <%}%>
+                        </select>
+                      </div>  
+                      <div class="form-group">
+                        <label for="amount">
+                            Amount
+                        </label>
+                        <input type="text" id="amount" name="amount" class="form-control" value="<%=payment_data.amount %>"
+                          onkeypress="return isNumberKey(event);" required>
+                      </div>       
+                    <div class="form-group" name="status">
+                      <label for="status">
+                        <%=process.env.title_status %>
+                      </label>
+                      <select class="form-control custom-select" id="status" name="status" required>
+                        <% if(payment_data.status=="Pending" ) { %>
+                          <option value="Pending" selected="selected">
+                            Pending
+                          </option>
+                          <option value="Paid">
+                            Paid
+                          </option>
+                          <option value="Failed">
+                            Failed
+                          </option>
+                          <% } else if(payment_data.status=="Paid"){ %>
+                            <option value="Pending">
+                                Pending
+                              </option>
+                              <option value="Paid" selected="selected">
+                                Paid
+                              </option>
+                              <option value="Failed">
+                                Failed
+                              </option>
+                                <%} else {%>
+                              <option value="Pending">
+                                  Pending
+                               </option>
+                               <option value="Paid">
+                                   Paid
+                               </option>
+                               <option value="Failed" selected="selected">
+                                  Failed
+                                </option>
+                                <%}%>
+                      </select>
+                    </div>           
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+                <div class="col-12">
+                  <input type="submit" value="Edit Payment" class="btn system-bottons float-right">
+                </div>
+              </div>
+
+            </div>
+
+          </form>
+          <% }else{ %>
+            <form class="form-data" role="form" method="post" action="/save_payment_data"
+              enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="card card-primary">
+                    <div class="card-header">
+                      <h3 class="card-title">
+                        Add Payment
+                      </h3>
+
+                      <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                          title="Collapse">
+                          <i class="fas fa-minus"></i></button>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <input type="hidden" class="form-control" name="picture" />
+                      <div class="row">
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                      </div>
+
+
+                      <div class="form-group">
+                        <label for="doctor_id">
+                          Doctor
+                        </label>
+                        <select class="form-control custom-select2" id="doctor_id" name="doctor_id" required>
+                            <% if(doctor_data.length > 0){  %>
+                              <option>Select class</option>
+                              <% doctor_data.forEach(function(data){%>
+                               
+                          <option value="<%=data._id%>"  ><%=data.name%></option>
+                          <%})%>
+                          <%}%>
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="patient_id">
+                            Patient
+                        </label>
+                        <select class="form-control custom-select2" id="patient_id" name="patient_id" required>
+                            <% if(patient_data.length > 0){  %>
+                              <option>Select class</option>
+                              <% patient_data.forEach(function(data){%>
+                               
+                          <option value="<%=data._id%>"  ><%=data.name%></option>
+                          <%})%>
+                          <%}%>
+                          </select>
+                      </div> 
+                      <div class="form-group">
+                        <label for="amount">
+                            Amount
+                        </label>
+                        <input type="text" id="amount" name="amount" class="form-control"
+                          onkeypress="return isNumberKey(event);" required>
+                      </div>   
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+                  <!-- /.card -->
+                  <div class="col-12">
+                    <input type="submit" value="Add Payment" class="btn system-bottons float-right">
+                  </div>
+                </div>
+              </div>
+
+              </div>
+            </form>
+            <% } %>
+  </section>
+
+  <script>
+    $(function () {
+      // $('.my-select-box').fSelect({});
+
+      var dateToday = new Date();
+      //Date range picker with time picker
+      $('#passport_expire_date').datepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        minDate: dateToday,
+        changeMonth: true,
+        changeYear: true,
+      });
+    });
+
+    document.getElementById("profile_file").onchange = function () {
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        // get loaded data and render thumbnail.
+        document.getElementById("profile_image").src = e.target.result;
+      };
+
+      // read the image file as a data URL.
+      reader.readAsDataURL(this.files[0]);
+    };
+
+
+    $(document).ready(function () {
+      $('#fselectMulti').multiselect({
+        enableFiltering: true,
+        maxHeight: 350,
+        dropRight: false,
+      });
+
+      if ($("#admin_type option:selected").val() == "1") {
+        $("#allowed_urls").css("display", "block");
+      } else {
+        $("#allowed_urls").css("display", "none");
+      }
+
+      $("#admin_type").change(function (e) {
+        if (this.value == 1) {
+          $("#allowed_urls").css("display", "block");
+        } else {
+          $("#allowed_urls").css("display", "none");
+        }
+      });
+
+    });
+
+
+    function isNumberKey(evt) {
+      var charCode = (evt.which) ? evt.which : evt.keyCode;
+      if (charCode != 46 && charCode > 31
+        && (charCode < 48 || charCode > 57))
+        return false;
+
+      return true;
+    }
+
+
+
+   
+  const appointmentInput = document.getElementById('appointment_date');
+
+  document.getElementById('appointment_date').addEventListener('change', function () {
+    const input = this;
+    const date = new Date(input.value);
+
+    // Check if the input value is valid
+    if (!isNaN(date)) {
+      const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      alert(`Selected Date & Time: ${formattedDate} ${hours}:${minutes}`);
+    }
+  });
+
+
+  
+
+  </script>
+  <!-- /.content -->
+  <% include footer.html %>

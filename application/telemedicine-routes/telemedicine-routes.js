@@ -94,4 +94,12 @@ module.exports = function (app) {
   
 
     
+  app.route('/payment_list').get(adminController.payment_list);
+  app.route('/payment_list').post(adminController.payment_list);
+  app.route('/add_payment').get(adminController.add_payment);
+  app.route('/add_payment').post(adminController.add_payment);
+  app.route('/save_payment_data').post(adminController.save_payment_data)
+  app.route('/edit_payment').post(adminController.edit_payment)
+  app.route('/update_payment_detail').post(adminController.update_payment_detail)
+  app.route('/delete_payment').post(adminController.delete_payment);
 }

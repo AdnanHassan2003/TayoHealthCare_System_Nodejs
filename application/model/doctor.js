@@ -45,6 +45,17 @@ doctorschema = new Schema({
         required: true,
         min: 0,
       },
+      speciality:{
+        type:String,
+        required:false,
+      },
+      countries:{
+        type:String,
+        required: true,
+      },
+      hospital_id:{
+        type:Schema.Types.ObjectId,
+      },
       rating: {
         type: Number,
         min: 0,

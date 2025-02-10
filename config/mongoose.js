@@ -21,6 +21,7 @@ module.exports = function () {
     require("../application/model/patient"); 
     require("../application/model/appointment"); 
     require("../application/model/hospital"); 
+    require("../application/model/Payment"); 
     
     
 

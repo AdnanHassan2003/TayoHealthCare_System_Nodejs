@@ -4,6 +4,7 @@ var Doctor = require('mongoose').model('doctor')
 var Patient = require('mongoose').model('patient')
 var Appointment = require('mongoose').model('appointment')
 var Hospital = require('mongoose').model('hospital')
+var Payment = require('mongoose').model('payment')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -549,8 +550,36 @@ exports.doctor_list = function (req, res) {
             }
             Doctor.aggregate([
                 query_search,
-                sort
+                sort,
+
+                { $lookup:{
+                    from:"hospitals",
+                    localField:"hospital_id",
+                    foreignField:"_id",
+                    as:"data"
+                    }},
+                    
+                    
+                    {$unwind:"$data"},
+                    
+                    {$project:{
+                        _id:1,
+                        sequence_id:1,
+                        name:1,
+                        picture:1,
+                        phone:1,
+                        email:1,
+                        hospital_name:"$data.name",
+                        countries:1,
+                        speciality:1,
+                        experience_years:1,
+                        consultation_fee:1,
+                        status:1,
+                        create_date:1
+                        }}
+              
             ]).then((doctor)=>{
+
                 res.render('doctor_list', {
                     url_data: req.session.menu_array,
                     detail: doctor,
@@ -699,7 +728,8 @@ exports.appointment_list = function(req, res){
                     patient_name:"$patient_data.name",
                     sequence_id:1,
                     appointment_date:1,
-                    status:1
+                    status:1,
+                    create_date:1
                           
                     }}
             
@@ -752,6 +782,73 @@ exports.hospital_list = function (req, res) {
     })
 }
 
+
+
+
+exports.payment_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+       Doctor.find({}).then((doctor_data)=>{
+        Patient.find({}).then((patient_data)=>{
+        Payment.aggregate([
+
+            {$lookup:{
+                
+                from:"doctors",
+                localField:"doctor_id",
+                foreignField:"_id",
+                as:"doctor_data"
+            
+                }},
+                
+                {$unwind:"$doctor_data"},
+                
+                {$lookup:{
+                
+                from:"patients",
+                localField:"patient_id",
+                foreignField:"_id",
+                as:"patient_data"
+            
+                }},
+                
+                {$unwind:"$patient_data"},
+                
+                
+                {$project:{
+                    _id:1,
+                    doctor_name:"$doctor_data.name",
+                    patient_name:"$patient_data.name",
+                    sequence_id:1,
+                    amount:1,
+                    payment_method:1,
+                    status:1,
+                    create_date:1
+                          
+                    }}
+            
+            ]).then((payment_data)=>{
+
+                res.render('payment_list', {
+                    url_data: req.session.menu_array,
+                    detail: payment_data,
+                    patient_data:patient_data,
+                    doctor_data:doctor_data,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+
+            })
+
+        })
+
+       })
+            
+
+        }
+    })
+}
 
 //---------------------------------------------------------------------------------------------------
 
@@ -828,14 +925,17 @@ exports.add_user = function (req, res) {
 exports.add_doctor = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
+            Hospital.find({}).then((hospital)=>{
             res.render("add_doctor",
                 {
                     systen_urls: systen_urls, 
                     msg: req.session.error,
+                    hospital_data:hospital,
                     url_data: req.session.menu_array,
                     moment: moment,
                     admin_type: req.session.admin.usertype
                 })
+            })
         } else {
             Utils.redirect_login(req, res);
         }
@@ -859,10 +959,12 @@ exports.add_patient = function (req, res) {
                     moment: moment,
                     admin_type: req.session.admin.usertype
                 })
+            
         } else {
             Utils.redirect_login(req, res);
         }
     });
+    
 };
 
 
@@ -911,6 +1013,33 @@ exports.add_hospital = function (req, res) {
                     moment: moment,
                     admin_type: req.session.admin.usertype
                 })
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+/// Add a patient
+exports.add_payment = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Doctor.find({}).then((doctor_array)=>{
+            Patient.find({}).then((patient_array)=>{
+                res.render("add_payment",
+                    {
+                        systen_urls: systen_urls,
+                        msg: req.session.error,
+                        url_data: req.session.menu_array,
+                        moment: moment,
+                        admin_type: req.session.admin.usertype,
+                        doctor_data:doctor_array,
+                        patient_data:patient_array
+                    })
+                })
+            })
+           
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1134,6 +1263,9 @@ exports.save_doctor_data = function (req, res) {
                             email: req.body.email,
                             consultation_fee:req.body.consultation_fee,
                             experience_years:req.body.experience_years,
+                            speciality:req.body.speciality,
+                            countries:req.body.countries,
+                            hospital_id:req.body.hospital_id,
                             license_number:Utils.get_unique_id(),
                             phone: req.body.phone,
                             status: 1,
@@ -1330,6 +1462,35 @@ exports.save_hospital_data = function (req, res) {
 
 };
 
+
+exports.save_payment_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+           
+                        var amount = req.body.amount
+                        var payment = new Payment({
+                            amount: amount,
+                            sequence_id: Utils.get_unique_id(),
+                            doctor_id:req.body.doctor_id,
+                            patient_id:req.body.patient_id,
+                            status: "Paid",
+                            payment_method:"EVC-Plus"
+                            
+                        });
+                
+                        payment.save().then((admin) => {
+                            req.session.error = "Congrates, payment was created successfully.........";
+                            res.redirect("/payment_list");
+                        });
+ 
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1379,13 +1540,23 @@ exports.edit_doctor = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
             Doctor.findOne({ _id: req.body.doctor_id }, { password: 0 }).then((doctor) => {
+                Hospital.find({}).then((hospital)=>{
+
                 if (doctor) {
                     // console.log(admin)
-                    res.render("add_doctor", { doctor_data: doctor, systen_urls: systen_urls })
+                    res.render("add_doctor",
+                         { 
+                            doctor_data: doctor,
+                            systen_urls: systen_urls,
+                            Hospital:hospital,
+                            hospital_id:doctor.hospital_id.toString()
+                    
+                        })
                 } else {
                     res.redirect("/doctor_list")
                 }
             });
+        })
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1464,6 +1635,44 @@ exports.edit_hospital = function (req, res) {
                 } else {
                     res.redirect("/hospital_list")
                 }
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+
+exports.edit_payment = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Payment.findOne({ _id: req.body.payment_id }, { password: 0 }).then((payment) => {
+                console.log("data_appointment", payment)
+                Doctor.find({}).then((doctor)=>{
+                    Patient.find({}).then((patient)=>{
+
+                        if (payment) {
+                
+                            res.render("add_payment", 
+                                { payment_data: payment,
+                                  Doctor:doctor,
+                                  Patient:patient,
+                                  doctor_id: payment.doctor_id.toString(),
+                                  patient_id:payment.patient_id.toString(),
+                                  systen_urls: systen_urls,
+                                  moment: moment 
+                                
+                                })
+                        } else {
+                            res.redirect("/payment_list")
+                        }
+
+                    })
+                })
+
             });
         } else {
             Utils.redirect_login(req, res);
@@ -1756,6 +1965,51 @@ exports.update_hospital_detail = function (req, res) {
     });
 };
 
+
+
+
+
+exports.update_payment_detail = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            var profile_file = req.files;
+            // req.body.name = req.body.name.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ');
+            if (profile_file == '' || profile_file == 'undefined') {
+                Payment.findByIdAndUpdate(req.body.payment_id, req.body, { useFindAndModify: false }).then((data) => {
+                    if (data._id.equals(req.session.admin.payment_id)) {
+                        Utils.redirect_login(req, res);
+                    } else {
+                        res.redirect("/payment_list");
+                    }
+                }, (err) => {
+                    res.redirect("/payment_list");
+                });
+            } else {
+                Payment.findById(req.body.payment_id).then((user) => {
+                    if (user.picture) {
+                        Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+                    }
+                    var image_name = user._id + Utils.tokenGenerator(4);
+                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
+                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
+                    req.body.picture = url;
+                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                    Payment.findByIdAndUpdate(req.body.payment_id, req.body, { useFindAndModify: false }).then((data) => {
+                        if (data._id.equals(req.session.admin.payment_id)) {
+                            Utils.redirect_login(req, res);
+                        } else {
+                            res.redirect("/payment_list");
+                        }
+                    }, (err) => {
+                        res.redirect("/payment_list");
+                    });
+                });
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1851,6 +2105,18 @@ exports.delete_hospital = function (req, res) {
         if (response.success) {
             Hospital.deleteOne({ _id: req.body.hospital_id }).then((user) => {
                 res.redirect("/hospital_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+exports.delete_payment = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Payment.deleteOne({ _id: req.body.payment_id }).then((user) => {
+                res.redirect("/payment_list")
             });
         } else {
             Utils.redirect_login(req, res);

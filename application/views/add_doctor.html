@@ -75,6 +75,44 @@
                         <input type="email" id="email" name="email" class="form-control" value="<%= doctor_data.email %>"
                           required>
                       </div> 
+                      <div class="form-group" name = "doctor">
+                        <label for="hospital_id">
+                          Hospital
+                        </label>
+                        <select class="form-control custom-select"  id="hospital_id" name="hospital_id" required>
+                          <option value=""> All</option>
+                          <% if(Hospital.length > 0){  %>
+                          
+                            <% Hospital.forEach(function(data){%>
+                
+    
+                              <%if(hospital_id == data._id){%>
+                                
+                                <option value="<%=data._id%>"  selected><%=data.name%></option>
+                                
+                              <%}else{%>
+                                <option value="<%=data._id%>"  ><%=data.name%></option>
+                              <%}%>
+                             
+                               
+                        <%})%>
+                        <%}%>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="name">
+                          Country
+                        </label>
+                        <input type="text" id="countries" name="countries" style="text-transform: capitalize;" class="form-control"
+                          value="<%= doctor_data.countries %>" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="name">
+                          Speciality
+                        </label>
+                        <input type="text" id="speciality" name="speciality" style="text-transform: capitalize;" class="form-control"
+                          value="<%= doctor_data.speciality %>" required>
+                      </div>
                       <div class="form-group">
                         <label for="experience_years">
                             Experience Years
@@ -185,6 +223,32 @@
                           <%= process.env.email %>
                         </label>
                         <input type="email" id="email" name="email" class="form-control" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="doctor_id">
+                          Hospital
+                        </label>
+                        <select class="form-control custom-select2" id="hospital_id" name="hospital_id" required>
+                            <% if(hospital_data.length > 0){  %>
+                              <option>Select Hospital</option>
+                              <% hospital_data.forEach(function(data){%>
+                               
+                          <option value="<%=data._id%>"  ><%=data.name%></option>
+                          <%})%>
+                          <%}%>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="countries">
+                          Country
+                        </label>
+                        <input type="text" id="countries" name="countries" class="form-control" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="speciality">
+                          Speciality
+                        </label>
+                        <input type="text" id="speciality" name="speciality" class="form-control" required>
                       </div>
                       <div class="form-group">
                         <label for="consultation_fee">
