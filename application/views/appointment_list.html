@@ -51,17 +51,77 @@
               <form style="background-color: #ffffff; padding: 10px; margin-bottom:10px;" class="form-data" role="form"
                 method="post" action="/appointment_list">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="status">
+                            Status
+                          </label>
+                          <select class="form-control custom-select" id="status" name="status">
+                            <%if(status == 0){%>
+                              <option value="ALL"  >All</option>
+                              <option value="0" selected> Pending</option>
+                              <option value="1"> Confirmed</option>
+                              <option value="2" selected> Completed</option>
+                              <option value="3"> Cancelled</option>
+                              
+                            <%}else if(status == 1){%>
+                              <option value="ALL"  >All</option>
+                              <option value="0"> Pending</option>
+                              <option value="1" selected> Confirmed</option>
+                              <option value="2"> Completed</option>
+                              <option value="3"> Cancelled</option>
+      
+                            <%}else if(status == 2){%>
+                              <option value="ALL"  >All</option>
+                              <option value="0"> Pending</option>
+                              <option value="1"> Confirmed</option>
+                              <option value="2" selected> Completed</option>
+                              <option value="3"> Cancelled</option>
+
+                            <%}else if(status == 3){%>
+                              <option value="ALL"  >All</option>
+                              <option value="0"> Pending</option>
+                              <option value="1"> Confirmed</option>
+                              <option value="2"> Completed</option>
+                              <option value="3" selected> Cancelled</option>
+
+                            <%}else if(status=='ALL' || status==undefined) {%>
+                              <option value="ALL">All</option>
+                              <option value="0"> Pending</option>
+                              <option value="1"> Confirmed</option>
+                              <option value="2"> Completed</option>
+                              <option value="3"> Cancelled</option>
+                              
+                            <%}%> 
                 
-                      <div class="row">
+                          </select>
                       </div>
                     </div>
-                    <!-- /.col -->
                     <div class="col-md-2">
   
                     </div>
-
+                    <div class="col-md-3">
+  
+                    </div>
+                    <div class="col-md-4">
+                      <div style="text-align: center;">
+                        <label>
+                          <%= process.env.date_filter %>
+                        </label>
+                      </div>
+                      <div class="row">
+                        <div class="col-6">
+                          <input type="text" class="form-control datepicker" placeholder="<%= process.env.start_date %>"
+                            value="<%= f_start_date %>" name="start_date" id="start_date">
+                        </div>
+                        <div class="col-6">
+                          <input type="text" class="form-control datepicker" placeholder="<%= process.env.end_date %>"
+                            value="<%= f_end_date %>" name="end_date" id="end_date">
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
                   <div class="row">
                     <div class="col-md-10" style="margin-top: 10px;">
                     </div>
@@ -128,15 +188,15 @@
                               
                               
                               <td>
-                                <% if (entry.status == "Pending") { %>
+                                <% if (entry.status == "0") { %>
                                   <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
                                     Pending
                                   </span>
-                                <% } else if (entry.status == "Confirmed") { %>
+                                <% } else if (entry.status == "1") { %>
                                   <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
                                     Confirmed
                                   </span>
-                                <% } else if (entry.status == "Completed") { %>
+                                <% } else if (entry.status == "2") { %>
                                   <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
                                     Completed
                                   </span>

@@ -32,45 +32,6 @@ var ObjectId = require('mongodb').ObjectID;
 
 
 
-
-
-exports.admin = function (req, res) {
-    Utils.check_admin_token(req.session.admin, function (response) {
-        if (response.success) {
-
-            Admin.aggregate([
-
-                {$group:{_id:null,
-                    Total_Admin:{$sum:1}}},
-                    
-                    
-                  {$project:{
-                      _id:0,
-                      Total_Admin:1
-                      
-                      
-                      }}
-                ]).then((totaladmin) => {
-                            res.render('home', {
-                                Totaladmin: totaladmin,
-                                url_data: req.session.menu_array,
-                                Totalsudents: 0,
-                                Totalcass: 0,
-                                Totalpayment: 0
-
-                            })
-            })
-
-        } else {
-            Utils.redirect_login(req, res);
-        }
-    });
-}
-
-
-
-
-
 ///// check admin credentiale /////
 exports.check_admin_login = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
@@ -91,7 +52,7 @@ exports.check_admin_login = function (req, res) {
               
                 if (!admin) {
                     req.session.error = process.env.user_not_registered;
-                    res.redirect("/admin")
+                    res.redirect("/")
                 } else {
                     if (!admin.comparePassword((req.body.password).toString())) {
                       //!admin.comparePassword((req.body.password).toString())
@@ -100,7 +61,7 @@ exports.check_admin_login = function (req, res) {
                         Admin.updateOne({ _id: admin._id }, { login_attempt_time: new Date(Date.now()), login_attempts: login_attempts }, { useFindAndModify: false }).then((Admin) => {
                         });
                         req.session.error = process.env.email_pass_invalid;
-                        res.redirect("/admin")
+                        res.redirect("/")
                     } else {
 
                         var token = Utils.tokenGenerator(36);
@@ -116,18 +77,6 @@ exports.check_admin_login = function (req, res) {
                         }
                         req.session.admin = admin_data;
                         Admin.updateOne({ _id: admin._id }, { token: token, last_login: new Date(Date.now()), login_attempts: 0 }, { useFindAndModify: false }).then((Adminn) => {
-
-                            Admin.aggregate([
-
-                                {$group:{_id:null,
-                                    Total_Admin:{$sum:1}}},
-                                     
-                                  {$project:{
-                                      _id:0,
-                                      Total_Admin:1
-                                       
-                                      }}
-                                ]).then((totaladmin) => {
                                               
                                             var match = {
                                                 $match: {
@@ -193,28 +142,98 @@ exports.check_admin_login = function (req, res) {
                                                 console.log("menu_array",menu_array)
                                                 req.session.menu_array = menu_array;
 
-                                            res.render('home', {
+                                                res.redirect("/dashboard")
 
-                                                url_data: req.session.menu_array,
-                                                Totaladmin: totaladmin,
-                                                Totalsudents: 0,
-                                                Totalcass: 0,
-                                                Totalpayment: 0
+                                                // url_data: req.session.menu_array,
+                                                // Totaladmin: totaladmin,
+                                                // Totalsudents: 0,
+                                                // Totalcass: 0,
+                                                // Totalpayment: 0
                                       
+                                // })
                                 })
-                                })
-                            })
+                            
                         })
                     }
                 }
             });
         } else {
-            res.render('home')
+            Utils.redirect_login(req, res);
         }
     });
 };
 
 
+
+
+
+exports.dashboard = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+
+            Admin.aggregate([
+
+                {$group:{_id:null,
+                    Total_Admin:{$sum:1}}},
+                    
+                    
+                  
+                ]).then((totaladmin) => {
+                   
+                        Doctor.aggregate([
+        
+                            {
+                                $group: {
+                                    _id: null,
+                                    Total_Doctor: { $sum: 1 }
+                                }
+                            }
+        
+        
+                    
+                        ]).then((totaldoctor) => {
+                            Patient.aggregate([
+        
+                                {
+                                    $group: {
+                                        _id: null,
+                                        Total_Patient: { $sum: 1 }
+                                    }
+                                }
+        
+        
+                        
+                            ]).then((totalpatient) => {
+                                Hospital.aggregate([
+        
+                                    {
+                                        $group: {
+                                            _id: null,
+                                            Total_Hospital: { $sum: 1 }
+                                        }
+                                    }
+        
+        
+                            
+                                ]).then((totalhospital) => {
+                            res.render('home', {
+                                TotalAdmin: totaladmin,
+                                TotalDoctor: totaldoctor,
+                                TotalPatient:totalpatient,
+                                TotalHospital:totalhospital,
+                                url_data: req.session.menu_array
+                                
+                            })
+                        })
+                    })
+                })
+            })
+
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+}
 
 
 
@@ -258,7 +277,7 @@ exports.list_admin = function (req, res) {
                 end_date = new Date(end_date)
             }
 
-            // var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+             var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
 
             f_start_date = moment(start_date).format("YYYY-MM-DD");
             f_end_date = moment(end_date).format("YYYY-MM-DD");
@@ -291,6 +310,7 @@ exports.list_admin = function (req, res) {
             //  query_search["$match"]["create_date"] = { $gte: start_date, $lte: end_date };
 
             Admin.aggregate([
+                date_filter,
                 query_search,
                 sort
             ]).then((admin_array) => {
@@ -548,6 +568,7 @@ exports.doctor_list = function (req, res) {
                     query_search["$match"][search_item] = search_value;
                 }
             }
+            
             Doctor.aggregate([
                 query_search,
                 sort,
@@ -583,7 +604,7 @@ exports.doctor_list = function (req, res) {
                 res.render('doctor_list', {
                     url_data: req.session.menu_array,
                     detail: doctor,
-                    msg: req.session.error,
+                    msg_success: req.session.success,
                     moment: moment,
                     admin_type: req.session.admin.usertype
                 });
@@ -695,9 +716,66 @@ exports.patient_list = function (req, res) {
 exports.appointment_list = function(req, res){
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
+
+            if (req.body.search_item == undefined) {
+                start_date = "";
+                end_date = "";
+            } else {
+                start_date = req.body.start_date;
+                end_date = req.body.end_date;
+            }
+            if (req.body.start_date == undefined && req.body.end_date == undefined) {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else if (req.body.start_date == "" || req.body.end_date == "") {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else {
+                var sdate = new Date(req.body.start_date);
+                start_date = sdate.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                var edate = new Date(req.body.end_date);
+                end_date = edate.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            }
+
+            var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+
+            f_start_date = moment(start_date).format("YYYY-MM-DD");
+            f_end_date = moment(end_date).format("YYYY-MM-DD");
+
+            //order by sequecy number
+            var sort = { "$sort": {} };
+            sort["$sort"]["_id"] = parseInt(-1);
+
+            var filter = {
+                $match: {},
+            };
+
+            var status = req.body.status
+            if (status != "ALL" && status != undefined && status != "") {
+                filter["$match"]["status"] = Number(status);
+            }
+
+
        Doctor.find({}).then((doctor_data)=>{
         Patient.find({}).then((patient_data)=>{
+            Appointment.find({}).then((appointment)=>{
+
+            
         Appointment.aggregate([
+            date_filter,
+            filter,
 
             {$lookup:{
                 
@@ -740,12 +818,17 @@ exports.appointment_list = function(req, res){
                     detail: appointment_data,
                     patient_data:patient_data,
                     doctor_data:doctor_data,
+                    appointment_data:appointment_data,
+                    appointment:appointment,
                     msg: req.session.error,
                     moment: moment,
-                    admin_type: req.session.admin.usertype
+                    admin_type: req.session.admin.usertype,
+                    //filters
+                    status: status
                 });
 
             })
+        })
 
         })
 
@@ -764,7 +847,77 @@ exports.hospital_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
-            Hospital.find({}).then((data_hospital)=>{
+            if (req.body.search_item == undefined) {
+                search_item = "sequence_id";
+                search_value = req.body.search_value;
+                start_date = "";
+                end_date = "";
+            } else {
+                search_item = req.body.search_item;
+                search_value = req.body.search_value;
+                start_date = req.body.start_date;
+                end_date = req.body.end_date;
+            }
+            if (req.body.start_date == undefined && req.body.end_date == undefined) {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else if (req.body.start_date == "" || req.body.end_date == "") {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else {
+                var sdate = new Date(req.body.start_date);
+                start_date = sdate.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                var edate = new Date(req.body.end_date);
+                end_date = edate.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            }
+
+            //var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+
+            f_start_date = moment(start_date).format("YYYY-MM-DD");
+            f_end_date = moment(end_date).format("YYYY-MM-DD");
+
+            //order by sequecy number
+            var sort = { "$sort": {} };
+            sort["$sort"]["_id"] = parseInt(-1);
+
+            //query search
+            var query_search = { "$match": {} };
+
+            if (search_item == 'email') {
+                if (search_value != undefined && search_value != '') {
+                    search_value = search_value.replace(/^\s+|\s+$/g, '');
+                    search_value = search_value.replace(/ +(?= )/g, '');
+                    query_search["$match"][search_item] = { $regex: new RegExp(search_value, 'i') };
+                }
+            } else if (search_item == 'phone') {
+                if (search_value != undefined && search_value != '') {
+                    search_value = search_value.replace(/\D/g, '');
+                    query_search["$match"][search_item] = { $regex: new RegExp(search_value, 'i') };
+                }
+            } else {
+                if (search_value != undefined && search_value != '') {
+                    query_search["$match"][search_item] = search_value;
+                }
+            }
+
+            Hospital.aggregate([
+                query_search,
+                sort,
+
+            ]).then((data_hospital)=>{
                 res.render('hospital_list', {
                     url_data: req.session.menu_array,
                     detail: data_hospital,
@@ -788,9 +941,61 @@ exports.hospital_list = function (req, res) {
 exports.payment_list = function(req, res){
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
+
+            if (req.body.search_item == undefined) {
+                start_date = "";
+                end_date = "";
+            } else {
+                start_date = req.body.start_date;
+                end_date = req.body.end_date;
+            }
+            if (req.body.start_date == undefined && req.body.end_date == undefined) {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else if (req.body.start_date == "" || req.body.end_date == "") {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else {
+                var sdate = new Date(req.body.start_date);
+                start_date = sdate.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                var edate = new Date(req.body.end_date);
+                end_date = edate.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            }
+
+            var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+
+            f_start_date = moment(start_date).format("YYYY-MM-DD");
+            f_end_date = moment(end_date).format("YYYY-MM-DD");
+
+            //order by sequecy number
+            var sort = { "$sort": {} };
+            sort["$sort"]["_id"] = parseInt(-1);
+
+            var filter = {
+                $match: {},
+            };
+            var status = req.body.status
+            if (status != "ALL" && status != undefined && status != "") {
+                filter["$match"]["status"] = Number(status);
+            }
+            
        Doctor.find({}).then((doctor_data)=>{
         Patient.find({}).then((patient_data)=>{
         Payment.aggregate([
+            date_filter,
+            filter,
 
             {$lookup:{
                 
@@ -836,7 +1041,9 @@ exports.payment_list = function(req, res){
                     doctor_data:doctor_data,
                     msg: req.session.error,
                     moment: moment,
-                    admin_type: req.session.admin.usertype
+                    admin_type: req.session.admin.usertype,
+                    //filters
+                    status:status
                 });
 
             })
@@ -1290,8 +1497,10 @@ exports.save_doctor_data = function (req, res) {
                             doctor.picture = liner;
                         }
                         doctor.save().then((admin) => {
-                            req.session.error = "Congrates, Admin was created successfully.........";
+                            req.session.success = "Congrates, Doctor was created successfully.........";
                             res.redirect("/doctor_list");
+                            
+                            
                         });
                     } else {
                         req.session.error = "Please use strong password that contains latrers and Digitals";
@@ -1389,7 +1598,7 @@ exports.save_appointment_data = function (req, res) {
                         var appointment = new Appointment({
                             reason: reason,
                             sequence_id: Utils.get_unique_id(),
-                            status: "Pending",
+                            status: 0,
                             doctor_id:req.body.doctor_id,
                             patient_id:req.body.patient_id,
                             appointment_date:req.body.appointment_date,
@@ -1474,7 +1683,7 @@ exports.save_payment_data = function (req, res) {
                             sequence_id: Utils.get_unique_id(),
                             doctor_id:req.body.doctor_id,
                             patient_id:req.body.patient_id,
-                            status: "Paid",
+                            status: 1,
                             payment_method:"EVC-Plus"
                             
                         });
@@ -1711,10 +1920,28 @@ exports.update_admin_details = function (req, res) {
                     if (admin.picture) {
                         Utils.deleteImageFromFolderTosaveNewOne(admin.picture, 1);
                     }
-                    var image_name = admin._id + Utils.tokenGenerator(4);
-                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
-                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
-                            req.body.picture = url;
+                   // Samee magaca sawirka cusub
+                   var image_name = admin._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                   var url = "./uploads/admin_profile/" + image_name;
+
+                   fs.readFile(req.files[0].path, function (err, data) {
+                       if (err) {
+                           console.error("Error reading file:", err);
+                           return res.redirect("/doctor_list");
+                       }
+
+                       fs.writeFile(url, data, 'binary', function (err) {
+                           if (err) {
+                               console.error("Error writing file:", err);
+                               return res.redirect("/doctor_list");
+                           }
+
+                           fs.unlink(req.files[0].path, function (err) {
+                               if (err) console.error("Error deleting temp file:", err);
+                           });
+
+                           // Cusbooneysii database
+                           req.body.picture = "admin_profile/" + image_name;
                     // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
                     Admin.findByIdAndUpdate(req.body.admin_id, req.body, { useFindAndModify: false }).then((data) => {
                         if (data._id.equals(req.session.admin.user_id)) {
@@ -1726,6 +1953,8 @@ exports.update_admin_details = function (req, res) {
                         res.redirect("/admin_list");
                     });
                 });
+            });
+        });
             }
         } else {
             Utils.redirect_login(req, res);
@@ -1786,25 +2015,46 @@ exports.update_doctor_detail = function (req, res) {
         if (response.success) {
             var profile_file = req.files;
             req.body.name = req.body.name.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ');
-            if (profile_file == '' || profile_file == 'undefined') {
+            if (!profile_file || profile_file.length === 0) {
                 Doctor.findByIdAndUpdate(req.body.doctor_id, req.body, { useFindAndModify: false }).then((data) => {
                     if (data._id.equals(req.session.admin.doctor_id)) {
                         Utils.redirect_login(req, res);
                     } else {
+                        req.session.success = "Congrates, Doctor was updated successfully.........";
                         res.redirect("/doctor_list");
                     }
                 }, (err) => {
                     res.redirect("/doctor_list");
                 });
             } else {
+                // frist one delete image kii hore
                 Doctor.findById(req.body.doctor_id).then((user) => {
                     if (user.picture) {
                         Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
                     }
-                    var image_name = user._id + Utils.tokenGenerator(4);
-                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
-                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
-                    req.body.picture = url;
+                    // Samee magaca sawirka cusub
+                    var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                    var url = "./uploads/admin_profile/" + image_name;
+
+                    fs.readFile(req.files[0].path, function (err, data) {
+                        if (err) {
+                            console.error("Error reading file:", err);
+                            return res.redirect("/doctor_list");
+                        }
+
+                        fs.writeFile(url, data, 'binary', function (err) {
+                            if (err) {
+                                console.error("Error writing file:", err);
+                                return res.redirect("/doctor_list");
+                            }
+
+                            fs.unlink(req.files[0].path, function (err) {
+                                if (err) console.error("Error deleting temp file:", err);
+                            });
+
+                            // Cusbooneysii database
+                            req.body.picture = "admin_profile/" + image_name;
+                    
                     // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
                     Doctor.findByIdAndUpdate(req.body.doctor_id, req.body, { useFindAndModify: false }).then((data) => {
                         if (data._id.equals(req.session.admin.doctor_id)) {
@@ -1813,8 +2063,13 @@ exports.update_doctor_detail = function (req, res) {
                             res.redirect("/doctor_list");
                         }
                     }, (err) => {
+                        
                         res.redirect("/doctor_list");
                     });
+                });
+                    
+            });
+                    
                 });
             }
         } else {
@@ -1822,7 +2077,6 @@ exports.update_doctor_detail = function (req, res) {
         }
     });
 };
-
 
 
 
@@ -1848,10 +2102,28 @@ exports.update_patient_detail = function (req, res) {
                     if (user.picture) {
                         Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
                     }
-                    var image_name = user._id + Utils.tokenGenerator(4);
-                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
-                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
-                    req.body.picture = url;
+                    // Samee magaca sawirka cusub
+                    var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                    var url = "./uploads/admin_profile/" + image_name;
+
+                    fs.readFile(req.files[0].path, function (err, data) {
+                        if (err) {
+                            console.error("Error reading file:", err);
+                            return res.redirect("/doctor_list");
+                        }
+
+                        fs.writeFile(url, data, 'binary', function (err) {
+                            if (err) {
+                                console.error("Error writing file:", err);
+                                return res.redirect("/doctor_list");
+                            }
+
+                            fs.unlink(req.files[0].path, function (err) {
+                                if (err) console.error("Error deleting temp file:", err);
+                            });
+
+                            // Cusbooneysii database
+                            req.body.picture = "admin_profile/" + image_name;
                     // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
                     Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
                         if (data._id.equals(req.session.admin.patient_id)) {
@@ -1863,6 +2135,8 @@ exports.update_patient_detail = function (req, res) {
                         res.redirect("/patient_list");
                     });
                 });
+            });
+         });
             }
         } else {
             Utils.redirect_login(req, res);
@@ -1943,10 +2217,28 @@ exports.update_hospital_detail = function (req, res) {
                     if (user.picture) {
                         Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
                     }
-                    var image_name = user._id + Utils.tokenGenerator(4);
-                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
-                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
-                    req.body.picture = url;
+                    // Samee magaca sawirka cusub
+                    var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                    var url = "./uploads/admin_profile/" + image_name;
+
+                    fs.readFile(req.files[0].path, function (err, data) {
+                        if (err) {
+                            console.error("Error reading file:", err);
+                            return res.redirect("/doctor_list");
+                        }
+
+                        fs.writeFile(url, data, 'binary', function (err) {
+                            if (err) {
+                                console.error("Error writing file:", err);
+                                return res.redirect("/doctor_list");
+                            }
+
+                            fs.unlink(req.files[0].path, function (err) {
+                                if (err) console.error("Error deleting temp file:", err);
+                            });
+
+                            // Cusbooneysii database
+                            req.body.picture = "admin_profile/" + image_name;
                     // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
                     Hospital.findByIdAndUpdate(req.body.hospital_id, req.body, { useFindAndModify: false }).then((data) => {
                         if (data._id.equals(req.session.admin.hospital_id)) {
@@ -1958,6 +2250,8 @@ exports.update_hospital_detail = function (req, res) {
                         res.redirect("/hospital_list");
                     });
                 });
+            });
+        });
             }
         } else {
             Utils.redirect_login(req, res);

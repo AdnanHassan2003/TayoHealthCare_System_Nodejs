@@ -106,58 +106,57 @@
                         <%=process.env.title_status %>
                       </label>
                       <select class="form-control custom-select" id="status" name="status" required>
-                        <% if(appointment_data.status=="Pending" ) { %>
-                          <option value="Pending" selected="selected">
+                        <% if(appointment_data.status=="0" ) { %>
+                          <option value="0" selected="selected">
                             Pending
                           </option>
-                          <option value="Confirmed">
+                          <option value="1">
                             Confirmed
                           </option>
-                          <option value="Completed">
+                          <option value="2">
                             Completed
                           </option>
-                          <option value="Cancelled">
+                          <option value="3">
                             Cancelled
                           </option>
-                          <% } else if(appointment_data.status=="Confirmed"){ %>
-                            <option value="Confirmed" selected="selected">
-                                Confirmed
-                            </option>
-                            <option value="Pending" >
+                          <% } else if(appointment_data.status=="1"){ %>
+                            <option value="0" >
                                 Pending
                             </option>
-                            <option value="Completed" >
+                            <option value="1" selected="selected">
+                              Confirmed
+                          </option>
+                            <option value="2" >
                                 Completed
                             </option>
-                            <option value="Cancelled" >
+                            <option value="3" >
                                 Cancelled
                             </option>
-                            <% } else if(appointment_data.status=="Completed") {%>
-                                <option value="Confirmed" >
-                                    Confirmed
-                                </option>
-                                <option value="Pending" >
+                            <% } else if(appointment_data.status=="2") {%>
+                                <option value="0" >
                                     Pending
                                 </option>
-                                <option value="Completed" selected="selected" >
+                                <option value="1" >
+                                  Confirmed
+                              </option>
+                                <option value="2" selected="selected" >
                                     Completed
                                 </option>
-                                <option value="Cancelled" >
+                                <option value="3" >
                                     Cancelled
                                 </option>
 
                                 <%} else {%>
-
-                                    <option value="Confirmed">
+                                  <option value="0">
+                                    Pending
+                                </option>
+                                    <option value="1">
                                         Confirmed
                                     </option>
-                                    <option value="Pending">
-                                        Pending
-                                    </option>
-                                    <option value="Completed">
+                                    <option value="2">
                                         Completed
                                     </option>
-                                    <option value="Cancelled" selected="selected" >
+                                    <option value="3" selected="selected" >
                                         Cancelled
                                     </option>
 

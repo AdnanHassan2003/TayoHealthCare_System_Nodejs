@@ -20,8 +20,8 @@ appointmentschema = new Schema({
         required: true
     },
     status: {
-        type: String,
-        default: 'Pending'
+        type: Number,
+        default: 0,
     },
     token: {
         type: String,

@@ -2,7 +2,8 @@ var adminController = require('../telemedicine-controller/telemedicine-controlle
 
 
 module.exports = function (app) {
-  app.route('/').get(adminController.admin);
+  app.route('/').get(adminController.dashboard);
+  app.route('/dashboard').get(adminController.dashboard);
   app.route('/admin').post(adminController.check_admin_login);
   app.route('/admin_list').get(adminController.list_admin);
   app.route('/admin_list').post(adminController.list_admin);

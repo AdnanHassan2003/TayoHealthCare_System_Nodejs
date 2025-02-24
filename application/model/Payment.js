@@ -23,8 +23,8 @@ paymentschema = new Schema({
         default:"EVC-Plus"
     },
     status: {
-        type: String,
-        default: 'Paid'
+        type: Number,
+        default: 0,
     },
     token: {
         type: String,

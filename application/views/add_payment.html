@@ -101,34 +101,34 @@
                         <%=process.env.title_status %>
                       </label>
                       <select class="form-control custom-select" id="status" name="status" required>
-                        <% if(payment_data.status=="Pending" ) { %>
-                          <option value="Pending" selected="selected">
+                        <% if(payment_data.status=="0" ) { %>
+                          <option value="0" selected="selected">
                             Pending
                           </option>
-                          <option value="Paid">
+                          <option value="1">
                             Paid
                           </option>
-                          <option value="Failed">
+                          <option value="2">
                             Failed
                           </option>
-                          <% } else if(payment_data.status=="Paid"){ %>
-                            <option value="Pending">
+                          <% } else if(payment_data.status=="1"){ %>
+                            <option value="0">
                                 Pending
                               </option>
-                              <option value="Paid" selected="selected">
+                              <option value="1" selected="selected">
                                 Paid
                               </option>
-                              <option value="Failed">
+                              <option value="2">
                                 Failed
                               </option>
                                 <%} else {%>
-                              <option value="Pending">
+                              <option value="0">
                                   Pending
                                </option>
-                               <option value="Paid">
+                               <option value="1">
                                    Paid
                                </option>
-                               <option value="Failed" selected="selected">
+                               <option value="2" selected="selected">
                                   Failed
                                 </option>
                                 <%}%>
