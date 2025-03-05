@@ -5,6 +5,7 @@ var Patient = require('mongoose').model('patient')
 var Appointment = require('mongoose').model('appointment')
 var Hospital = require('mongoose').model('hospital')
 var Payment = require('mongoose').model('payment')
+var Message = require('mongoose').model('message')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -1057,6 +1058,33 @@ exports.payment_list = function(req, res){
     })
 }
 
+
+
+
+
+
+exports.message_list = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Message.find({}).then((message_Array) => {
+
+
+                res.render('message_list', {
+                    url_data: req.session.menu_array,
+                    Message: message_Array,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+            })
+        } else {
+
+            Utils.redirect_login(req, res);
+        }
+    })
+}
+
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1252,6 +1280,27 @@ exports.add_payment = function (req, res) {
         }
     });
 };
+
+
+
+
+
+exports.add_message = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            res.render("add_message",
+                {
+                    systen_urls: systen_urls, msg: req.session.error,
+                    msg: req.session.error,
+                    url_data: req.session.menu_array,
+                    admin_type: req.session.admin.usertype
+                })
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
 
 
 
@@ -1693,6 +1742,57 @@ exports.save_payment_data = function (req, res) {
                             res.redirect("/payment_list");
                         });
  
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
+
+
+
+
+
+
+exports.save_message_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+            Patient.find({}).then((patient) => {
+                if (patient.length > 0) {
+                    patient.forEach(each_patient => {
+                        if (each_patient.token) {
+                            var data = {
+                                "title": req.body.title,
+                                "token": each_std.token,
+                                "message": req.body.message
+                            }
+                            Utils.send_notification(data, function (response) {
+
+
+                            })
+                        }
+
+                    })
+                }
+            })
+
+
+            var title = req.body.title
+            var message = new Message({
+                title: title,
+                message: req.body.message,
+                sequence_id: Utils.get_unique_id(),
+
+
+            });
+            message.save().then((admin) => {
+                req.session.error = "Congrates, Admin was created successfully.........";
+                res.redirect("/message_list");
+            });
+
+
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -2411,6 +2511,21 @@ exports.delete_payment = function (req, res) {
         if (response.success) {
             Payment.deleteOne({ _id: req.body.payment_id }).then((user) => {
                 res.redirect("/payment_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+////  delete message function
+exports.delete_message = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Message.deleteOne({ _id: req.body.message_id }).then((user) => {
+                res.redirect("/message_list")
             });
         } else {
             Utils.redirect_login(req, res);

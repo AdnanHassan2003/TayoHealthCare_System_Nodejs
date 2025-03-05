@@ -21,7 +21,7 @@ module.exports = function (app) {
 
 
 
-  
+
   app.route("/menu_list").get(adminController.menu_list)
   app.route("/menu_list").post(adminController.menu_list)
   app.route("/add_menu").post(adminController.add_menu)
@@ -40,7 +40,6 @@ module.exports = function (app) {
   app.route('/edit_user').post(adminController.edit_user)
   app.route('/update_user_detail').post(adminController.update_user_detail)
   app.route('/delete_user').post(adminController.delete_user);
-
 
 
 
@@ -84,6 +83,7 @@ module.exports = function (app) {
   
   
 
+
   app.route('/hospital_list').get(adminController.hospital_list);
   app.route('/hospital_list').post(adminController.hospital_list);
   app.route('/add_hospital').get(adminController.add_hospital);
@@ -94,7 +94,9 @@ module.exports = function (app) {
   app.route('/delete_hospital').post(adminController.delete_hospital);
   
 
-    
+  
+  
+
   app.route('/payment_list').get(adminController.payment_list);
   app.route('/payment_list').post(adminController.payment_list);
   app.route('/add_payment').get(adminController.add_payment);
@@ -103,4 +105,18 @@ module.exports = function (app) {
   app.route('/edit_payment').post(adminController.edit_payment)
   app.route('/update_payment_detail').post(adminController.update_payment_detail)
   app.route('/delete_payment').post(adminController.delete_payment);
+
+
+
+
+
+  app.route('/message_list').get(adminController.message_list)
+  app.route('/message_list').post(adminController.message_list)
+  app.route('/add_message').get(adminController.add_message)
+  app.route('/add_message').post(adminController.add_message)
+  app.route('/save_message_data').post(adminController.save_message_data)
+  app.route('/delete_message').post(adminController.delete_message);  
+
+
+  
 }
