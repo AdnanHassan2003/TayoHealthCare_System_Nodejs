@@ -118,5 +118,18 @@ module.exports = function (app) {
   app.route('/delete_message').post(adminController.delete_message);  
 
 
+
+
+
+  app.route('/feedback_list').get(adminController.feedback_list);
+  app.route('/feedback_list').post(adminController.feedback_list);
+  app.route('/add_feedback').get(adminController.add_feedback);
+  app.route('/add_feedback').post(adminController.add_feedback);
+  app.route('/save_feedback_data').post(adminController.save_feedback_data)
+  app.route('/edit_feedback').post(adminController.edit_feedback)
+  app.route('/update_feedback_detail').post(adminController.update_feedback_detail)
+  app.route('/delete_feedback').post(adminController.delete_feedback);
+
+
   
 }

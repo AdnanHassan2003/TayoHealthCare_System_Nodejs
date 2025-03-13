@@ -6,6 +6,7 @@ var Appointment = require('mongoose').model('appointment')
 var Hospital = require('mongoose').model('hospital')
 var Payment = require('mongoose').model('payment')
 var Message = require('mongoose').model('message')
+var Feedback = require('mongoose').model('feedback')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -1085,6 +1086,137 @@ exports.message_list = function (req, res) {
 }
 
 
+
+
+
+
+exports.feedback_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+
+            if (req.body.search_item == undefined) {
+                start_date = "";
+                end_date = "";
+            } else {
+                start_date = req.body.start_date;
+                end_date = req.body.end_date;
+            }
+            if (req.body.start_date == undefined && req.body.end_date == undefined) {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else if (req.body.start_date == "" || req.body.end_date == "") {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else {
+                var sdate = new Date(req.body.start_date);
+                start_date = sdate.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                var edate = new Date(req.body.end_date);
+                end_date = edate.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            }
+
+            var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+
+            f_start_date = moment(start_date).format("YYYY-MM-DD");
+            f_end_date = moment(end_date).format("YYYY-MM-DD");
+
+            //order by sequecy number
+            var sort = { "$sort": {} };
+            sort["$sort"]["_id"] = parseInt(-1);
+
+            var filter = {
+                $match: {},
+            };
+
+            var status = req.body.status
+            if (status != "ALL" && status != undefined && status != "") {
+                filter["$match"]["status"] = Number(status);
+            }
+
+
+       Doctor.find({}).then((doctor_data)=>{
+        Patient.find({}).then((patient_data)=>{
+            Feedback.find({}).then((feedback)=>{
+
+            
+        Feedback.aggregate([
+            // date_filter,
+            // filter,
+
+            {$lookup:{
+                
+                from:"doctors",
+                localField:"doctor_id",
+                foreignField:"_id",
+                as:"doctor_data"
+            
+                }},
+                
+                {$unwind:"$doctor_data"},
+                
+                {$lookup:{
+                
+                from:"patients",
+                localField:"patient_id",
+                foreignField:"_id",
+                as:"patient_data"
+            
+                }},
+                
+                {$unwind:"$patient_data"},
+                
+                
+                {$project:{
+                    _id:1,
+                    doctor_name:"$doctor_data.name",
+                    patient_name:"$patient_data.name",
+                    sequence_id:1,
+                    rating:1,
+                    comments:1,
+                    create_date:1
+                          
+                    }}
+            
+            ]).then((feedback_data)=>{
+                console.log("feedback", feedback_data)
+
+                res.render('feedback_list', {
+                    url_data: req.session.menu_array,
+                    detail: feedback_data,
+                    patient_data:patient_data,
+                    doctor_data:doctor_data,
+                    
+                    feedback:feedback,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype,
+                    //filters
+                    status: status
+                });
+
+            })
+        })
+
+        })
+
+       })
+            
+
+        }
+    })
+}
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1303,6 +1435,31 @@ exports.add_message = function (req, res) {
 
 
 
+
+/// Add a patient
+exports.add_feedback = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Doctor.find({}).then((doctor_array)=>{
+            Patient.find({}).then((patient_array)=>{
+                res.render("add_feedback",
+                    {
+                        systen_urls: systen_urls,
+                        msg: req.session.error,
+                        url_data: req.session.menu_array,
+                        moment: moment,
+                        admin_type: req.session.admin.usertype,
+                        doctor_data:doctor_array,
+                        patient_data:patient_array
+                    })
+                })
+            })
+           
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 
 //---------------------------------------------------------------------------------------------------
 
@@ -1800,6 +1957,36 @@ exports.save_message_data = function (req, res) {
 
 };
 
+
+
+
+
+exports.save_feedback_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+           
+                        var comments = req.body.comments
+                        var feedback = new Feedback({
+                            comments: comments,
+                            sequence_id: Utils.get_unique_id(),
+                            doctor_id:req.body.doctor_id,
+                            patient_id:req.body.patient_id,
+                            rating:req.body.rating,
+                        });
+                
+                        feedback.save().then((admin) => {
+                            req.session.error = "Congrates, feedback was created successfully........";
+                            res.redirect("/feedback_list");
+                        });
+ 
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1977,6 +2164,44 @@ exports.edit_payment = function (req, res) {
                                 })
                         } else {
                             res.redirect("/payment_list")
+                        }
+
+                    })
+                })
+
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+
+exports.edit_feedback = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Feedback.findOne({ _id: req.body.feedback_id }, { password: 0 }).then((feedback) => {
+                console.log("data_feedback", feedback)
+                Doctor.find({}).then((doctor)=>{
+                    Patient.find({}).then((patient)=>{
+
+                        if (feedback) {
+                
+                            res.render("add_feedback", 
+                                { feedback_data: feedback,
+                                  Doctor:doctor,
+                                  Patient:patient,
+                                  doctor_id: feedback.doctor_id.toString(),
+                                  patient_id:feedback.patient_id.toString(),
+                                  systen_urls: systen_urls,
+                                  moment: moment 
+                                
+                                })
+                        } else {
+                            res.redirect("/feedback_list")
                         }
 
                     })
@@ -2404,6 +2629,52 @@ exports.update_payment_detail = function (req, res) {
         }
     });
 };
+
+
+
+
+
+exports.update_feedback_detail = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            var profile_file = req.files;
+            // req.body.name = req.body.name.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ');
+            if (profile_file == '' || profile_file == 'undefined') {
+                Feedback.findByIdAndUpdate(req.body.feedback_id, req.body, { useFindAndModify: false }).then((data) => {
+                    if (data._id.equals(req.session.admin.feedback_id)) {
+                        Utils.redirect_login(req, res);
+                    } else {
+                        res.redirect("/feedback_list");
+                    }
+                }, (err) => {
+                    res.redirect("/feedback_list");
+                });
+            } else {
+                Feedback.findById(req.body.feedback_id).then((user) => {
+                    if (user.picture) {
+                        Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+                    }
+                    var image_name = user._id + Utils.tokenGenerator(4);
+                    var url = Utils.getImageFolderPath(1) + image_name + '.jpg';
+                    Utils.saveImageIntoFolder(req.files[0].path, image_name + '.jpg', 1);
+                    req.body.picture = url;
+                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                    Feedback.findByIdAndUpdate(req.body.feedback_id, req.body, { useFindAndModify: false }).then((data) => {
+                        if (data._id.equals(req.session.admin.feedback_id)) {
+                            Utils.redirect_login(req, res);
+                        } else {
+                            res.redirect("/feedback_list");
+                        }
+                    }, (err) => {
+                        res.redirect("/feedback_list");
+                    });
+                });
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -2526,6 +2797,22 @@ exports.delete_message = function (req, res) {
         if (response.success) {
             Message.deleteOne({ _id: req.body.message_id }).then((user) => {
                 res.redirect("/message_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+// delete message function
+exports.delete_feedback = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Feedback.deleteOne({ _id: req.body.feedback_id }).then((user) => {
+                res.redirect("/feedback_list")
             });
         } else {
             Utils.redirect_login(req, res);
