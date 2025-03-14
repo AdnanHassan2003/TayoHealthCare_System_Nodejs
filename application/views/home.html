@@ -60,7 +60,16 @@
                       <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;"><%= TotalAdmin[0].Total_Admin %></strong>    
                 </div>
             </div>
-            <%}%>
+            <%} else {%>
+              <div class="card " style="width: 280px; height: 160px; margin-left: 30px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
+                <div class="card-body">   
+                    <img class="card-img-top " style="width: 50px; margin-left: 55px;" src="user.png" class="rounded-circle" alt="Card image">
+                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Admin</strong></h1>
+                    <br>
+                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>    
+                </div>
+            </div>
+              <%}%>
 
             <% if(TotalDoctor.length > 0) {%>
             <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
@@ -72,7 +81,16 @@
                 </div>
             </div>
 
-            <%}%>
+            <%}else {%>
+              <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
+                <div class="card-body">
+                    <img class="card-img-top" style="width: 50px; margin-left: 22%;" src="doctors1.png" class="rounded-circle" alt="Card image">
+                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Doctor</strong></h1>
+                    <br>
+                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>   
+                </div>
+            </div>
+              <%}%>
 
            <% if(TotalPatient.length >0) {%>
             
@@ -84,7 +102,16 @@
                       <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;"><%= TotalPatient[0].Total_Patient %></strong>
               </div>
           </div>
-          <%}%>
+          <%}else {%>
+            <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
+              <div class="card-body">
+                  <img class="card-img-top" style="width: 50px; margin-left: 20%;" src="patient.png" class="rounded-circle" alt="Card image">
+                  <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Patient</strong></h1>
+                  <br>
+                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>
+              </div>
+          </div>
+            <%}%>
 
 
           <% if(TotalHospital.length >0) {%>
@@ -96,7 +123,16 @@
                         <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;"><%= TotalHospital[0].Total_Hospital %></strong>
                 </div>
             </div>
-            <%}%>
+            <%}else {%>
+              <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
+                <div class="card-body">
+                    <img class="card-img-top" style="width: 50px; margin-left: 15%;" src="classs.png" class="rounded-circle" alt="Card image">
+                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Hospital</strong></h1>
+                    <br>
+                        <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>
+                </div>
+            </div>
+              <%}%>
           
         </div>
 
