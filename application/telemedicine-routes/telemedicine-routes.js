@@ -131,5 +131,19 @@ module.exports = function (app) {
   app.route('/delete_feedback').post(adminController.delete_feedback);
 
 
+
+
+
+
+
+
+  // All Apis That Use Our Telemedicine Application
+  app.route('/login_DoctorAndPatient').post(adminController.login_DoctorAndPatient);
+  app.route('/register_Patient').post(adminController.register_Patient)
+  app.route('/getAll_Doctors').post(adminController.getAll_Doctors);
+  app.route('/appointements').post(adminController.appointements);
+  app.route('/booking_Appointement').post(adminController.booking_Appointement);
+  app.route('/payPayement').post(adminController.payPayement);
   
+
 }

@@ -2972,3 +2972,315 @@ exports.admn_change_admin_pass = function (req, res) {
 
 
 
+//---------------------------------------------------------------------------------------------------
+
+
+  // All Apis That Use Our Telemedicine Application
+
+
+
+
+//Api login doctor and patient information
+exports.login_DoctorAndPatient = function(req, res){
+    if(req.body.type == "0"){
+        Doctor.findOne({
+            email: req.body.email,
+            password:req.body.password
+        }).then((doctor) => {
+            if(doctor){
+                res.send({
+                    success:true,
+                    message:"Successfully to Login Doctor",
+                    record:doctor
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Invalid Email or Password for Doctor",
+                })
+            }
+        });
+    }
+    else if(req.body.type == "1"){
+        Patient.findOne({
+            email: req.body.email,
+            password:req.body.password
+        }).then((patient) => {
+            if(patient){
+                res.send({
+                    success:true,
+                    message:"Successfully to Login Patient",
+                    record:patient
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Invalid Email or Password for Patient"
+                })
+            }
+        });
+    }
+}
+
+
+
+  //Api registration patient
+exports.register_Patient = function (req, res) {
+        console.log("body", req.body)
+            Patient.findOne({ "phone": req.body.phone }).then((patient) => {
+                console.log("user", patient)
+                if (patient) {
+                    res.send({
+                        success:false,
+                        message:"Sorry, There is an patient with this phone, please check the phone",
+                    })
+                } else {
+                    // Create a schema
+                    var schema = new passwordValidator();
+                    schema.is().min(8)                                 // Minimum length 8
+                        .is().max(30)                                  // Maximum length 100
+                        .has().lowercase()                             // Must have lowercase letters
+                        .has().digits()                                // Must have at least 2 digits
+                        .has().not().spaces();                         // Blacklist these values
+                    // Validate against a password string
+                    if (schema.validate(req.body.password)) {
+                        var profile_file = req.files;
+                        var name = req.body.name
+                        var patient = new Patient({
+                            name: name,
+                            sequence_id: Utils.get_unique_id(),
+                            email: req.body.email,
+                            address:req.body.address,
+                            gender:req.body.gender,
+                            age:req.body.age,
+                            license_number:Utils.get_unique_id(),
+                            phone: req.body.phone,
+                            status: 1,
+                            extra_detail: req.body.extra_detail,
+                            picture: "",
+                            user_name: req.body.user_name,
+                            PassWord: req.body.password,
+                            password: Bcrypt.hashSync(req.body.password, 10)
+                        });
+                        if (profile_file != undefined && profile_file.length > 0) {
+                            image_name = Utils.tokenGenerator(29) + '.jpg';
+                            url = "./uploads/admin_profile/" + image_name;
+                            liner = "admin_profile/" + image_name;
+
+                            fs.readFile(req.files[0].path, function (err, data) {
+                                fs.writeFile(url, data, 'binary', function (err) { });
+                                fs.unlink(req.files[0].path, function (err, file) {
+
+                                });
+                            });
+
+                            patient.picture = liner;
+                        }
+                        patient.save().then((patient) => {
+
+                            res.send({
+                                success:true,
+                                message:"patient was created successfully",
+                                record:patient
+                            })
+                        });
+                    } else {
+                        res.send({
+                            success:false,
+                            message:"Please use strong password that contains latrers and Digitals",
+                        })
+                    }
+                }
+            })
+
+};
+
+
+
+//Api get all doctors information
+exports.getAll_Doctors = function(req, res){
+    Doctor.aggregate([
+    
+        { $lookup:{
+            from:"hospitals",
+            localField:"hospital_id",
+            foreignField:"_id",
+            as:"data"
+            }},
+            
+            
+            {$unwind:"$data"},
+            
+            {$project:{
+                _id:1,
+                sequence_id:1,
+                name:1,
+                picture:1,
+                phone:1,
+                email:1,
+                hospital_name:"$data.name",
+                countries:1,
+                speciality:1,
+                experience_years:1,
+                consultation_fee:1,
+                status:1,
+                create_date:1
+                }}
+      
+    ]).then((doctor)=>{
+
+        if(doctor){
+
+            res.send({
+                success:true,
+                message:"Successfully to fetch All Doctors",
+                record:doctor
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch All Doctors"
+            })
+
+        }
+
+
+    })
+}
+
+
+
+
+//Api get all appointments for the specified doctor
+exports.appointements = function(req, res){
+        Appointment.aggregate([
+
+            {
+                $match: {
+                    "patient_id": ObjectId(req.body.patient_id)
+                }
+            },
+
+            {$lookup:{
+                
+                from:"doctors",
+                localField:"doctor_id",
+                foreignField:"_id",
+                as:"doctor_data"
+            
+                }},
+                
+                {$unwind:"$doctor_data"},
+                
+                {$lookup:{
+                
+                from:"patients",
+                localField:"patient_id",
+                foreignField:"_id",
+                as:"patient_data"
+            
+                }},
+                
+                {$unwind:"$patient_data"},
+                
+                
+                {$project:{
+                    _id:1,
+                    doctor_name:"$doctor_data.name",
+                    patient_name:"$patient_data.name",
+                    sequence_id:1,
+                    appointment_date:1,
+                    status:1,
+                    create_date:1
+                          
+                    }}
+            
+            ]).then((appointment_data)=>{
+
+                if(appointment_data){
+
+                    res.send({
+                        success:true,
+                        message:"Successfully to fetch All Appointements",
+                        record:appointment_data
+                    })
+                }else{
+                    res.send({
+                        success:false,
+                        message:"Sorry! to fetch Appointements"
+                    })
+        
+                }
+
+
+            })
+            
+}
+
+
+//Api booking appointments for the doctor
+exports.booking_Appointement = function (req, res) {
+           
+                        var reason = req.body.reason
+                        var appointment = new Appointment({
+                            reason: reason,
+                            sequence_id: Utils.get_unique_id(),
+                            status: 0,
+                            doctor_id:req.body.doctor_id,
+                            patient_id:req.body.patient_id,
+                            appointment_date:req.body.appointment_date,
+                        });
+                
+                        appointment.save().then((bookingappointment) => {
+
+                            if(bookingappointment){
+                                res.send({
+                                    success:true,
+                                    message:"Successfully to book appointment",
+                                    record:bookingappointment
+                                })
+                            }
+                            else{
+                                res.send({
+                                    success:false,
+                                    message:"Sorry! to Book Appointment Failed"
+                                })
+                            }
+                        });
+};
+
+
+
+
+//Api pay payment doctor
+exports.payPayement = function (req, res) {
+           
+                        var amount = req.body.amount
+                        var payment = new Payment({
+                            amount: amount,
+                            sequence_id: Utils.get_unique_id(),
+                            doctor_id:req.body.doctor_id,
+                            patient_id:req.body.patient_id,
+                            status: 1,
+                            payment_method:"EVC-Plus"
+                            
+                        });
+                
+                        payment.save().then((admin) => {
+                            if(bookingappointment){
+                                res.send({
+                                    success:true,
+                                    message:"Successfully to Pay Payment",
+                                    record:bookingappointment
+                                })
+                            }
+                            else{
+                                res.send({
+                                    success:false,
+                                    message:"Sorry! to Pay Payment Failed"
+                                })
+                            }
+                        });
+
+};
+
