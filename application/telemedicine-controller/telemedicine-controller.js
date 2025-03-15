@@ -3097,56 +3097,125 @@ exports.register_Patient = function (req, res) {
 
 
 
-//Api get all doctors information
-exports.getAll_Doctors = function(req, res){
-    Doctor.aggregate([
+// //Api get all doctors information
+// exports.getAll_Doctors = function(req, res){
+//     Doctor.aggregate([
     
-        { $lookup:{
-            from:"hospitals",
-            localField:"hospital_id",
-            foreignField:"_id",
-            as:"data"
-            }},
+//         { $lookup:{
+//             from:"hospitals",
+//             localField:"hospital_id",
+//             foreignField:"_id",
+//             as:"data"
+//             }},
             
             
-            {$unwind:"$data"},
+//             {$unwind:"$data"},
             
-            {$project:{
-                _id:1,
-                sequence_id:1,
-                name:1,
-                picture:1,
-                phone:1,
-                email:1,
-                hospital_name:"$data.name",
-                countries:1,
-                speciality:1,
-                experience_years:1,
-                consultation_fee:1,
-                status:1,
-                create_date:1
-                }}
+//             {$project:{
+//                 _id:1,
+//                 sequence_id:1,
+//                 name:1,
+//                 picture:1,
+//                 phone:1,
+//                 email:1,
+//                 hospital_name:"$data.name",
+//                 countries:1,
+//                 speciality:1,
+//                 experience_years:1,
+//                 consultation_fee:1,
+//                 status:1,
+//                 create_date:1
+//                 }}
       
-    ]).then((doctor)=>{
+//     ]).then((doctor)=>{
 
-        if(doctor){
+//         if(doctor){
+
+//             res.send({
+//                 success:true,
+//                 message:"Successfully to fetch All Doctors",
+//                 record:doctor
+//             })
+//         }else{
+//             res.send({
+//                 success:false,
+//                 message:"Sorry! to fetch All Doctors"
+//             })
+
+//         }
+
+
+//     })
+// }
+
+
+exports.getAll_Doctors = async function(req, res) {
+    try {
+        let doctors = await Doctor.aggregate([
+            {
+                $lookup: {
+                    from: "hospitals",
+                    localField: "hospital_id",
+                    foreignField: "_id",
+                    as: "data"
+                }
+            },
+            { $unwind: "$data" },
+            {
+                $project: {
+                    _id: 1,
+                    sequence_id: 1,
+                    name: 1,
+                    picture: 1,
+                    phone: 1,
+                    email: 1,
+                    hospital_name: "$data.name",
+                    countries: 1,
+                    speciality: 1,
+                    experience_years: 1,
+                    consultation_fee: 1,
+                    status: 1,
+                    create_date: 1
+                }
+            }
+        ]);
+
+        if (doctors.length > 0) {
+            // Loop through each doctor and update their rating
+            for (let doctor of doctors) {
+                let feedbacks = await Feedback.find({ doctor_id: doctor._id });
+
+                // Calculate average rating
+                let totalRating = feedbacks.reduce((sum, feedback) => sum + feedback.rating, 0);
+                let averageRating = feedbacks.length > 0 ? totalRating / feedbacks.length : 0;
+
+                
+                // Update doctor's rating
+                await Doctor.updateOne({ _id: doctor._id }, { $set: { rating: averageRating } });
+
+                // // Add rating to response data
+                // doctor.rating = averageRating;
+                // Ensure only 1 decimal place
+                doctor.rating = parseFloat(averageRating.toFixed(1));
+
+            }
 
             res.send({
-                success:true,
-                message:"Successfully to fetch All Doctors",
-                record:doctor
-            })
-        }else{
+                success: true,
+                message: "Successfully fetched all doctors",
+                record: doctors
+            });
+        } else {
             res.send({
-                success:false,
-                message:"Sorry! to fetch All Doctors"
-            })
-
+                success: false,
+                message: "No doctors found"
+            });
         }
-
-
-    })
-}
+    } catch (error) {
+        console.error("Error in fetching doctors:", error);
+        res.status(500).send({ success: false, message: "Server error" });
+    }
+};
 
 
 
