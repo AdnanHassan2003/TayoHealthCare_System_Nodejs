@@ -3098,57 +3098,6 @@ exports.register_Patient = function (req, res) {
 
 
 // //Api get all doctors information
-// exports.getAll_Doctors = function(req, res){
-//     Doctor.aggregate([
-    
-//         { $lookup:{
-//             from:"hospitals",
-//             localField:"hospital_id",
-//             foreignField:"_id",
-//             as:"data"
-//             }},
-            
-            
-//             {$unwind:"$data"},
-            
-//             {$project:{
-//                 _id:1,
-//                 sequence_id:1,
-//                 name:1,
-//                 picture:1,
-//                 phone:1,
-//                 email:1,
-//                 hospital_name:"$data.name",
-//                 countries:1,
-//                 speciality:1,
-//                 experience_years:1,
-//                 consultation_fee:1,
-//                 status:1,
-//                 create_date:1
-//                 }}
-      
-//     ]).then((doctor)=>{
-
-//         if(doctor){
-
-//             res.send({
-//                 success:true,
-//                 message:"Successfully to fetch All Doctors",
-//                 record:doctor
-//             })
-//         }else{
-//             res.send({
-//                 success:false,
-//                 message:"Sorry! to fetch All Doctors"
-//             })
-
-//         }
-
-
-//     })
-// }
-
-
 exports.getAll_Doctors = async function(req, res) {
     try {
         let doctors = await Doctor.aggregate([
