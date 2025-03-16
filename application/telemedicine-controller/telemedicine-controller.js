@@ -3035,15 +3035,6 @@ exports.register_Patient = function (req, res) {
                         message:"Sorry, There is an patient with this phone, please check the phone",
                     })
                 } else {
-                    // Create a schema
-                    var schema = new passwordValidator();
-                    schema.is().min(8)                                 // Minimum length 8
-                        .is().max(30)                                  // Maximum length 100
-                        .has().lowercase()                             // Must have lowercase letters
-                        .has().digits()                                // Must have at least 2 digits
-                        .has().not().spaces();                         // Blacklist these values
-                    // Validate against a password string
-                    if (schema.validate(req.body.password)) {
                         var profile_file = req.files;
                         var name = req.body.name
                         var patient = new Patient({
@@ -3060,7 +3051,7 @@ exports.register_Patient = function (req, res) {
                             picture: "",
                             user_name: req.body.user_name,
                             PassWord: req.body.password,
-                            password: Bcrypt.hashSync(req.body.password, 10)
+                            password: Bcrypt.hashSync(req.body.PassWord, 10)
                         });
                         if (profile_file != undefined && profile_file.length > 0) {
                             image_name = Utils.tokenGenerator(29) + '.jpg';
@@ -3084,12 +3075,6 @@ exports.register_Patient = function (req, res) {
                                 record:patient
                             })
                         });
-                    } else {
-                        res.send({
-                            success:false,
-                            message:"Please use strong password that contains latrers and Digitals",
-                        })
-                    }
                 }
             })
 

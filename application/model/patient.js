@@ -32,7 +32,6 @@ patientschema = new Schema({
     },
     age: {
         type: Number,
-        required: true,
         min: 0
       },
       address: {
@@ -42,7 +41,6 @@ patientschema = new Schema({
       },
       gender: {
         type: String,
-        required: true,
       },
     token: {
         type: String,
