@@ -2981,54 +2981,6 @@ exports.admn_change_admin_pass = function (req, res) {
 
 
 //Api login doctor and patient information
-// exports.login_DoctorAndPatient = function(req, res){
-//     console.log("request",req.body);
-//     if(req.body.type == "0"){
-//         Doctor.findOne({
-//             email: req.body.email,
-//             PassWord:req.body.PassWord
-//         }).then((doctor) => {
-//             if(doctor){
-//                 res.send({
-//                     success:true,
-//                     message:"Successfully to Login Doctor",
-//                     record:doctor
-//                 })
-//             }else{
-//                 res.send({
-//                     success:false,
-//                     message:"Invalid Email or Password for Doctor",
-//                 })
-//             }
-//         });
-//     }
-//     else if(req.body.type == "1"){
-//         Patient.findOne({
-//             email: req.body.email,
-//             PassWord:req.body.PassWord
-//         }).then((patient) => {
-//             console.log("nkjndskjffccfg",patient)
-//             if(patient){
-//                 res.send({
-//                     success:true,
-//                     message:"Successfully to Login Patient",
-//                     record:patient
-//                 })
-//             }else{
-//                 res.send({
-//                     success:false,
-//                     message:"Invalid Email or Password for Patient"
-//                 })
-//             }
-//         });
-//     }
-// }
-
-
-
-
-
-
 exports.login_DoctorAndPatient = function(req, res){
         Doctor.findOne({ email: req.body.email,PassWord:req.body.PassWord}).then((doctor) => {
             if(doctor){
