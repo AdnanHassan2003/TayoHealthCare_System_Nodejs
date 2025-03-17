@@ -26,6 +26,7 @@ doctorschema = new Schema({
         required: true
     },
     password: String,
+    PassWord:String,
     status: {
         type: Number,
         default: 0
@@ -72,6 +73,9 @@ doctorschema = new Schema({
         type: Number,
         default: 0
     },
+    token: {
+      type: String
+  },
     picture: String,
     create_date: {
         type: Date,

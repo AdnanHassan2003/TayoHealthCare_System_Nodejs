@@ -2982,10 +2982,11 @@ exports.admn_change_admin_pass = function (req, res) {
 
 //Api login doctor and patient information
 exports.login_DoctorAndPatient = function(req, res){
+    console.log("request",req.body);
     if(req.body.type == "0"){
         Doctor.findOne({
             email: req.body.email,
-            password:req.body.password
+            PassWord:req.body.PassWord
         }).then((doctor) => {
             if(doctor){
                 res.send({
@@ -3004,8 +3005,9 @@ exports.login_DoctorAndPatient = function(req, res){
     else if(req.body.type == "1"){
         Patient.findOne({
             email: req.body.email,
-            password:req.body.password
+            PassWord:req.body.PassWord
         }).then((patient) => {
+            console.log("nkjndskjffccfg",patient)
             if(patient){
                 res.send({
                     success:true,
@@ -3050,7 +3052,7 @@ exports.register_Patient = function (req, res) {
                             extra_detail: req.body.extra_detail,
                             picture: "",
                             user_name: req.body.user_name,
-                            PassWord: req.body.password,
+                            PassWord: req.body.PassWord,
                             password: Bcrypt.hashSync(req.body.PassWord, 10)
                         });
                         if (profile_file != undefined && profile_file.length > 0) {
