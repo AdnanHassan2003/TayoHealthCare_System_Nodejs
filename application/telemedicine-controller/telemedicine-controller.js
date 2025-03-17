@@ -1682,6 +1682,7 @@ exports.save_doctor_data = function (req, res) {
                             license_number:Utils.get_unique_id(),
                             phone: req.body.phone,
                             status: 1,
+                            type:0,
                             extra_detail: req.body.extra_detail,
                             picture: "",
                             user_name: req.body.user_name,
@@ -1756,6 +1757,7 @@ exports.save_patient_data = function (req, res) {
                             license_number:Utils.get_unique_id(),
                             phone: req.body.phone,
                             status: 1,
+                            type:1,
                             extra_detail: req.body.extra_detail,
                             picture: "",
                             user_name: req.body.user_name,
@@ -2978,16 +2980,57 @@ exports.admn_change_admin_pass = function (req, res) {
   // All Apis That Use Our Telemedicine Application
 
 
-
-
 //Api login doctor and patient information
+// exports.login_DoctorAndPatient = function(req, res){
+//     console.log("request",req.body);
+//     if(req.body.type == "0"){
+//         Doctor.findOne({
+//             email: req.body.email,
+//             PassWord:req.body.PassWord
+//         }).then((doctor) => {
+//             if(doctor){
+//                 res.send({
+//                     success:true,
+//                     message:"Successfully to Login Doctor",
+//                     record:doctor
+//                 })
+//             }else{
+//                 res.send({
+//                     success:false,
+//                     message:"Invalid Email or Password for Doctor",
+//                 })
+//             }
+//         });
+//     }
+//     else if(req.body.type == "1"){
+//         Patient.findOne({
+//             email: req.body.email,
+//             PassWord:req.body.PassWord
+//         }).then((patient) => {
+//             console.log("nkjndskjffccfg",patient)
+//             if(patient){
+//                 res.send({
+//                     success:true,
+//                     message:"Successfully to Login Patient",
+//                     record:patient
+//                 })
+//             }else{
+//                 res.send({
+//                     success:false,
+//                     message:"Invalid Email or Password for Patient"
+//                 })
+//             }
+//         });
+//     }
+// }
+
+
+
+
+
+
 exports.login_DoctorAndPatient = function(req, res){
-    console.log("request",req.body);
-    if(req.body.type == "0"){
-        Doctor.findOne({
-            email: req.body.email,
-            PassWord:req.body.PassWord
-        }).then((doctor) => {
+        Doctor.findOne({ email: req.body.email,PassWord:req.body.PassWord}).then((doctor) => {
             if(doctor){
                 res.send({
                     success:true,
@@ -2995,35 +3038,24 @@ exports.login_DoctorAndPatient = function(req, res){
                     record:doctor
                 })
             }else{
-                res.send({
-                    success:false,
-                    message:"Invalid Email or Password for Doctor",
-                })
+                Patient.findOne({ email: req.body.email, PassWord:req.body.PassWord}).then((patient) => {
+                    if(patient){
+                        res.send({
+                            success:true,
+                            message:"Successfully to Login Patient",
+                            record:patient
+                        })
+                    }else{
+                        res.send({
+                            success:false,
+                            message:"Invalid Email or Password"
+                        })
+                    }
+                });
+              
             }
-        });
-    }
-    else if(req.body.type == "1"){
-        Patient.findOne({
-            email: req.body.email,
-            PassWord:req.body.PassWord
-        }).then((patient) => {
-            console.log("nkjndskjffccfg",patient)
-            if(patient){
-                res.send({
-                    success:true,
-                    message:"Successfully to Login Patient",
-                    record:patient
-                })
-            }else{
-                res.send({
-                    success:false,
-                    message:"Invalid Email or Password for Patient"
-                })
-            }
-        });
-    }
+        })
 }
-
 
 
   //Api registration patient
@@ -3049,6 +3081,7 @@ exports.register_Patient = function (req, res) {
                             license_number:Utils.get_unique_id(),
                             phone: req.body.phone,
                             status: 1,
+                            type:1,
                             extra_detail: req.body.extra_detail,
                             picture: "",
                             user_name: req.body.user_name,
