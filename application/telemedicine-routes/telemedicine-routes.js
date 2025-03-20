@@ -144,6 +144,7 @@ module.exports = function (app) {
   app.route('/appointements').post(adminController.appointements);
   app.route('/booking_Appointement').post(adminController.booking_Appointement);
   app.route('/payPayement').post(adminController.payPayement);
+  app.route('/getAll_Hospitals').post(adminController.getAll_Hospitals);
   
 
 }

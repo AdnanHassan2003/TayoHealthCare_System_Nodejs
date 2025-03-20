@@ -3274,3 +3274,21 @@ exports.payPayement = function (req, res) {
 
 };
 
+
+
+exports.getAll_Hospitals = function(req,res){
+    Hospital.find().then((hospital_data)=>{
+        if(hospital_data){
+            res.send({
+                success:true,
+                message:"Successfully to fetch All Hospitals",
+                record:hospital_data
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch Hospitals"
+            })
+        }
+    })
+}
