@@ -76,11 +76,13 @@ doctorschema = new Schema({
     token: {
       type: String
   },
+
+
     picture: String,
     create_date: {
         type: Date,
         default: Date.now
-    }
+    },
 });
 
 

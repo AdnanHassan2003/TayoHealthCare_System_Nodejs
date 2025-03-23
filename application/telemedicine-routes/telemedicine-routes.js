@@ -134,6 +134,13 @@ module.exports = function (app) {
 
 
 
+  app.route('/shifts_list').get(adminController.shifts_list);
+  app.route('/shifts_list').post(adminController.shifts_list);
+
+
+
+
+
 
 
 

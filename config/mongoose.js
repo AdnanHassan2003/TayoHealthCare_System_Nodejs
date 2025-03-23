@@ -24,7 +24,7 @@ module.exports = function () {
     require("../application/model/Payment"); 
     require("../application/model/message");
     require("../application/model/feedback");
-    
+    require("../application/model/shifts");
     
 
     return db;

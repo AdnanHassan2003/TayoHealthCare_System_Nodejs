@@ -262,6 +262,35 @@
                         </label>
                         <input type="number" id="experience_years" name="experience_years" class="form-control" required>
                       </div>
+                    
+                      <div class="form-group">
+                        <label>Availability</label>
+                        <div class="row">
+                          <% let days = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]; %>
+                          <% days.forEach(function(day) { %>
+                            <div class="col-md-4">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="availability[<%= day %>][day]" value="<%= day %>" id="<%= day %>">
+                                <label class="form-check-label" for="<%= day %>"><%= day %></label>
+                              </div>
+                      
+                              <!-- Time slots area -->
+                              <div class="time-slots" id="slots_<%= day %>" style="display: none;">
+                                <label>Time Slots</label>
+                                <div id="timeSlotsContainer_<%= day %>">
+                                  <div class="time-slot">
+                                    <input type="time" name="availability[<%= day %>][slots][0][start_time]" class="form-control">
+                                     <input type="time" name="availability[<%= day %>][slots][0][end_time]" class="form-control">
+
+                                    <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">- Rem</button>
+                                  </div>
+                                </div>
+                                <button type="button" class="btn btn-success add-slot" data-day="<%= day %>">+ Add</button>
+                              </div>
+                            </div>
+                          <% }); %>
+                        </div>
+                      </div>
                       
                       <div class="form-group">
                         <label for="user_name">
@@ -365,6 +394,66 @@
       slotsDiv.style.display = this.checked ? 'block' : 'none';
     });
   });
+
+  // Function to add new time slots
+  // document.querySelectorAll('.add-slot').forEach(button => {
+  //   button.addEventListener('click', function() {
+  //     let day = this.getAttribute('data-day');
+  //     let container = document.getElementById('timeSlotsContainer_' + day);
+  //     let newSlot = document.createElement('div');
+  //     newSlot.classList.add('time-slot');
+  //     newSlot.innerHTML = `
+  //       <input type="time" name="availability[${day}][start_time][]" class="form-control">
+  //       <input type="time" name="availability[${day}][end_time][]" class="form-control">
+  //       <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">-Rem</button>
+  //     `;
+  //     container.appendChild(newSlot);
+  //   });
+  // });
+
+
+
+  document.querySelectorAll('.add-slot').forEach(button => {
+    button.addEventListener('click', function() {
+        let day = this.getAttribute('data-day');
+        let container = document.getElementById('timeSlotsContainer_' + day);
+        let index = container.getElementsByClassName('time-slot').length;
+
+        let newSlot = document.createElement('div');
+        newSlot.classList.add('time-slot');
+        newSlot.innerHTML = `
+            <input type="time" name="availability[${day}][slots][${index}][start_time]" class="form-control">
+            <input type="time" name="availability[${day}][slots][${index}][end_time]" class="form-control">
+            <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">- Rem</button>
+        `;
+        container.appendChild(newSlot);
+    });
+});
+
+
+  // Function to remove a time slot
+  function removeSlot(button) {
+    button.parentElement.remove();
+  }
+
+
+
+//   document.querySelectorAll('.add-slot').forEach(button => {
+//     button.addEventListener('click', function() {
+//         let day = this.getAttribute('data-day');
+//         let container = document.getElementById('timeSlotsContainer_' + day);
+//         let index = container.getElementsByClassName('time-slot').length;
+
+//         let newSlot = document.createElement('div');
+//         newSlot.classList.add('time-slot');
+//         newSlot.innerHTML = `
+//             <input type="time" name="availability[${day}][slots][${index}][start_time]" class="form-control">
+//             <input type="time" name="availability[${day}][slots][${index}][end_time]" class="form-control">
+//             <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">- Rem</button>
+//         `;
+//         container.appendChild(newSlot);
+//     });
+// });
 
 
   </script>
