@@ -19,6 +19,9 @@ appointmentschema = new Schema({
         type: Date,
         required: true
     },
+    shifts_id: {
+        type: Schema.Types.ObjectId,
+    },
     status: {
         type: Number,
         default: 0,

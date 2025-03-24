@@ -136,7 +136,11 @@ module.exports = function (app) {
 
   app.route('/shifts_list').get(adminController.shifts_list);
   app.route('/shifts_list').post(adminController.shifts_list);
-
+  app.route('/add_shifts').get(adminController.add_shifts);
+  app.route('/add_shifts').post(adminController.add_shifts);
+  app.route('/save_shifts_data').post(adminController.save_shifts_data)
+  
+  
 
 
 
@@ -152,6 +156,7 @@ module.exports = function (app) {
   app.route('/booking_Appointement').post(adminController.booking_Appointement);
   app.route('/payPayement').post(adminController.payPayement);
   app.route('/getAll_Hospitals').post(adminController.getAll_Hospitals);
+  app.route('/shifts').post(adminController.shifts);
   
 
 }

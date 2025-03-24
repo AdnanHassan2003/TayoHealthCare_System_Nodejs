@@ -1511,6 +1511,32 @@ exports.add_feedback = function (req, res) {
     });
 };
 
+
+
+
+
+
+
+exports.add_shifts = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Doctor.find({}).then((doctor_array)=>{
+                res.render("add_shifts",
+                    {
+                        systen_urls: systen_urls,
+                        msg: req.session.error,
+                        url_data: req.session.menu_array,
+                        moment: moment,
+                        admin_type: req.session.admin.usertype,
+                        doctor_data:doctor_array,
+                    })
+            })
+           
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -2034,6 +2060,85 @@ exports.save_feedback_data = function (req, res) {
     });
 
 };
+
+
+
+
+
+function convertTo12HourFormat(time) {
+    if (!time || typeof time !== "string" || !time.includes(":")) {
+        console.error("Invalid time format received:", time);
+        return "Invalid Time"; // Handle invalid input
+    }
+
+    let [hours, minutes] = time.split(":").map(Number);
+    if (isNaN(hours) || isNaN(minutes)) {
+        console.error("Invalid time values:", time);
+        return "Invalid Time";
+    }
+
+    let period = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12; // Convert to 12-hour format (0 should become 12)
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+}
+
+
+
+exports.save_shifts_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, async function (response) {
+        console.log("body", req.body);
+        if (response.success) {
+            let doctor_id = req.body.doctor_id;
+            let extra_detail = req.body.extra_detail;
+            let sequence_id = Utils.get_unique_id();
+            let shiftsData = [];
+
+            if (req.body.availability) {
+                Object.keys(req.body.availability).forEach(day => {
+                    let slots = req.body.availability[day].slots || [];
+
+                    slots.forEach(slot => {
+                        if (!slot.time) {
+                            console.error(`Missing time for day: ${day}`);
+                            return;
+                        }
+
+                        let formattedTime = convertTo12HourFormat(slot.time); // Convert 24h to 12h format
+
+                        if (formattedTime === "Invalid Time") {
+                            console.error(`Skipping invalid time: ${slot.time}`);
+                            return;
+                        }
+
+                        shiftsData.push({
+                            sequence_id: sequence_id,
+                            doctor_id: doctor_id,
+                            day: day,
+                            time: formattedTime,
+                            status: 1,
+                            extra_detail: extra_detail
+                        });
+                    });
+                });
+
+                try {
+                    await Shifts.insertMany(shiftsData); // Save multiple records at once
+                    req.session.error = "Congrats, shifts were created successfully!";
+                    res.redirect("/shifts_list");
+                } catch (err) {
+                    console.error(err);
+                    res.status(500).send("Error saving shifts");
+                }
+            } else {
+                res.status(400).send("No availability data received");
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
 
 //---------------------------------------------------------------------------------------------------
 
@@ -3260,6 +3365,7 @@ exports.booking_Appointement = function (req, res) {
                             status: 0,
                             doctor_id:req.body.doctor_id,
                             patient_id:req.body.patient_id,
+                            shifts_id:req.body.shifts_id,
                             appointment_date:req.body.appointment_date,
                         });
                 
@@ -3334,3 +3440,135 @@ exports.getAll_Hospitals = function(req,res){
         }
     })
 }
+
+
+
+exports.shifts = function(req, res){
+    Shifts.aggregate([
+
+        {$match:{
+            "doctor_id" : ObjectId(req.body.doctor_id),
+            }
+            },
+            {
+                $match: {
+                    "day": "Saturday" // Match shifts where the day is Saturday
+                }
+            }
+        
+        ]).then((Saturday)=>{
+
+            Shifts.aggregate([
+
+                {$match:{
+                    "doctor_id" : ObjectId(req.body.doctor_id),
+                    }
+                    },
+                    {
+                        $match: {
+                            "day": "Sunday" // Match shifts where the day is Saturday
+                        }
+                    }
+                
+                ]).then((Sunday)=>{
+
+                    Shifts.aggregate([
+
+                        {$match:{
+                            "doctor_id" : ObjectId(req.body.doctor_id),
+                            }
+                            },
+                            {
+                                $match: {
+                                    "day": "Monday" // Match shifts where the day is Saturday
+                                }
+                            }
+                        
+                        ]).then((Monday)=>{
+                            Shifts.aggregate([
+
+                                {$match:{
+                                    "doctor_id" : ObjectId(req.body.doctor_id),
+                                    }
+                                    },
+                                    {
+                                        $match: {
+                                            "day": "Tuesday" // Match shifts where the day is Saturday
+                                        }
+                                    }
+                                
+                                ]).then((Tuesday)=>{
+                                    Shifts.aggregate([
+
+                                        {$match:{
+                                            "doctor_id" : ObjectId(req.body.doctor_id),
+                                            }
+                                            },
+                                            {
+                                                $match: {
+                                                    "day": "Wednesday" // Match shifts where the day is Saturday
+                                                }
+                                            }
+                                        
+                                        ]).then((Wednesday)=>{
+                                            Shifts.aggregate([
+
+                                                {$match:{
+                                                    "doctor_id" : ObjectId(req.body.doctor_id),
+                                                    }
+                                                    },
+                                                    {
+                                                        $match: {
+                                                            "day": "Thursday" // Match shifts where the day is Saturday
+                                                        }
+                                                    }
+                                                
+                                                ]).then((Thursday)=>{
+                                                    Shifts.aggregate([
+
+                                                        {$match:{
+                                                            "doctor_id" : ObjectId(req.body.doctor_id),
+                                                            }
+                                                            },
+                                                            {
+                                                                $match: {
+                                                                    "day": "Friday" // Match shifts where the day is Saturday
+                                                                }
+                                                            }
+                                                        
+                                                        ]).then((Friday)=>{
+                            
+       
+
+            
+            if(Saturday && Sunday && Monday && Tuesday && Wednesday && Thursday || Friday){
+                res.send({
+                    success:true,
+                    message:"Successfully to  Fetch all shifts",
+                    Saturday:Saturday,
+                    Sunday:Sunday,
+                    Monday:Monday,
+                    Tuesday:Tuesday,
+                    Wednesday:Wednesday,
+                    Thursday:Thursday,
+                    Friday:Friday
+                })
+            }
+            else{
+                res.send({
+                    success:false,
+                    message:"Failed to fetch all shifts"
+                })
+            }
+
+        })
+    })
+})
+})
+})
+})
+})
+}
+
+
+

@@ -15,7 +15,7 @@
       </div>
       <% } %>
 
-        <% if(typeof doctor_data !='undefined' ){ %>
+        <% if(typeof shifts_data !='undefined' ){ %>
           <form class="form-data" role="form" method="post" action="/update_doctor_detail"
             enctype="multipart/form-data">
             <div class="row">
@@ -169,14 +169,14 @@
 
           </form>
           <% }else{ %>
-            <form class="form-data" role="form" method="post" action="/save_doctor_data"
+            <form class="form-data" role="form" method="post" action="/save_shifts_data"
               enctype="multipart/form-data">
               <div class="row">
                 <div class="col-md-8">
                   <div class="card card-primary">
                     <div class="card-header">
                       <h3 class="card-title">
-                        Add Doctor
+                        Add Shifts
                       </h3>
 
                       <div class="card-tools">
@@ -190,77 +190,23 @@
                       <div class="row">
                         <div class="col-md-3">
                         </div>
-                        <div class="col-md-6">
-                          <img class="profile-user-img img-fluid img-circle" style="width: 250px; height: 250px;"
-                            src="default.png" alt="User profile picture" id="profile_image">
-                        </div>
                         <div class="col-md-3">
                         </div>
                       </div>
-
-                      <div class="row col-md-4 float-right" style="margin-bottom: 10px;">
-                        <input type="button" id="loadFileXml" value="Select Profile Image" style="border-radius:12px;border-width:2px;padding:2px 10px; background:transparent;
-                  color:#656d78;" onclick="document.getElementById('profile_file').click();" />
-                        <input type="file" style="display:none;  " id="profile_file" name="profile_file" />
-                      </div>
-                      <div class="form-group">
-                        <label for="name">
-                          <%= process.env.title_name %>
-                        </label>
-                        <input type="text" id="name" name="name" style="text-transform: capitalize;"
-                          class="form-control" required>
-                      </div>
-                      <div class="form-group">
-                        <label for="phone">
-                          <%= process.env.phone %>
-                        </label>
-                        <input type="text" id="phone" name="phone" class="form-control"
-                          onkeypress="return isNumberKey(event);" required>
-                      </div>                                     
-
-                      <div class="form-group">
-                        <label for="email">
-                          <%= process.env.email %>
-                        </label>
-                        <input type="email" id="email" name="email" class="form-control" required>
-                      </div>
+                            
                       <div class="form-group">
                         <label for="doctor_id">
-                          Hospital
+                          Doctor
                         </label>
-                        <select class="form-control custom-select2" id="hospital_id" name="hospital_id" required>
-                            <% if(hospital_data.length > 0){  %>
+                        <select class="form-control custom-select2" id="doctor_id" name="doctor_id" required>
+                            <% if(doctor_data.length > 0){  %>
                               <option>Select Hospital</option>
-                              <% hospital_data.forEach(function(data){%>
+                              <% doctor_data.forEach(function(data){%>
                                
                           <option value="<%=data._id%>"  ><%=data.name%></option>
                           <%})%>
                           <%}%>
                           </select>
-                      </div>
-                      <div class="form-group">
-                        <label for="countries">
-                          Country
-                        </label>
-                        <input type="text" id="countries" name="countries" class="form-control" required>
-                      </div>
-                      <div class="form-group">
-                        <label for="speciality">
-                          Speciality
-                        </label>
-                        <input type="text" id="speciality" name="speciality" class="form-control" required>
-                      </div>
-                      <div class="form-group">
-                        <label for="consultation_fee">
-                            Consultation Fee
-                        </label>
-                        <input type="number" id="consultation_fee" name="consultation_fee" class="form-control" required>
-                      </div>
-                      <div class="form-group">
-                        <label for="experience_years">
-                            Experience Years
-                        </label>
-                        <input type="number" id="experience_years" name="experience_years" class="form-control" required>
                       </div>
                     
                       <div class="form-group">
@@ -279,31 +225,17 @@
                                 <label>Time Slots</label>
                                 <div id="timeSlotsContainer_<%= day %>">
                                   <div class="time-slot">
-                                    <input type="time" name="availability[<%= day %>][slots][0][start_time]" class="form-control">
-                                     <input type="time" name="availability[<%= day %>][slots][0][end_time]" class="form-control">
-
+                                    <input type="time" name="availability[<%= day %>][slots][0][time]" class="form-control">
                                     <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">- Rem</button>
-                                  </div>
+                                </div>
+                                
                                 </div>
                                 <button type="button" class="btn btn-success add-slot" data-day="<%= day %>">+ Add</button>
                               </div>
                             </div>
                           <% }); %>
                         </div>
-                      </div>
-                      
-                      <div class="form-group">
-                        <label for="user_name">
-                          <%= process.env.user_name %>
-                        </label>
-                        <input type="text" id="user_name" name="user_name" class="form-control">
-                      </div>
-                      <div class="form-group">
-                        <label for="password">
-                          <%= process.env.password %>
-                        </label>
-                        <input type="password" id="password" name="password" class="form-control" required>
-                      </div>                  
+                      </div>               
                       <div class="form-group">
                         <label for="extra_detail">
                           <%= process.env.extra_detail %>
@@ -315,7 +247,7 @@
                   </div>
                   <!-- /.card -->
                   <div class="col-12">
-                    <input type="submit" value="Add Doctor" class="btn system-bottons float-right">
+                    <input type="submit" value="Add Shifts" class="btn system-bottons float-right">
                   </div>
                 </div>
               </div>
@@ -339,19 +271,6 @@
         changeYear: true,
       });
     });
-
-    document.getElementById("profile_file").onchange = function () {
-      var reader = new FileReader();
-
-      reader.onload = function (e) {
-        // get loaded data and render thumbnail.
-        document.getElementById("profile_image").src = e.target.result;
-      };
-
-      // read the image file as a data URL.
-      reader.readAsDataURL(this.files[0]);
-    };
-
 
     $(document).ready(function () {
       $('#fselectMulti').multiselect({
@@ -395,6 +314,30 @@
     });
   });
 
+
+
+  document.querySelectorAll('.add-slot').forEach(button => {
+    button.addEventListener('click', function() {
+        let day = this.getAttribute('data-day');
+        let container = document.getElementById('timeSlotsContainer_' + day);
+        let index = container.getElementsByClassName('time-slot').length;
+
+        let newSlot = document.createElement('div');
+        newSlot.classList.add('time-slot');
+        newSlot.innerHTML = `
+            <input type="time" name="availability[${day}][slots][${index}][time]" class="form-control">
+            <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">- Rem</button>
+        `;
+        container.appendChild(newSlot);
+    });
+});
+
+// Function to remove a time slot
+function removeSlot(button) {
+    button.parentElement.remove();
+}
+
+
   // Function to add new time slots
   // document.querySelectorAll('.add-slot').forEach(button => {
   //   button.addEventListener('click', function() {
@@ -413,28 +356,28 @@
 
 
 
-  document.querySelectorAll('.add-slot').forEach(button => {
-    button.addEventListener('click', function() {
-        let day = this.getAttribute('data-day');
-        let container = document.getElementById('timeSlotsContainer_' + day);
-        let index = container.getElementsByClassName('time-slot').length;
+//   document.querySelectorAll('.add-slot').forEach(button => {
+//     button.addEventListener('click', function() {
+//         let day = this.getAttribute('data-day');
+//         let container = document.getElementById('timeSlotsContainer_' + day);
+//         let index = container.getElementsByClassName('time-slot').length;
 
-        let newSlot = document.createElement('div');
-        newSlot.classList.add('time-slot');
-        newSlot.innerHTML = `
-            <input type="time" name="availability[${day}][slots][${index}][start_time]" class="form-control">
-            <input type="time" name="availability[${day}][slots][${index}][end_time]" class="form-control">
-            <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">- Rem</button>
-        `;
-        container.appendChild(newSlot);
-    });
-});
+//         let newSlot = document.createElement('div');
+//         newSlot.classList.add('time-slot');
+//         newSlot.innerHTML = `
+//             <input type="time" name="availability[${day}][slots][${index}][start_time]" class="form-control">
+//             <input type="time" name="availability[${day}][slots][${index}][end_time]" class="form-control">
+//             <button type="button" class="btn btn-danger remove-slot" onclick="removeSlot(this)">- Rem</button>
+//         `;
+//         container.appendChild(newSlot);
+//     });
+// });
 
 
-  // Function to remove a time slot
-  function removeSlot(button) {
-    button.parentElement.remove();
-  }
+//   // Function to remove a time slot
+//   function removeSlot(button) {
+//     button.parentElement.remove();
+//   }
 
 
 

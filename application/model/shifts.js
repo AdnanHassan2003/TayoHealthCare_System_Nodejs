@@ -28,15 +28,20 @@ shiftsschema = new Schema({
         ],
       },
     
+
       time: {
         type: String,
-        match: /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/, // Format: HH:mm AM/PM
+        match: /^(0?[1-9]|1[0-2]):([0-5]\d) (AM|PM)$/, // Format: HH:mm AM/PM
       },
+      
 
       status: {
         type: Number,
         default: 0
     },
+    extra_detail: {
+      type: String,
+  },
 
     create_date: {
         type: Date,
