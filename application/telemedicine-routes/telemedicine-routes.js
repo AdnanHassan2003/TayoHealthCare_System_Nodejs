@@ -157,6 +157,7 @@ module.exports = function (app) {
   app.route('/payPayement').post(adminController.payPayement);
   app.route('/getAll_Hospitals').post(adminController.getAll_Hospitals);
   app.route('/shifts').post(adminController.shifts);
+  app.route('/check_shifts').post(adminController.check_shifts);
   
 
 }

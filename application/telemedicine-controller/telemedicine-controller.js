@@ -14,6 +14,7 @@ const Bcrypt = require('bcryptjs');
 var moment = require('moment-timezone');
 var Excel = require('exceljs');
 var fs = require('fs');
+const { format } = require('date-fns');
 var node_gcm = require("node-gcm")
 var crypto = require('crypto');
 var Utils = require('../controller/utils');
@@ -3356,38 +3357,110 @@ exports.appointements = function(req, res){
 
 
 //Api booking appointments for the doctor
-exports.booking_Appointement = function (req, res) {
+// exports.booking_Appointement = function (req, res) {
            
-                        var reason = req.body.reason
-                        var appointment = new Appointment({
-                            reason: reason,
-                            sequence_id: Utils.get_unique_id(),
-                            status: 0,
-                            doctor_id:req.body.doctor_id,
-                            patient_id:req.body.patient_id,
-                            shifts_id:req.body.shifts_id,
-                            appointment_date:req.body.appointment_date,
-                        });
+//                         var reason = req.body.reason
+//                         var appointment = new Appointment({
+//                             reason: reason,
+//                             sequence_id: Utils.get_unique_id(),
+//                             status: 0,
+//                             doctor_id:req.body.doctor_id,
+//                             patient_id:req.body.patient_id,
+//                             shifts_id:req.body.shifts_id,
+//                             appointment_date:req.body.appointment_date,
+//                         });
                 
-                        appointment.save().then((bookingappointment) => {
+//                         appointment.save().then((bookingappointment) => {
 
-                            if(bookingappointment){
-                                res.send({
-                                    success:true,
-                                    message:"Successfully to book appointment",
-                                    record:bookingappointment
-                                })
-                            }
-                            else{
-                                res.send({
-                                    success:false,
-                                    message:"Sorry! to Book Appointment Failed"
-                                })
-                            }
-                        });
+//                             if(bookingappointment){
+//                                 res.send({
+//                                     success:true,
+//                                     message:"Successfully to book appointment",
+//                                     record:bookingappointment
+//                                 })
+//                             }
+//                             else{
+//                                 res.send({
+//                                     success:false,
+//                                     message:"Sorry! to Book Appointment Failed"
+//                                 })
+//                             }
+//                         });
+// };
+
+
+
+// exports.booking_Appointement = function (req, res) {
+//     var reason = req.body.reason;
+    
+//     var appointment = new Appointment({
+//         reason: reason,
+//         sequence_id: Utils.get_unique_id(),
+//         status: 0,
+//         doctor_id: req.body.doctor_id,
+//         patient_id: req.body.patient_id,
+//         shifts_id: req.body.shifts_id,
+//         appointment_date: new Date(req.body.appointment_date), // Ensure it's a Date object
+//     });
+
+//     appointment.save().then((bookingappointment) => {
+//         if (bookingappointment) {
+//             // Format the date
+//             const formattedDate = format(new Date(bookingappointment.appointment_date), 'dd MMMM yyyy');
+
+//             res.send({
+//                 success: true,
+//                 message: "Successfully booked appointment",
+//                 record: {
+//                     ...bookingappointment.toObject(),
+//                     appointment_date: formattedDate, // Override with formatted date
+//                 },
+//             });
+//         } else {
+//             res.send({
+//                 success: false,
+//                 message: "Sorry! Booking appointment failed",
+//             });
+//         }
+//     }).catch((err) => {
+//         res.status(500).send({ success: false, message: "Server error", error: err.message });
+//     });
+// };
+
+
+
+
+exports.booking_Appointement = function (req, res) {
+    const appointmentDate = new Date(req.body.appointment_date);
+    const formattedDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(appointmentDate);
+
+    var appointment = new Appointment({
+        reason: req.body.reason,
+        sequence_id: Utils.get_unique_id(),
+        status: 0,
+        doctor_id: req.body.doctor_id,
+        patient_id: req.body.patient_id,
+        shifts_id: req.body.shifts_id,
+        appointment_date: formattedDate // Store as "25 March 2025"
+    });
+
+    appointment.save().then((bookingappointment) => {
+        if (bookingappointment) {
+            res.send({
+                success: true,
+                message: "Successfully booked appointment",
+                record: bookingappointment
+            });
+        } else {
+            res.send({
+                success: false,
+                message: "Sorry! Booking appointment failed"
+            });
+        }
+    }).catch((err) => {
+        res.status(500).send({ success: false, message: "Server error", error: err.message });
+    });
 };
-
-
 
 
 //Api pay payment doctor
@@ -3572,3 +3645,116 @@ exports.shifts = function(req, res){
 
 
 
+// exports.check_shifts = function(req, res){
+//     Appointment.findOne({shifts_id:req.body.shifts_id, appointment_date:req.body.appointment_date}).then((shiftes_appointment)=>{
+//         if(shiftes_appointment){
+
+//             res.send({
+//                 success:true,
+//                 message:"waa la qabsaday"
+
+//             })
+
+//         }
+//         else{
+//             Shifts.findOne({_id:req.body.shifts_id}).then((shiftes)=>{
+//                 console.log("shiftes", shiftes);
+//                 var date = req.body.appointment_date;
+//                 const options = { day: '2-digit', month: 'long', year: 'numeric' };
+//                 const currentDate = new Date().toLocaleDateString('en-GB', options);
+
+//                 if(date >= currentDate){
+//                     var time = shiftes.time;
+//                     console.log("time", time);
+//                     const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+//                     const currentTime = new Date().toLocaleTimeString('en-US', options);
+//                     console.log("currentTime",currentTime);
+
+//                     if(currentTime > time.toString){
+//                         res.send({
+//                             success:false,
+//                             message:"waala dhafay time ka aad rabtit inaad qabsato"
+            
+//                         })
+
+//                     }
+//                     else{
+//                         res.send({
+//                             success:true,
+//                             message:"waad qabsan rartaa appointment gaan "
+            
+//                         })
+//                     }
+
+//                 }
+//                 else{
+
+//                 res.send({
+//                     success:false,
+//                     message:"waala dhafay date ka aad rabtit inaad qabsato"
+    
+//                 })
+
+//                 }
+ 
+
+//             })
+       
+//         }
+
+//     })
+
+// }
+
+
+
+exports.check_shifts = function(req, res) {
+    Appointment.findOne({ shifts_id: req.body.shifts_id, appointment_date: req.body.appointment_date }).then((shiftes_appointment) => {
+            if (shiftes_appointment) {
+                return res.send({
+                    success: false,
+                    message: "The shift has already been booked"
+                });
+            }
+            else{
+                Shifts.findOne({ _id: req.body.shifts_id }).then((shiftes) => {
+                
+                    let appointmentDate = new Date(req.body.appointment_date);
+                    let currentDate = new Date(); 
+    
+                    if (appointmentDate < currentDate.setHours(0, 0, 0, 0)) {
+                        return res.send({
+                            success: false,
+                            message: "The date you selected has already passed"
+                        });
+                    }
+                    else{
+                        let shiftTime = shiftes.time; 
+                        let currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                        let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                        let currentDateTime = new Date(`${new Date().toDateString()} ${currentTime}`);
+
+                        if (currentDateTime > shiftDateTime) {
+                            return res.send({
+                                success: false,
+                                message: "The time you selected has already passed"
+                            });
+                        }
+                        else{
+                            return res.send({
+                                success: true,
+                                message: "You can book this shifts"
+                            });
+                        }
+                    }
+                });
+            } 
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send({
+                success: false,
+                message: "Waxaa dhacay qalad"
+            });
+        });
+};

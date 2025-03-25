@@ -15,8 +15,8 @@ appointmentschema = new Schema({
     patient_id: {
         type: Schema.Types.ObjectId,
     },
-    appointment_date:{
-        type: Date,
+    appointment_date: {
+        type: String, // Change from Date to String
         required: true
     },
     shifts_id: {
@@ -42,6 +42,13 @@ appointmentschema = new Schema({
     }
 });
 
+
+// Middleware to format date before saving
+appointmentschema.pre('save', function (next) {
+    const options = { day: '2-digit', month: 'long', year: 'numeric' };
+    this.appointment_date = new Intl.DateTimeFormat('en-GB', options).format(new Date(this.appointment_date));
+    next();
+});
 
 appointmentschema.index({ create_date: 1 }, { background: true });
 

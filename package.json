@@ -19,6 +19,7 @@
     "countries-and-timezones": "^3.3.0",
     "country-data": "0.0.31",
     "crypto": "^1.0.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^8.2.0",
     "ejs": "^2.7.2",
     "exceljs": "^4.2.0",
