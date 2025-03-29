@@ -3715,12 +3715,9 @@ exports.check_shifts = function(req, res) {
                     message: "The shift has already been booked"
                 });
             }
-            else{
-                Shifts.findOne({ _id: req.body.shifts_id }).then((shiftes) => {
-                
+            else{   
                     let appointmentDate = new Date(req.body.appointment_date);
                     let currentDate = new Date(); 
-    
                     if (appointmentDate < currentDate.setHours(0, 0, 0, 0)) {
                         return res.send({
                             success: false,
@@ -3728,10 +3725,14 @@ exports.check_shifts = function(req, res) {
                         });
                     }
                     else{
+                       Shifts.findOne({ _id: req.body.shifts_id }).then((shiftes) => {
+
                         let shiftTime = shiftes.time; 
                         let currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                         let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                        console.log("shiftDateTime", shiftDateTime)
                         let currentDateTime = new Date(`${new Date().toDateString()} ${currentTime}`);
+                        console.log("currentDateTime", currentDateTime)
 
                         if (currentDateTime > shiftDateTime) {
                             return res.send({
@@ -3745,8 +3746,9 @@ exports.check_shifts = function(req, res) {
                                 message: "You can book this shifts"
                             });
                         }
+                    });
                     }
-                });
+                
             } 
         })
         .catch((err) => {
