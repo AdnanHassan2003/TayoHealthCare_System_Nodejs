@@ -801,12 +801,25 @@ exports.appointment_list = function(req, res){
                 }},
                 
                 {$unwind:"$patient_data"},
+               // -----------------------
+                {$lookup:{
+                
+                    from:"shifts",
+                    localField:"shifts_id",
+                    foreignField:"_id",
+                    as:"shifts_data"
+                
+                    }},
+                    
+                    {$unwind:"$shifts_data"},
                 
                 
                 {$project:{
                     _id:1,
                     doctor_name:"$doctor_data.name",
                     patient_name:"$patient_data.name",
+                    shift_time:"$shifts_data.time",
+                    shift_day:"$shifts_data.day",
                     sequence_id:1,
                     appointment_date:1,
                     status:1,
@@ -1030,6 +1043,8 @@ exports.payment_list = function(req, res){
                     sequence_id:1,
                     amount:1,
                     payment_method:1,
+                    sender_phone:1,
+                    reciver_phone:1,
                     status:1,
                     create_date:1
                           
@@ -3288,8 +3303,8 @@ exports.getAll_Doctors = async function(req, res) {
 
  
 
-//Api get all appointments for the specified doctor
-exports.appointements = function(req, res){
+//Api get all appointments patient
+exports.patient_appointements = function(req, res){
         Appointment.aggregate([
 
             {
@@ -3319,12 +3334,25 @@ exports.appointements = function(req, res){
                 }},
                 
                 {$unwind:"$patient_data"},
+
+                {$lookup:{
+                
+                    from:"shifts",
+                    localField:"shifts_id",
+                    foreignField:"_id",
+                    as:"shifts_data"
+                
+                    }},
+                    
+                    {$unwind:"$shifts_data"},
                 
                 
                 {$project:{
                     _id:1,
                     doctor_name:"$doctor_data.name",
                     patient_name:"$patient_data.name",
+                    shift_time:"$shifts_data.time",
+                    shift_day:"$shifts_data.day",
                     sequence_id:1,
                     appointment_date:1,
                     status:1,
@@ -3338,13 +3366,13 @@ exports.appointements = function(req, res){
 
                     res.send({
                         success:true,
-                        message:"Successfully to fetch All Appointements",
+                        message:"Successfully to fetch All Appointements for Patient",
                         record:appointment_data
                     })
                 }else{
                     res.send({
                         success:false,
-                        message:"Sorry! to fetch Appointements"
+                        message:"Sorry! to fetch Appointements for Patient"
                     })
         
                 }
@@ -3355,79 +3383,224 @@ exports.appointements = function(req, res){
 }
 
 
-//Api booking appointments for the doctor
-// exports.booking_Appointement = function (req, res) {
-           
-//                         var reason = req.body.reason
-//                         var appointment = new Appointment({
-//                             reason: reason,
-//                             sequence_id: Utils.get_unique_id(),
-//                             status: 0,
-//                             doctor_id:req.body.doctor_id,
-//                             patient_id:req.body.patient_id,
-//                             shifts_id:req.body.shifts_id,
-//                             appointment_date:req.body.appointment_date,
-//                         });
+
+
+
+//Api get all appointments for doctor
+exports.doctor_appointements = function(req, res){
+    Appointment.aggregate([
+
+        {
+            $match: {
+                "doctor_id": ObjectId(req.body.doctor_id)
+            }
+        },
+
+        {$lookup:{
+            
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        
+            }},
+            
+            {$unwind:"$doctor_data"},
+            
+            {$lookup:{
+            
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        
+            }},
+            
+            {$unwind:"$patient_data"},
+
+            {$lookup:{
+            
+                from:"shifts",
+                localField:"shifts_id",
+                foreignField:"_id",
+                as:"shifts_data"
+            
+                }},
                 
-//                         appointment.save().then((bookingappointment) => {
+                {$unwind:"$shifts_data"},
+            
+            
+            {$project:{
+                _id:1,
+                doctor_name:"$doctor_data.name",
+                patient_name:"$patient_data.name",
+                shift_time:"$shifts_data.time",
+                shift_day:"$shifts_data.day",
+                sequence_id:1,
+                appointment_date:1,
+                status:1,
+                create_date:1
+                      
+                }}
+        
+        ]).then((appointment_data)=>{
 
-//                             if(bookingappointment){
-//                                 res.send({
-//                                     success:true,
-//                                     message:"Successfully to book appointment",
-//                                     record:bookingappointment
-//                                 })
-//                             }
-//                             else{
-//                                 res.send({
-//                                     success:false,
-//                                     message:"Sorry! to Book Appointment Failed"
-//                                 })
-//                             }
-//                         });
-// };
+            if(appointment_data){
 
-
-
-// exports.booking_Appointement = function (req, res) {
-//     var reason = req.body.reason;
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch All Appointements for Doctor",
+                    record:appointment_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch Appointements for Doctor"
+                })
     
-//     var appointment = new Appointment({
-//         reason: reason,
-//         sequence_id: Utils.get_unique_id(),
-//         status: 0,
-//         doctor_id: req.body.doctor_id,
-//         patient_id: req.body.patient_id,
-//         shifts_id: req.body.shifts_id,
-//         appointment_date: new Date(req.body.appointment_date), // Ensure it's a Date object
-//     });
+            }
 
-//     appointment.save().then((bookingappointment) => {
-//         if (bookingappointment) {
-//             // Format the date
-//             const formattedDate = format(new Date(bookingappointment.appointment_date), 'dd MMMM yyyy');
 
-//             res.send({
-//                 success: true,
-//                 message: "Successfully booked appointment",
-//                 record: {
-//                     ...bookingappointment.toObject(),
-//                     appointment_date: formattedDate, // Override with formatted date
-//                 },
-//             });
-//         } else {
-//             res.send({
-//                 success: false,
-//                 message: "Sorry! Booking appointment failed",
-//             });
-//         }
-//     }).catch((err) => {
-//         res.status(500).send({ success: false, message: "Server error", error: err.message });
-//     });
-// };
+        })
+        
+}
 
 
 
+
+exports.patient_transection = function(req, res){
+    Payment.aggregate([
+
+        {
+            $match: {
+                "patient_id": ObjectId(req.body.patient_id)
+            }
+        },
+
+        {$lookup:{
+            
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        
+            }},
+            
+            {$unwind:"$doctor_data"},
+            
+            {$lookup:{
+            
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        
+            }},
+            
+            {$unwind:"$patient_data"},
+            
+            
+            {$project:{
+                _id:1,
+                doctor_name:"$doctor_data.name",
+                patient_name:"$patient_data.name",
+                amount:1,
+                sequence_id:1,
+                payment_method:1,
+                sender_phone:1,
+                reciver_phone:1,
+                status:1,
+                create_date:1
+                      
+                }}
+        
+        ]).then((payment_data)=>{
+            if(payment_data){
+
+                     res.send({
+                    success:true,
+                    message:"Successfully to fetch All  for Patient",
+                    record:payment_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch Transactions for Patient"
+                })
+    
+            }
+
+        })
+}
+
+
+
+
+
+exports.doctor_transection = function(req, res){
+    Payment.aggregate([
+
+        {
+            $match: {
+                "doctor_id": ObjectId(req.body.doctor_id)
+            }
+        },
+
+        {$lookup:{
+            
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        
+            }},
+            
+            {$unwind:"$doctor_data"},
+            
+            {$lookup:{
+            
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        
+            }},
+            
+            {$unwind:"$patient_data"},
+            
+            
+            {$project:{
+                _id:1,
+                doctor_name:"$doctor_data.name",
+                patient_name:"$patient_data.name",
+                amount:1,
+                sequence_id:1,
+                payment_method:1,
+                sender_phone:1,
+                reciver_phone:1,
+                status:1,
+                create_date:1
+                      
+                }}
+        
+        ]).then((payment_data)=>{
+            if(payment_data){
+
+                     res.send({
+                    success:true,
+                    message:"Successfully to fetch All Transactions for Doctor",
+                    record:payment_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch Transactions for Doctor",n
+                })
+    
+            }
+
+        })
+}
 
 exports.booking_Appointement = function (req, res) {
     const appointmentDate = new Date(req.body.appointment_date);
@@ -3492,6 +3665,65 @@ exports.payPayement = function (req, res) {
                             }
                         });
 
+};
+
+  
+
+exports.bookAndPay = function (req, res) {
+    // Marka hore, wax ka bixi lacag bixinta (Payment)
+    var amount = req.body.amount;
+    var payment = new Payment({
+        amount: amount,
+        sequence_id: Utils.get_unique_id(),
+        doctor_id: req.body.doctor_id,
+        patient_id: req.body.patient_id,
+        sender_phone:req.body.sender_phone,
+        reciver_phone:req.body.reciver_phone,
+        status: 1, // Payment successful 
+        payment_method: "EVC-Plus"
+    });
+
+    payment.save().then((savedPayment) => {
+            if (!savedPayment) {
+                return res.send({
+                    success: false,
+                    message: "Sorry! Payment failed"
+                });
+            }
+
+            // Haddii Payment lagu guuleystay, samee appointment booking
+            const appointmentDate = new Date(req.body.appointment_date);
+            const formattedDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(appointmentDate);
+
+            var appointment = new Appointment({
+                reason: req.body.reason,
+                sequence_id: Utils.get_unique_id(),
+                status: 0,
+                doctor_id: req.body.doctor_id,
+                patient_id: req.body.patient_id,
+                shifts_id: req.body.shifts_id,
+                appointment_date: formattedDate // Store as "25 March 2025"
+            });
+
+            return appointment.save();
+        })
+        .then((savedAppointment) => {
+            if (!savedAppointment) {
+                return res.send({
+                    success: false,
+                    message: "Payment successful, but appointment booking failed"
+                });
+            }
+
+            res.send({
+                success: true,
+                message: "Successfully paid & booked appointment",
+                record: savedAppointment
+            });
+        })
+        .catch((err) => {
+            res.status(500).send({ success: false, message: "Server error", error: err.message });
+        });
 };
 
 

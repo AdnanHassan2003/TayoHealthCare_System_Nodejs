@@ -157,7 +157,13 @@
                           Patient
                         </th>
                         <th>
+                          Day
+                        </th>
+                        <th>
                           Appointment date
+                        </th>
+                        <th>
+                          Time
                         </th>
                         <th>
                           <%= process.env.title_status %>
@@ -183,10 +189,14 @@
                                 <%= entry.patient_name %>
                               </td>
                               <td>
+                                <%= entry.shift_day %>
+                              </td>
+                              <td>
                                 <%= moment(entry.appointment_date).format("DD-MMMM-YYYY") %>
                               </td>
-                              
-                              
+                              <td>
+                                <%= entry.shift_time %>
+                              </td>
                               <td>
                                 <% if (entry.status == "0") { %>
                                   <span class="system-bottons" style="padding: 5px; border-radius: 4px;">

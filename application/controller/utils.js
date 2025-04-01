@@ -18,6 +18,27 @@ Date.prototype.addHours = function () {
     return this;
 }
 
+//add hours to current timezone dynamic
+exports.addHours = function (date, req) {
+    var  hoursToAdd;
+    // Check if req.session.pos.gmt_time is defined
+    if (req && req.session && req.session.pos && req.session.pos.gmt_time !== undefined) {
+        hoursToAdd = req.session.pos.gmt_time;
+    } else {
+        hoursToAdd = process.env.time_zone_hour;
+    }
+    // Add the hours to the date
+    date.setTime(date.getTime() + (hoursToAdd * 60 * 60 * 1000));
+    return date;
+};
+
+//add hours to current timezone dynamic
+exports.addHoursStatic = function (date) {
+    var  hoursToAdd=process.env.time_zone_hour;
+    date.setTime(date.getTime() + (hoursToAdd * 60 * 60 * 1000));
+    return date;
+}
+
 exports.getTimeDifferenceInMinute = function (endDate, startDate) {
     var difference = 0;
     var startDateFormat = moment(startDate, process.env.DATE_FORMAT);

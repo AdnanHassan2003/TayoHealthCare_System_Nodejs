@@ -15,6 +15,16 @@ paymentschema = new Schema({
     patient_id: {
         type: Schema.Types.ObjectId,
     },
+    sender_phone: {
+        type: String,
+        trim: true,
+        required: true
+    },
+    reciver_phone: {
+        type: String,
+        trim: true,
+        required: true
+    },
     amount:{
         type:Number
     },

@@ -152,9 +152,13 @@ module.exports = function (app) {
   app.route('/login_DoctorAndPatient').post(adminController.login_DoctorAndPatient);
   app.route('/register_Patient').post(adminController.register_Patient)
   app.route('/getAll_Doctors').post(adminController.getAll_Doctors);
-  app.route('/appointements').post(adminController.appointements);
+  app.route('/patient_appointements').post(adminController.patient_appointements); // waa all appointments uu patients uu qabsaday
+  app.route('/doctor_appointements').post(adminController.doctor_appointements); // waa all appointments uu doctor uu laga qabsaday
+  app.route('/patient_transection').post(adminController.patient_transection);  // waa all transecton ka uu bixiyey patient
+  app.route('/doctor_transection').post(adminController.doctor_transection);  // waa all transecton ka uu qatay doctor ka
   app.route('/booking_Appointement').post(adminController.booking_Appointement);
   app.route('/payPayement').post(adminController.payPayement);
+  app.route('/bookAndPay').post(adminController.bookAndPay);
   app.route('/getAll_Hospitals').post(adminController.getAll_Hospitals);
   app.route('/shifts').post(adminController.shifts);
   app.route('/check_shifts').post(adminController.check_shifts);
