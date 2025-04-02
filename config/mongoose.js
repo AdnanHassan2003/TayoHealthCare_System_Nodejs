@@ -26,6 +26,7 @@ module.exports = function () {
     require("../application/model/feedback");
     require("../application/model/shifts");
     require("../application/model/adds");
+    require("../application/model/selfmanagment");
     
     
 

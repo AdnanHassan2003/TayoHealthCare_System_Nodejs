@@ -155,6 +155,19 @@ module.exports = function (app) {
 
 
 
+
+
+  app.route('/selfmanagment_list').get(adminController.selfmanagment_list);
+  app.route('/selfmanagment_list').post(adminController.selfmanagment_list);
+  app.route('/add_selfmanagment').get(adminController.add_selfmanagment);
+  app.route('/add_selfmanagment').post(adminController.add_selfmanagment);
+  app.route('/save_selfmanagment_data').post(adminController.save_selfmanagment_data)
+  app.route('/edit_selfmanagment').post(adminController.edit_selfmanagment)
+  app.route('/update_selfmanagment_detail').post(adminController.update_selfmanagment_detail)
+  app.route('/delete_selfmanagment').post(adminController.delete_selfmanagment);
+
+
+
   
 
   // All Apis That Use Our Telemedicine Application
@@ -172,6 +185,7 @@ module.exports = function (app) {
   app.route('/shifts').post(adminController.shifts);
   app.route('/check_shifts').post(adminController.check_shifts);
   app.route('/adds').post(adminController.adds);
+  app.route('/selfmanagment').post(adminController.selfmanagment);
   
 
 }

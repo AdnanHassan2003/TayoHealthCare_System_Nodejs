@@ -9,6 +9,7 @@ var Message = require('mongoose').model('message')
 var Feedback = require('mongoose').model('feedback')
 var Shifts = require('mongoose').model('shifts')
 var Adds = require('mongoose').model('adds')
+var SelfManagment = require('mongoose').model('selfmanagment')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -1307,6 +1308,31 @@ exports.adds_list = function(req, res){
         }
     })
 }
+
+
+
+
+
+exports.selfmanagment_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            SelfManagment.find({}).then((selfmanagment_data)=>{
+
+                res.render('selfmanagment_list', {
+                    url_data: req.session.menu_array,
+                    detail: selfmanagment_data,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+            })
+            
+        }else {
+
+            Utils.redirect_login(req, res);
+        }
+    })
+}
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1587,6 +1613,27 @@ exports.add_adds = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
                 res.render("add_adds",
+                    {
+                        systen_urls: systen_urls,
+                        msg: req.session.error,
+                        url_data: req.session.menu_array,
+                        moment: moment,
+                        admin_type: req.session.admin.usertype,
+                    })
+           
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+exports.add_selfmanagment = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+                res.render("add_selfmanagment",
                     {
                         systen_urls: systen_urls,
                         msg: req.session.error,
@@ -2247,6 +2294,50 @@ exports.save_adds_data = function (req, res) {
     });
 
 };
+
+
+
+
+
+exports.save_selfmanagment_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+
+                        var profile_file = req.files;
+                        var selfmanagment = new SelfManagment({
+                            sequence_id: Utils.get_unique_id(),
+                            extra_detail: req.body.extra_detail,
+                            status: 1,
+                            picture: "",
+                           
+                        });
+                        if (profile_file != undefined && profile_file.length > 0) {
+                            image_name = Utils.tokenGenerator(29) + '.jpg';
+                            url = "./uploads/admin_profile/" + image_name;
+                            liner = "admin_profile/" + image_name;
+
+                            fs.readFile(req.files[0].path, function (err, data) {
+                                fs.writeFile(url, data, 'binary', function (err) { });
+                                fs.unlink(req.files[0].path, function (err, file) {
+
+                                });
+                            });
+
+                            selfmanagment.picture = liner;
+                        }
+                        selfmanagment.save().then((admin) => {
+                            req.session.error = "Congrates, selfmanagment was created successfully.........";
+                            res.redirect("/selfmanagment_list");
+                        });
+                
+              
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -2488,6 +2579,27 @@ exports.edit_adds = function (req, res) {
                     res.render("add_adds", { adds_data: adds, systen_urls: systen_urls })
                 } else {
                     res.redirect("/adds_list")
+                }
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+
+exports.edit_selfmanagment = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            SelfManagment.findOne({ _id: req.body.selfmanagment_id }, { password: 0 }).then((selfmanagment) => {
+                if (selfmanagment) {
+                    // console.log(admin)
+                    res.render("add_selfmanagment", { selfmanagment_data: selfmanagment, systen_urls: systen_urls })
+                } else {
+                    res.redirect("/selfmanagment_list")
                 }
             });
         } else {
@@ -3023,6 +3135,70 @@ exports.update_adds_detail = function (req, res) {
         }
     });
 };
+
+
+
+
+exports.update_selfmanagment_detail = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            var profile_file = req.files;
+            if (profile_file == '' || profile_file == 'undefined') {
+                SelfManagment.findByIdAndUpdate(req.body.selfmanagment_id, req.body, { useFindAndModify: false }).then((data) => {
+                    if (data._id.equals(req.session.admin.selfmanagment_id)) {
+                        Utils.redirect_login(req, res);
+                    } else {
+                        res.redirect("/selfmanagment_list");
+                    }
+                }, (err) => {
+                    res.redirect("/selfmanagment_list");
+                });
+            } else {
+                SelfManagment.findById(req.body.selfmanagment_id).then((user) => {
+                    if (user.picture) {
+                        Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+                    }
+                    // Samee magaca sawirka cusub
+                    var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                    var url = "./uploads/admin_profile/" + image_name;
+
+                    fs.readFile(req.files[0].path, function (err, data) {
+                        if (err) {
+                            console.error("Error reading file:", err);
+                            return res.redirect("/doctor_list");
+                        }
+
+                        fs.writeFile(url, data, 'binary', function (err) {
+                            if (err) {
+                                console.error("Error writing file:", err);
+                                return res.redirect("/doctor_list");
+                            }
+
+                            fs.unlink(req.files[0].path, function (err) {
+                                if (err) console.error("Error deleting temp file:", err);
+                            });
+
+                            // Cusbooneysii database
+                            req.body.picture = "admin_profile/" + image_name;
+                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                    SelfManagment.findByIdAndUpdate(req.body.selfmanagment_id, req.body, { useFindAndModify: false }).then((data) => {
+                        if (data._id.equals(req.session.admin.selfmanagment_id)) {
+                            Utils.redirect_login(req, res);
+                        } else {
+                            res.redirect("/selfmanagment_list");
+                        }
+                    }, (err) => {
+                        res.redirect("/selfmanagment_list");
+                    });
+                });
+            });
+        });
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -3185,6 +3361,20 @@ exports.delete_adds = function (req, res) {
 };
 
 
+
+
+
+exports.delete_selfmanagment = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            SelfManagment.deleteOne({ _id: req.body.selfmanagment_id }).then((user) => {
+                res.redirect("/selfmanagment_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 // Handle view admin logout
@@ -4132,7 +4322,9 @@ exports.check_shifts = function(req, res) {
 
 
 exports.adds = function(req, res){
-    Adds.find({}).then((adds_data)=>{
+    Adds.aggregate([
+        {$match:{"status":1}}   
+        ]).then((adds_data)=>{
         if(adds_data){
             res.send({
                 success:true,
@@ -4143,6 +4335,31 @@ exports.adds = function(req, res){
             res.send({
                 success:false,
                 message:"Sorry! to fetch Adds"
+            })
+        }
+
+    })
+
+}
+
+
+
+
+
+exports.selfmanagment = function(req, res){
+    SelfManagment.aggregate([
+        {$match:{"status":1}}   
+        ]).then((selfmanagment_data)=>{
+        if(selfmanagment_data){
+            res.send({
+                success:true,
+                message:"Successfully to fetch all Self Managment",
+                record:selfmanagment_data
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch Self Managment"
             })
         }
 
