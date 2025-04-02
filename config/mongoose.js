@@ -25,6 +25,8 @@ module.exports = function () {
     require("../application/model/message");
     require("../application/model/feedback");
     require("../application/model/shifts");
+    require("../application/model/adds");
+    
     
 
     return db;

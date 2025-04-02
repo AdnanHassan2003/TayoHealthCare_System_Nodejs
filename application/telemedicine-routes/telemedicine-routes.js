@@ -144,9 +144,18 @@ module.exports = function (app) {
 
 
 
+  app.route('/adds_list').get(adminController.adds_list);
+  app.route('/adds_list').post(adminController.adds_list);
+  app.route('/add_adds').get(adminController.add_adds);
+  app.route('/add_adds').post(adminController.add_adds);
+  app.route('/save_adds_data').post(adminController.save_adds_data)
+  app.route('/edit_adds').post(adminController.edit_adds)
+  app.route('/update_adds_detail').post(adminController.update_adds_detail)
+  app.route('/delete_adds').post(adminController.delete_adds);
 
 
 
+  
 
   // All Apis That Use Our Telemedicine Application
   app.route('/login_DoctorAndPatient').post(adminController.login_DoctorAndPatient);
@@ -162,6 +171,7 @@ module.exports = function (app) {
   app.route('/getAll_Hospitals').post(adminController.getAll_Hospitals);
   app.route('/shifts').post(adminController.shifts);
   app.route('/check_shifts').post(adminController.check_shifts);
+  app.route('/adds').post(adminController.adds);
   
 
 }

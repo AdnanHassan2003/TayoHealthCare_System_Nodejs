@@ -8,6 +8,7 @@ var Payment = require('mongoose').model('payment')
 var Message = require('mongoose').model('message')
 var Feedback = require('mongoose').model('feedback')
 var Shifts = require('mongoose').model('shifts')
+var Adds = require('mongoose').model('adds')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -28,6 +29,7 @@ const setting = require('../model/setting')
 const { each } = require('async')
 const { utils } = require('xlsx')
 const { group, Console } = require('console')
+const message = require('../model/message')
 // const { utils } = require('xlsx/types')
 var ObjectId = require('mongodb').ObjectID;
 
@@ -1282,6 +1284,29 @@ exports.shifts_list = function(req, res){
     })
 }
 
+
+
+
+exports.adds_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Adds.find({}).then((adds_data)=>{
+
+                res.render('adds_list', {
+                    url_data: req.session.menu_array,
+                    detail: adds_data,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+            })
+            
+        }else {
+
+            Utils.redirect_login(req, res);
+        }
+    })
+}
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1546,6 +1571,29 @@ exports.add_shifts = function (req, res) {
                         doctor_data:doctor_array,
                     })
             })
+           
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+
+
+
+exports.add_adds = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+                res.render("add_adds",
+                    {
+                        systen_urls: systen_urls,
+                        msg: req.session.error,
+                        url_data: req.session.menu_array,
+                        moment: moment,
+                        admin_type: req.session.admin.usertype,
+                    })
            
         } else {
             Utils.redirect_login(req, res);
@@ -2155,6 +2203,50 @@ exports.save_shifts_data = function (req, res) {
 };
 
 
+
+
+
+
+
+exports.save_adds_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+
+                        var profile_file = req.files;
+                        var adds = new Adds({
+                            sequence_id: Utils.get_unique_id(),
+                            extra_detail: req.body.extra_detail,
+                            status: 1,
+                            picture: "",
+                           
+                        });
+                        if (profile_file != undefined && profile_file.length > 0) {
+                            image_name = Utils.tokenGenerator(29) + '.jpg';
+                            url = "./uploads/admin_profile/" + image_name;
+                            liner = "admin_profile/" + image_name;
+
+                            fs.readFile(req.files[0].path, function (err, data) {
+                                fs.writeFile(url, data, 'binary', function (err) { });
+                                fs.unlink(req.files[0].path, function (err, file) {
+
+                                });
+                            });
+
+                            adds.picture = liner;
+                        }
+                        adds.save().then((admin) => {
+                            req.session.error = "Congrates, adds was created successfully.........";
+                            res.redirect("/adds_list");
+                        });
+                
+              
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -2381,6 +2473,29 @@ exports.edit_feedback = function (req, res) {
         }
     });
 };
+
+
+
+
+
+
+exports.edit_adds = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Adds.findOne({ _id: req.body.adds_id }, { password: 0 }).then((adds) => {
+                if (adds) {
+                    // console.log(admin)
+                    res.render("add_adds", { adds_data: adds, systen_urls: systen_urls })
+                } else {
+                    res.redirect("/adds_list")
+                }
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
 //---------------------------------------------------------------------------------------------------
 
 
@@ -2843,6 +2958,71 @@ exports.update_feedback_detail = function (req, res) {
         }
     });
 };
+
+
+
+
+
+exports.update_adds_detail = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            var profile_file = req.files;
+            if (profile_file == '' || profile_file == 'undefined') {
+                Adds.findByIdAndUpdate(req.body.adds_id, req.body, { useFindAndModify: false }).then((data) => {
+                    if (data._id.equals(req.session.admin.adds_id)) {
+                        Utils.redirect_login(req, res);
+                    } else {
+                        res.redirect("/adds_list");
+                    }
+                }, (err) => {
+                    res.redirect("/adds_list");
+                });
+            } else {
+                Adds.findById(req.body.adds_id).then((user) => {
+                    if (user.picture) {
+                        Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+                    }
+                    // Samee magaca sawirka cusub
+                    var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                    var url = "./uploads/admin_profile/" + image_name;
+
+                    fs.readFile(req.files[0].path, function (err, data) {
+                        if (err) {
+                            console.error("Error reading file:", err);
+                            return res.redirect("/doctor_list");
+                        }
+
+                        fs.writeFile(url, data, 'binary', function (err) {
+                            if (err) {
+                                console.error("Error writing file:", err);
+                                return res.redirect("/doctor_list");
+                            }
+
+                            fs.unlink(req.files[0].path, function (err) {
+                                if (err) console.error("Error deleting temp file:", err);
+                            });
+
+                            // Cusbooneysii database
+                            req.body.picture = "admin_profile/" + image_name;
+                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                    Adds.findByIdAndUpdate(req.body.adds_id, req.body, { useFindAndModify: false }).then((data) => {
+                        if (data._id.equals(req.session.admin.adds_id)) {
+                            Utils.redirect_login(req, res);
+                        } else {
+                            res.redirect("/adds_list");
+                        }
+                    }, (err) => {
+                        res.redirect("/adds_list");
+                    });
+                });
+            });
+        });
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -2987,6 +3167,23 @@ exports.delete_feedback = function (req, res) {
         }
     });
 };
+
+
+
+
+
+exports.delete_adds = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Adds.deleteOne({ _id: req.body.adds_id }).then((user) => {
+                res.redirect("/adds_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
 
 //---------------------------------------------------------------------------------------------------
 
@@ -3878,69 +4075,6 @@ exports.shifts = function(req, res){
 
 
 
-// exports.check_shifts = function(req, res){
-//     Appointment.findOne({shifts_id:req.body.shifts_id, appointment_date:req.body.appointment_date}).then((shiftes_appointment)=>{
-//         if(shiftes_appointment){
-
-//             res.send({
-//                 success:true,
-//                 message:"waa la qabsaday"
-
-//             })
-
-//         }
-//         else{
-//             Shifts.findOne({_id:req.body.shifts_id}).then((shiftes)=>{
-//                 console.log("shiftes", shiftes);
-//                 var date = req.body.appointment_date;
-//                 const options = { day: '2-digit', month: 'long', year: 'numeric' };
-//                 const currentDate = new Date().toLocaleDateString('en-GB', options);
-
-//                 if(date >= currentDate){
-//                     var time = shiftes.time;
-//                     console.log("time", time);
-//                     const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-//                     const currentTime = new Date().toLocaleTimeString('en-US', options);
-//                     console.log("currentTime",currentTime);
-
-//                     if(currentTime > time.toString){
-//                         res.send({
-//                             success:false,
-//                             message:"waala dhafay time ka aad rabtit inaad qabsato"
-            
-//                         })
-
-//                     }
-//                     else{
-//                         res.send({
-//                             success:true,
-//                             message:"waad qabsan rartaa appointment gaan "
-            
-//                         })
-//                     }
-
-//                 }
-//                 else{
-
-//                 res.send({
-//                     success:false,
-//                     message:"waala dhafay date ka aad rabtit inaad qabsato"
-    
-//                 })
-
-//                 }
- 
-
-//             })
-       
-//         }
-
-//     })
-
-// }
-
-
-
 exports.check_shifts = function(req, res) {
     Appointment.findOne({ shifts_id: req.body.shifts_id, appointment_date: req.body.appointment_date }).then((shiftes_appointment) => {
             if (shiftes_appointment) {
@@ -3993,3 +4127,25 @@ exports.check_shifts = function(req, res) {
             });
         });
 };
+
+
+
+
+exports.adds = function(req, res){
+    Adds.find({}).then((adds_data)=>{
+        if(adds_data){
+            res.send({
+                success:true,
+                message:"Successfully to fetch all Adds",
+                record:adds_data
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch Adds"
+            })
+        }
+
+    })
+
+}
