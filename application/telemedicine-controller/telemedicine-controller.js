@@ -3350,6 +3350,7 @@ exports.patient_appointements = function(req, res){
                 {$project:{
                     _id:1,
                     doctor_name:"$doctor_data.name",
+                    doctor_profile:"$doctor_data.picture",
                     patient_name:"$patient_data.name",
                     shift_time:"$shifts_data.time",
                     shift_day:"$shifts_data.day",
@@ -3434,6 +3435,7 @@ exports.doctor_appointements = function(req, res){
                 _id:1,
                 doctor_name:"$doctor_data.name",
                 patient_name:"$patient_data.name",
+                patient_profile:"$patient_data.picture",
                 shift_time:"$shifts_data.time",
                 shift_day:"$shifts_data.day",
                 sequence_id:1,
