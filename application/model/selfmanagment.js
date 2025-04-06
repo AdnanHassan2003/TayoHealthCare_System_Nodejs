@@ -13,6 +13,11 @@ selfmanagmentschema = new Schema({
         type: Number,
         default: 0
     },
+
+    title:{
+        type:String,
+        require:true
+    },
     extra_detail: {
         require:true,
         type: String,
