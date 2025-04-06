@@ -18,7 +18,7 @@ appointmentschema = new Schema({
     appointment_date: {
         type: String, // Change from Date to String
         required: true
-    },
+    }, 
     shifts_id: {
         type: Schema.Types.ObjectId,
     },
