@@ -4323,6 +4323,524 @@ exports.check_shifts = function(req, res) {
 
 
 
+
+exports.Saturday_Shifts = async function(req, res) {
+    try {
+        const doctorId = ObjectId(req.body.doctor_id);
+        const appointmentDate = new Date(req.body.appointment_date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set to start of today
+
+        // Haddii appointment_date la dhafay, soo celin waxba
+        if (appointmentDate < currentDate) {
+            return res.send({
+                success: false,
+                message: "The date you selected has already passed"
+            });
+        }
+
+        // List of days
+        const daysOfWeek = ["Saturday"];
+
+        // Get all shifts of the doctor
+        const allShifts = await Shifts.find({ doctor_id: doctorId });
+
+        // Filter each shift
+        const availableShiftsByDay = {};
+
+        for (let day of daysOfWeek) {
+            // Filter shifts by day
+            const dayShifts = allShifts.filter(shift => shift.day === day);
+
+            const filteredShifts = [];
+
+            for (let shift of dayShifts) {
+                const shiftAlreadyBooked = await Appointment.findOne({
+                    shifts_id: shift._id,
+                    appointment_date: req.body.appointment_date
+                });
+
+                if (shiftAlreadyBooked) continue; // Skip if booked
+
+                // Compare times only if appointment date is today
+                let shiftTime = shift.time;
+                let now = new Date();
+                let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                let nowDateTime = new Date();
+
+                if (
+                    appointmentDate.toDateString() === now.toDateString() &&
+                    nowDateTime > shiftDateTime
+                ) {
+                    continue; // Skip if time passed today
+                }
+
+                // Shift is available
+                filteredShifts.push(shift);
+            }
+
+            availableShiftsByDay[day] = filteredShifts;
+        }
+
+        res.send({
+            success: true,
+            message: "Available shifts fetched successfully",
+            shifts: availableShiftsByDay
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Waxaa dhacay qalad server-ka"
+        });
+    }
+};
+
+exports.Sunday_Shifts = async function(req, res) {
+    try {
+        const doctorId = ObjectId(req.body.doctor_id);
+        const appointmentDate = new Date(req.body.appointment_date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set to start of today
+
+        // Haddii appointment_date la dhafay, soo celin waxba
+        if (appointmentDate < currentDate) {
+            return res.send({
+                success: false,
+                message: "The date you selected has already passed"
+            });
+        }
+
+        // List of days
+        const daysOfWeek = ["Sunday"];
+
+        // Get all shifts of the doctor
+        const allShifts = await Shifts.find({ doctor_id: doctorId });
+
+        // Filter each shift
+        const availableShiftsByDay = {};
+
+        for (let day of daysOfWeek) {
+            // Filter shifts by day
+            const dayShifts = allShifts.filter(shift => shift.day === day);
+
+            const filteredShifts = [];
+
+            for (let shift of dayShifts) {
+                const shiftAlreadyBooked = await Appointment.findOne({
+                    shifts_id: shift._id,
+                    appointment_date: req.body.appointment_date
+                });
+
+                if (shiftAlreadyBooked) continue; // Skip if booked
+
+                // Compare times only if appointment date is today
+                let shiftTime = shift.time;
+                let now = new Date();
+                let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                let nowDateTime = new Date();
+
+                if (
+                    appointmentDate.toDateString() === now.toDateString() &&
+                    nowDateTime > shiftDateTime
+                ) {
+                    continue; // Skip if time passed today
+                }
+
+                // Shift is available
+                filteredShifts.push(shift);
+            }
+
+            availableShiftsByDay[day] = filteredShifts;
+        }
+
+        res.send({
+            success: true,
+            message: "Available shifts fetched successfully",
+            shifts: availableShiftsByDay
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Waxaa dhacay qalad server-ka"
+        });
+    }
+};
+
+exports.Monday_Shifts = async function(req, res) {
+    try {
+        const doctorId = ObjectId(req.body.doctor_id);
+        const appointmentDate = new Date(req.body.appointment_date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set to start of today
+
+        // Haddii appointment_date la dhafay, soo celin waxba
+        if (appointmentDate < currentDate) {
+            return res.send({
+                success: false,
+                message: "The date you selected has already passed"
+            });
+        }
+
+        // List of days
+        const daysOfWeek = ["Monday"];
+
+        // Get all shifts of the doctor
+        const allShifts = await Shifts.find({ doctor_id: doctorId });
+
+        // Filter each shift
+        const availableShiftsByDay = {};
+
+        for (let day of daysOfWeek) {
+            // Filter shifts by day
+            const dayShifts = allShifts.filter(shift => shift.day === day);
+
+            const filteredShifts = [];
+
+            for (let shift of dayShifts) {
+                const shiftAlreadyBooked = await Appointment.findOne({
+                    shifts_id: shift._id,
+                    appointment_date: req.body.appointment_date
+                });
+
+                if (shiftAlreadyBooked) continue; // Skip if booked
+
+                // Compare times only if appointment date is today
+                let shiftTime = shift.time;
+                let now = new Date();
+                let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                let nowDateTime = new Date();
+
+                if (
+                    appointmentDate.toDateString() === now.toDateString() &&
+                    nowDateTime > shiftDateTime
+                ) {
+                    continue; // Skip if time passed today
+                }
+
+                // Shift is available
+                filteredShifts.push(shift);
+            }
+
+            availableShiftsByDay[day] = filteredShifts;
+        }
+
+        res.send({
+            success: true,
+            message: "Available shifts fetched successfully",
+            shifts: availableShiftsByDay
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Waxaa dhacay qalad server-ka"
+        });
+    }
+};
+
+
+exports.Tuesday_Shifts = async function(req, res) {
+    try {
+        const doctorId = ObjectId(req.body.doctor_id);
+        const appointmentDate = new Date(req.body.appointment_date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set to start of today
+
+        // Haddii appointment_date la dhafay, soo celin waxba
+        if (appointmentDate < currentDate) {
+            return res.send({
+                success: false,
+                message: "The date you selected has already passed"
+            });
+        }
+
+        // List of days
+        const daysOfWeek = ["Tuesday"];
+
+        // Get all shifts of the doctor
+        const allShifts = await Shifts.find({ doctor_id: doctorId });
+
+        // Filter each shift
+        const availableShiftsByDay = {};
+
+        for (let day of daysOfWeek) {
+            // Filter shifts by day
+            const dayShifts = allShifts.filter(shift => shift.day === day);
+
+            const filteredShifts = [];
+
+            for (let shift of dayShifts) {
+                const shiftAlreadyBooked = await Appointment.findOne({
+                    shifts_id: shift._id,
+                    appointment_date: req.body.appointment_date
+                });
+
+                if (shiftAlreadyBooked) continue; // Skip if booked
+
+                // Compare times only if appointment date is today
+                let shiftTime = shift.time;
+                let now = new Date();
+                let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                let nowDateTime = new Date();
+
+                if (
+                    appointmentDate.toDateString() === now.toDateString() &&
+                    nowDateTime > shiftDateTime
+                ) {
+                    continue; // Skip if time passed today
+                }
+
+                // Shift is available
+                filteredShifts.push(shift);
+            }
+
+            availableShiftsByDay[day] = filteredShifts;
+        }
+
+        res.send({
+            success: true,
+            message: "Available shifts fetched successfully",
+            shifts: availableShiftsByDay
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Waxaa dhacay qalad server-ka"
+        });
+    }
+};
+
+
+exports.Wednesday_Shifts = async function(req, res) {
+    try {
+        const doctorId = ObjectId(req.body.doctor_id);
+        const appointmentDate = new Date(req.body.appointment_date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set to start of today
+
+        // Haddii appointment_date la dhafay, soo celin waxba
+        if (appointmentDate < currentDate) {
+            return res.send({
+                success: false,
+                message: "The date you selected has already passed"
+            });
+        }
+
+        // List of days
+        const daysOfWeek = ["Wednesday"];
+
+        // Get all shifts of the doctor
+        const allShifts = await Shifts.find({ doctor_id: doctorId });
+
+        // Filter each shift
+        const availableShiftsByDay = {};
+
+        for (let day of daysOfWeek) {
+            // Filter shifts by day
+            const dayShifts = allShifts.filter(shift => shift.day === day);
+
+            const filteredShifts = [];
+
+            for (let shift of dayShifts) {
+                const shiftAlreadyBooked = await Appointment.findOne({
+                    shifts_id: shift._id,
+                    appointment_date: req.body.appointment_date
+                });
+
+                if (shiftAlreadyBooked) continue; // Skip if booked
+
+                // Compare times only if appointment date is today
+                let shiftTime = shift.time;
+                let now = new Date();
+                let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                let nowDateTime = new Date();
+
+                if (
+                    appointmentDate.toDateString() === now.toDateString() &&
+                    nowDateTime > shiftDateTime
+                ) {
+                    continue; // Skip if time passed today
+                }
+
+                // Shift is available
+                filteredShifts.push(shift);
+            }
+
+            availableShiftsByDay[day] = filteredShifts;
+        }
+
+        res.send({
+            success: true,
+            message: "Available shifts fetched successfully",
+            shifts: availableShiftsByDay
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Waxaa dhacay qalad server-ka"
+        });
+    }
+};
+
+
+exports.Thursday_Shifts = async function(req, res) {
+    try {
+        const doctorId = ObjectId(req.body.doctor_id);
+        const appointmentDate = new Date(req.body.appointment_date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set to start of today
+
+        // Haddii appointment_date la dhafay, soo celin waxba
+        if (appointmentDate < currentDate) {
+            return res.send({
+                success: false,
+                message: "The date you selected has already passed"
+            });
+        }
+
+        // List of days
+        const daysOfWeek = ["Thursday"];
+
+        // Get all shifts of the doctor
+        const allShifts = await Shifts.find({ doctor_id: doctorId });
+
+        // Filter each shift
+        const availableShiftsByDay = {};
+
+        for (let day of daysOfWeek) {
+            // Filter shifts by day
+            const dayShifts = allShifts.filter(shift => shift.day === day);
+
+            const filteredShifts = [];
+
+            for (let shift of dayShifts) {
+                const shiftAlreadyBooked = await Appointment.findOne({
+                    shifts_id: shift._id,
+                    appointment_date: req.body.appointment_date
+                });
+
+                if (shiftAlreadyBooked) continue; // Skip if booked
+
+                // Compare times only if appointment date is today
+                let shiftTime = shift.time;
+                let now = new Date();
+                let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                let nowDateTime = new Date();
+
+                if (
+                    appointmentDate.toDateString() === now.toDateString() &&
+                    nowDateTime > shiftDateTime
+                ) {
+                    continue; // Skip if time passed today
+                }
+
+                // Shift is available
+                filteredShifts.push(shift);
+            }
+
+            availableShiftsByDay[day] = filteredShifts;
+        }
+
+        res.send({
+            success: true,
+            message: "Available shifts fetched successfully",
+            shifts: availableShiftsByDay
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Waxaa dhacay qalad server-ka"
+        });
+    }
+};
+
+
+
+exports.Friday_Shifts = async function(req, res) {
+    try {
+        const doctorId = ObjectId(req.body.doctor_id);
+        const appointmentDate = new Date(req.body.appointment_date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set to start of today
+
+        // Haddii appointment_date la dhafay, soo celin waxba
+        if (appointmentDate < currentDate) {
+            return res.send({
+                success: false,
+                message: "The date you selected has already passed"
+            });
+        }
+
+        // List of days
+        const daysOfWeek = ["Friday"];
+
+        // Get all shifts of the doctor
+        const allShifts = await Shifts.find({ doctor_id: doctorId });
+
+        // Filter each shift
+        const availableShiftsByDay = {};
+
+        for (let day of daysOfWeek) {
+            // Filter shifts by day
+            const dayShifts = allShifts.filter(shift => shift.day === day);
+
+            const filteredShifts = [];
+
+            for (let shift of dayShifts) {
+                const shiftAlreadyBooked = await Appointment.findOne({
+                    shifts_id: shift._id,
+                    appointment_date: req.body.appointment_date
+                });
+
+                if (shiftAlreadyBooked) continue; // Skip if booked
+
+                // Compare times only if appointment date is today
+                let shiftTime = shift.time;
+                let now = new Date();
+                let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                let nowDateTime = new Date();
+
+                if (
+                    appointmentDate.toDateString() === now.toDateString() &&
+                    nowDateTime > shiftDateTime
+                ) {
+                    continue; // Skip if time passed today
+                }
+
+                // Shift is available
+                filteredShifts.push(shift);
+            }
+
+            availableShiftsByDay[day] = filteredShifts;
+        }
+
+        res.send({
+            success: true,
+            message: "Available shifts fetched successfully",
+            shifts: availableShiftsByDay
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Waxaa dhacay qalad server-ka"
+        });
+    }
+};
+
+
 exports.adds = function(req, res){
     Adds.aggregate([
         {$match:{"status":1}}   

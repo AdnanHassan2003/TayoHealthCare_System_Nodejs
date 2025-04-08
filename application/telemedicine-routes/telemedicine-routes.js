@@ -178,15 +178,27 @@ module.exports = function (app) {
   app.route('/doctor_appointements').post(adminController.doctor_appointements); // waa all appointments uu doctor uu laga qabsaday
   app.route('/patient_transection').post(adminController.patient_transection);  // waa all transecton ka uu bixiyey patient
   app.route('/doctor_transection').post(adminController.doctor_transection);  // waa all transecton ka uu qatay doctor ka
-  app.route('/booking_Appointement').post(adminController.booking_Appointement);
-  app.route('/payPayement').post(adminController.payPayement);
+  app.route('/booking_Appointement').post(adminController.booking_Appointement);  //not work
+  app.route('/payPayement').post(adminController.payPayement);   // not work
   app.route('/bookAndPay').post(adminController.bookAndPay);
   app.route('/getAll_Hospitals').post(adminController.getAll_Hospitals);
-  app.route('/shifts').post(adminController.shifts);
-  app.route('/check_shifts').post(adminController.check_shifts);
+  app.route('/shifts').post(adminController.shifts);  // not work 
+  app.route('/check_shifts').post(adminController.check_shifts);  // not work
+  app.route('/Saturday_Shifts').post(adminController.Saturday_Shifts);
+  app.route('/Sunday_Shifts').post(adminController.Sunday_Shifts);
+  app.route('/Monday_Shifts').post(adminController.Monday_Shifts);
+  app.route('/Tuesday_Shifts').post(adminController.Tuesday_Shifts);
+  app.route('/Wednesday_Shifts').post(adminController.Wednesday_Shifts);
+  app.route('/Thursday_Shifts').post(adminController.Thursday_Shifts);
+  app.route('/Friday_Shifts').post(adminController.Friday_Shifts);
   app.route('/adds').post(adminController.adds);
   app.route('/selfmanagment').post(adminController.selfmanagment);
   app.route('/updateProfile').post(adminController.updateProfile);
+
+
+
+
+
   
 
 }
