@@ -4367,6 +4367,8 @@ exports.Saturday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
+                // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4440,6 +4442,8 @@ exports.Sunday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
+                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                 nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4513,6 +4517,8 @@ exports.Monday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
+                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                 nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4587,6 +4593,8 @@ exports.Tuesday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
+                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                 nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4661,6 +4669,8 @@ exports.Wednesday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
+                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                 nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4735,6 +4745,8 @@ exports.Thursday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
+                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                 nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4764,7 +4776,6 @@ exports.Thursday_Shifts = async function(req, res) {
         });
     }
 };
-
 
 
 exports.Friday_Shifts = async function(req, res) {
@@ -4810,6 +4821,8 @@ exports.Friday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
+                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                 nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
