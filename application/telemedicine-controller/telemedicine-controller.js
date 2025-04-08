@@ -4371,266 +4371,70 @@ exports.selfmanagment = function(req, res){
 
 
 
-// exports.updateProfile = function (req, res) {
-//     const profile_file = req.file;
-
-//     // Check if patient_id exists
-//     if (!req.body.patient_id) {
-//         return res.status(400).send({ status: 'error', message: 'Patient ID is required.' });
-//     }
-
-//     // Haddii aan la upload-garin wax sawir
-//     if (!profile_file) {
-//         Patient.findByIdAndUpdate(req.body.patient_id, req.body)
-//             .then((data) => {
-//                 if (data._id.equals(req.session.admin.patient_id)) {
-//                     return res.status(200).send({ status: 'success', message: 'Your profile was successfully updated.' });
-//                 }
-//                 res.status(200).send({ status: 'success', message: 'Profile updated successfully without picture.' });
-//             })
-//             .catch((err) => {
-//                 console.error("Error updating profile without picture:", err);
-//                 res.status(500).send({ status: 'error', message: 'An error occurred while updating profile.' });
-//             });
-//     } else {
-//         Patient.findById(req.body.patient_id)
-//             .then((user) => {
-//                 if (user.picture) {
-//                     Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
-//                 }
-
-//                 const ext = path.extname(profile_file.originalname).toLowerCase();
-//                 const image_name = user._id + "_" + Utils.tokenGenerator(4) + ext;
-//                 const uploadPath = path.join(__dirname, '../uploads/admin_profile/', image_name);
-
-//                 fs.rename(profile_file.path, uploadPath, function (err) {
-//                     if (err) {
-//                         console.error("Error moving file:", err);
-//                         return res.status(500).send({ status: 'error', message: 'File upload failed.' });
-//                     }
-
-//                     req.body.picture = "admin_profile/" + image_name;
-
-//                     Patient.findByIdAndUpdate(req.body.patient_id, req.body)
-//                         .then((data) => {
-//                             if (data._id.equals(req.session.admin.patient_id)) {
-//                                 return res.status(200).send({ status: 'success', message: 'Profile updated successfully with new picture.' });
-//                             }
-//                             res.status(200).send({ status: 'success', message: 'Profile updated successfully with new picture.' });
-//                         })
-//                         .catch((err) => {
-//                             console.error("Error updating patient with picture:", err);
-//                             res.status(500).send({ status: 'error', message: 'Could not update profile with picture.' });
-//                         });
-//                 });
-//             })
-//             .catch((err) => {
-//                 console.error("Error finding patient:", err);
-//                 res.status(500).send({ status: 'error', message: 'Error finding patient information.' });
-//             });
-//     }
-// };
 
 
+exports.updateProfile = function (req, res) {
+    console.log("gggggggg",req.body)
+    var profile_file = req.files;
 
+    if (!profile_file || profile_file == '' || profile_file == 'undefined') {
+        // Haddii file la’aan update, waa la diidi karaa ama fariin la dirayaa
+        return res.send({
+            success: false,
+            message: "No image uploaded"
+        });
+    } else {
+        // File waa la upload gareeyey – sawirka update garee kaliya
+        Patient.findById(req.body.patient_id).then((user) => {
+            if (user.picture) {
+                Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+            }
 
+            var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+            var url = "./uploads/admin_profile/" + image_name;
 
+            fs.readFile(req.files[0].path, function (err, data) {
+                if (err) {
+                    console.error("Error reading file:", err);
+                    return res.send({
+                        success: false,
+                        message: "Failed to read uploaded file"
+                    });
+                }
 
+                fs.writeFile(url, data, 'binary', function (err) {
+                    if (err) {
+                        console.error("Error writing file:", err);
+                        return res.send({
+                            success: false,
+                            message: "Failed to save profile picture"
+                        });
+                    }
 
-// exports.updateProfile = function (req, res) {
-//             var profile_file = req.files;
-//             if (profile_file == '' || profile_file == 'undefined') {
-//                 Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
-//                     if (data._id.equals(req.session.admin.patient_id)) {
-//                     } else {
-                       
-//                     }
-//                 }, (err) => {
-                  
-//                 });
-//             } else {
-//                 Patient.findById(req.body.patient_id).then((user) => {
-//                     if (user.picture) {
-//                         Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
-//                     }
-//                     var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
-//                     var url = "./uploads/admin_profile/" + image_name;
+                    fs.unlink(req.files[0].path, function (err) {
+                        if (err) console.error("Error deleting temp file:", err);
+                    });
 
-//                     fs.readFile(req.files[0].path, function (err, data) {
-//                         if (err) {
-//                             console.error("Error reading file:", err);
-//                         }
-
-//                         fs.writeFile(url, data, 'binary', function (err) {
-//                             if (err) {
-//                                 console.error("Error writing file:", err);
-//                             }
-
-//                             fs.unlink(req.files[0].path, function (err) {
-//                                 if (err) console.error("Error deleting temp file:", err);
-//                             });
-
-//                             // Cusbooneysii database
-//                             req.body.picture = "admin_profile/" + image_name;
-//                     // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
-//                     Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
-//                         if (data._id.equals(req.session.admin.patient_id)) {
-//                             Utils.redirect_login(req, res);
-//                         } else {
-                           
-//                         }
-//                     }, (err) => {
-                      
-//                     });
-//                 });
-//             });
-//         });
-//             }
-       
-// };
-
-
-// exports.updateProfile = function (req, res) {
-//     var profile_file = req.files;
-    
-//     if (!profile_file || profile_file == '' || profile_file == 'undefined') {
-//         // No file uploaded, just update the data
-//         Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
-//             if (data._id.equals(req.session.admin.patient_id)) {
-//                 res.send({
-//                     success: true,
-//                     message: "Successfully updated your profile (without image)"
-//                 });
-//             } else {
-//                 res.send({
-//                     success: true,
-//                     message: "Profile updated successfully"
-//                 });
-//             }
-//         }).catch((err) => {
-//             res.send({
-//                 success: false,
-//                 message: "Error while updating profile"
-//             });
-//         });
-//     } else {
-//         // File was uploaded, update picture and profile
-//         Patient.findById(req.body.patient_id).then((user) => {
-//             if (user.picture) {
-//                 Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
-//             }
-
-//             var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
-//             var url = "./uploads/admin_profile/" + image_name;
-
-//             fs.readFile(req.files[0].path, function (err, data) {
-//                 if (err) {
-//                     console.error("Error reading file:", err);
-//                     return res.send({
-//                         success: false,
-//                         message: "Failed to read uploaded file"
-//                     });
-//                 }
-
-//                 fs.writeFile(url, data, 'binary', function (err) {
-//                     if (err) {
-//                         console.error("Error writing file:", err);
-//                         return res.send({
-//                             success: false,
-//                             message: "Failed to save profile picture"
-//                         });
-//                     }
-
-//                     fs.unlink(req.files[0].path, function (err) {
-//                         if (err) console.error("Error deleting temp file:", err);
-//                     });
-
-//                     req.body.picture = "admin_profile/" + image_name;
-
-//                     Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
-//                         res.send({
-//                             success: true,
-//                             message: "Successfully updated profile with image"
-//                         });
-//                     }).catch((err) => {
-//                         res.send({
-//                             success: false,
-//                             message: "Error while updating profile with image"
-//                         });
-//                     });
-//                 });
-//             });
-//         });
-//     }
-// };
-
-
-
-
-
-
-// exports.updateProfile = function (req, res) {
-//     console.log("gggggggg",req.body)
-//     var profile_file = req.body.picture;
-
-//     if (!profile_file || profile_file == '' || profile_file == 'undefined') {
-//         // Haddii file la’aan update, waa la diidi karaa ama fariin la dirayaa
-//         return res.send({
-//             success: false,
-//             message: "No image uploaded"
-//         });
-//     } else {
-//         // File waa la upload gareeyey – sawirka update garee kaliya
-//         Patient.findById(req.body.patient_id).then((user) => {
-//             if (user.picture) {
-//                 Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
-//             }
-
-//             var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
-//             var url = "./uploads/admin_profile/" + image_name;
-
-//             fs.readFile(req.files[0].path, function (err, data) {
-//                 if (err) {
-//                     console.error("Error reading file:", err);
-//                     return res.send({
-//                         success: false,
-//                         message: "Failed to read uploaded file"
-//                     });
-//                 }
-
-//                 fs.writeFile(url, data, 'binary', function (err) {
-//                     if (err) {
-//                         console.error("Error writing file:", err);
-//                         return res.send({
-//                             success: false,
-//                             message: "Failed to save profile picture"
-//                         });
-//                     }
-
-//                     fs.unlink(req.files[0].path, function (err) {
-//                         if (err) console.error("Error deleting temp file:", err);
-//                     });
-
-//                     // Update only picture field
-//                     Patient.findByIdAndUpdate(
-//                         req.body.patient_id,
-//                         { picture: "admin_profile/" + image_name },
-//                         { useFindAndModify: false }
-//                     ).then((data) => {
-//                         res.send({
-//                             success: true,
-//                             message: "Profile picture updated successfully"
-//                         });
-//                     }).catch((err) => {
-//                         res.send({
-//                             success: false,
-//                             message: "Error while updating profile picture"
-//                         });
-//                     });
-//                 });
-//             });
-//         });
-//     }
-// };
+                    // Update only picture field
+                    Patient.findByIdAndUpdate(
+                        req.body.patient_id,
+                        { picture: "admin_profile/" + image_name },
+                        { useFindAndModify: false }
+                    ).then((data) => {
+                        res.send({
+                            success: true,
+                            message: "Profile picture updated successfully"
+                        });
+                    }).catch((err) => {
+                        res.send({
+                            success: false,
+                            message: "Error while updating profile picture"
+                        });
+                    });
+                });
+            });
+        });
+    }
+};
 
 

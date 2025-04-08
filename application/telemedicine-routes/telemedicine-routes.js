@@ -186,7 +186,7 @@ module.exports = function (app) {
   app.route('/check_shifts').post(adminController.check_shifts);
   app.route('/adds').post(adminController.adds);
   app.route('/selfmanagment').post(adminController.selfmanagment);
-  // app.route('/updateProfile').post(adminController.updateProfile);
+  app.route('/updateProfile').post(adminController.updateProfile);
   
 
 }
