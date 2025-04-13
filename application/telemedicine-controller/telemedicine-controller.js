@@ -1291,14 +1291,37 @@ exports.shifts_list = function(req, res){
 exports.adds_list = function(req, res){
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Adds.find({}).then((adds_data)=>{
 
+            var filter = {
+                $match: {},
+            };
+            var status = req.body.status
+            if (status != "ALL" && status != undefined && status != "") {
+                filter["$match"]["status"] = Number(status);
+            }
+
+
+            Adds.aggregate([
+                filter,
+     
+                    {$project:{
+                        _id:1,
+                        sequence_id:1,
+                        extra_detail:1,
+                        picture:1,
+                        status:1,
+                        create_date:1
+                              
+                        }}
+                
+                ]).then((adds_data)=>{
                 res.render('adds_list', {
                     url_data: req.session.menu_array,
                     detail: adds_data,
                     msg: req.session.error,
                     moment: moment,
-                    admin_type: req.session.admin.usertype
+                    admin_type: req.session.admin.usertype,
+                    status:status
                 });
             })
             
@@ -1316,14 +1339,38 @@ exports.adds_list = function(req, res){
 exports.selfmanagment_list = function(req, res){
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            SelfManagment.find({}).then((selfmanagment_data)=>{
 
+            var filter = {
+                $match: {},
+            };
+            var status = req.body.status
+            if (status != "ALL" && status != undefined && status != "") {
+                filter["$match"]["status"] = Number(status);
+            }
+
+            SelfManagment.aggregate([
+                filter,
+     
+                    {$project:{
+                        _id:1,
+                        sequence_id:1,
+                        title:1,
+                        extra_detail:1,
+                        picture:1,
+                        status:1,
+                        create_date:1
+                              
+                        }}
+
+            ]).then((selfmanagment_data)=>{
+                
                 res.render('selfmanagment_list', {
                     url_data: req.session.menu_array,
                     detail: selfmanagment_data,
                     msg: req.session.error,
                     moment: moment,
-                    admin_type: req.session.admin.usertype
+                    admin_type: req.session.admin.usertype,
+                    status:status
                 });
             })
             
@@ -4399,6 +4446,7 @@ exports.Saturday_Shifts = async function(req, res) {
     }
 };
 
+
 exports.Sunday_Shifts = async function(req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
@@ -4474,6 +4522,7 @@ exports.Sunday_Shifts = async function(req, res) {
     }
 };
 
+
 exports.Monday_Shifts = async function(req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
@@ -4548,6 +4597,7 @@ exports.Monday_Shifts = async function(req, res) {
         });
     }
 };
+
 
 
 exports.Tuesday_Shifts = async function(req, res) {
@@ -4626,6 +4676,7 @@ exports.Tuesday_Shifts = async function(req, res) {
 };
 
 
+
 exports.Wednesday_Shifts = async function(req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
@@ -4700,6 +4751,7 @@ exports.Wednesday_Shifts = async function(req, res) {
         });
     }
 };
+
 
 
 exports.Thursday_Shifts = async function(req, res) {
@@ -4854,6 +4906,7 @@ exports.Friday_Shifts = async function(req, res) {
 };
 
 
+
 exports.adds = function(req, res){
     Adds.aggregate([
         {$match:{"status":1}}   
@@ -4874,7 +4927,6 @@ exports.adds = function(req, res){
     })
 
 }
-
 
 
 
@@ -4903,11 +4955,8 @@ exports.selfmanagment = function(req, res){
 
 
 
-
 exports.updateProfile = function (req, res) {
-    console.log("gggggggg",req.body)
     var profile_file = req.files;
-
     if (!profile_file || profile_file == '' || profile_file == 'undefined') {
         // Haddii file la’aan update, waa la diidi karaa ama fariin la dirayaa
         return res.send({
@@ -4920,7 +4969,6 @@ exports.updateProfile = function (req, res) {
             if (user.picture) {
                 Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
             }
-
             var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
             var url = "./uploads/admin_profile/" + image_name;
 

@@ -65,9 +65,35 @@
               <form style="background-color: #ffffff; padding: 10px; margin-bottom:10px;" class="form-data" role="form"
                 method="post" action="/selfmanagment_list">
                 <div class="row">
-                    <div class="col-md-6">
+                    
+                      <div class="col-md-3">
                   
-
+                        <div class="form-group">
+                          <label for="status">
+                            Status
+                          </label>
+                          <select class="form-control custom-select" id="status" name="status">
+                            <%if(status == 1){%>
+                              <option value="ALL">All</option>
+                              <option value="1" selected>Active</option>
+                              <option value="0"> Inactive</option>
+                             
+                              
+                            <%}else if(status == 0){%>
+                              <option value="ALL">All</option>
+                              <option value="1">Active</option>
+                              <option value="0" selected> Inactive</option>
+                             
+    
+                            <%}else if(status=='ALL' || status==undefined) {%>
+                              <option value="ALL" selected>All</option>
+                              <option value="1">Active</option>
+                              <option value="0"> Inactive</option>
+                              
+                            <%}%> 
+                
+                          </select>
+                      </div>
                     </div>
                     <!-- /.col -->
                     <div class="col-md-2">
