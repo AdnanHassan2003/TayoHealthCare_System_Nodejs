@@ -2035,7 +2035,7 @@ exports.save_appointment_data = function (req, res) {
                         var appointment = new Appointment({
                             reason: reason,
                             sequence_id: Utils.get_unique_id(),
-                            status: 0,
+                            status: 1,
                             doctor_id:req.body.doctor_id,
                             patient_id:req.body.patient_id,
                             appointment_date:req.body.appointment_date,
@@ -4136,7 +4136,7 @@ exports.bookAndPay = function (req, res) {
             var appointment = new Appointment({
                 reason: req.body.reason,
                 sequence_id: Utils.get_unique_id(),
-                status: 0,
+                status: 1,
                 doctor_id: req.body.doctor_id,
                 patient_id: req.body.patient_id,
                 shifts_id: req.body.shifts_id,
