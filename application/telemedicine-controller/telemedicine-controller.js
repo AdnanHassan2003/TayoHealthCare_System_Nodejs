@@ -10,6 +10,7 @@ var Feedback = require('mongoose').model('feedback')
 var Shifts = require('mongoose').model('shifts')
 var Adds = require('mongoose').model('adds')
 var SelfManagment = require('mongoose').model('selfmanagment')
+var Conseltaion = require('mongoose').model('conseltation')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -5125,4 +5126,58 @@ exports.conseltaion = function(req, res){
 
         })
         
+}
+
+
+
+exports.save_conseltaion = function(req, res){
+
+    var roomID = req.body.roomID
+    var conseltaion = new Conseltaion({
+        roomID:roomID,
+        sequence_id:Utils.get_unique_id(),
+        doctor_id:req.body.doctor_id,
+        patient_id:req.body.patient_id,
+        status:"pending",
+    
+    });
+
+    conseltaion.save().then((conseltaion)=>{
+        if(conseltaion){
+            res.send({
+                success:true,
+                message:"successfully to register conseltation",
+                record:conseltaion
+            })
+        }
+        else{
+            res.send({
+                success:false,
+                message:"Sorry! not register conseltation",
+            })
+
+        }
+
+    })
+
+}
+
+
+
+exports.update_conseltaion = function(req,res){
+    Conseltaion.findOneAndUpdate({roomID:req.body.roomID}, { $set: { status: req.body.status } }).then((updateConsel)=>{
+        if(updateConsel){
+            res.send({
+                success:true,
+                message:"Successfully to update conseltation status",
+                record:updateConsel
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! not update conseltation status"
+            })
+        }
+
+    })
 }

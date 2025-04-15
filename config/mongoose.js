@@ -27,7 +27,7 @@ module.exports = function () {
     require("../application/model/shifts");
     require("../application/model/adds");
     require("../application/model/selfmanagment");
-    
+    require("../application/model/conseltation");
     
 
     return db;

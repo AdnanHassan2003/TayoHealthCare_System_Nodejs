@@ -196,6 +196,8 @@ module.exports = function (app) {
   app.route('/updateProfile').post(adminController.updateProfile);
   app.route('/docAndpat').post(adminController.docAndpat);
   app.route('/conseltaion').post(adminController.conseltaion);
+  app.route('/save_conseltaion').post(adminController.save_conseltaion);
+  app.route('/update_conseltaion').post(adminController.update_conseltaion);
 
 
 
