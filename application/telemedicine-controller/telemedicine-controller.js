@@ -5017,3 +5017,112 @@ exports.updateProfile = function (req, res) {
 };
 
 
+
+exports.docAndpat = function(req, res){
+    Doctor.find({}).then((doctorData)=>{
+        Patient.find({}).then((patientData)=>{
+            if(doctorData && patientData){
+                
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch all Doctors And Patients",
+                    record:doctorData,patientData
+                })
+
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch  Doctors And Patients"
+                })
+            }
+
+        })
+    })
+
+}
+
+
+
+ 
+//Api get all appointments for doctor
+exports.conseltaion = function(req, res){
+    Appointment.aggregate([
+
+        {
+            $match: {
+                doctor_id: ObjectId(req.body.doctor_id),
+                status: 1
+            }
+        },
+
+        {$lookup:{
+            
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        
+            }},
+            
+            {$unwind:"$doctor_data"},
+            
+            {$lookup:{
+            
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        
+            }},
+            
+            {$unwind:"$patient_data"},
+
+            {$lookup:{
+            
+                from:"shifts",
+                localField:"shifts_id",
+                foreignField:"_id",
+                as:"shifts_data"
+            
+                }},
+                
+                {$unwind:"$shifts_data"},
+            
+            
+            {$project:{
+                _id:1,
+                doctor_name:"$doctor_data.name",
+                doctor_id:"$doctor_data._id",
+                patient_name:"$patient_data.name",
+                patient_id:"$patient_data._id",
+                patient_profile:"$patient_data.picture",
+                shift_time:"$shifts_data.time",
+                shift_day:"$shifts_data.day",
+                sequence_id:1,
+                appointment_date:1,
+                status:1,
+                create_date:1
+                      
+                }}
+        
+        ]).then((conseltation_data)=>{
+
+            if(conseltation_data){
+
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch All Patients pending conseltation",
+                    record:conseltation_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch  Patients pending conseltation"
+                })
+    
+            }
+
+
+        })
+        
+}
