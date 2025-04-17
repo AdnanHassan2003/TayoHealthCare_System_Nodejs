@@ -40,7 +40,6 @@
     "password-validator": "^5.1.1",
     "redis": "^2.8.0",
     "request": "^2.88.2",
-    "socket.io": "^4.8.1",
     "tempfile": "^3.0.0",
     "xlsx": "^0.16.9"
   }
