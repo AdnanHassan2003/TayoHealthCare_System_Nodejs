@@ -5189,3 +5189,41 @@ exports.update_conseltaion = function(req,res){
 
     })
 }
+
+
+
+
+
+exports.update_token = function(req, res){
+    Doctor.findOne({ _id:req.body._id}).then((doctor) => {
+        if(doctor){
+            Doctor.findOneAndUpdate({ _id: req.body._id }, { $set: { token: req.body.token }}, { new: true }).then((data_doctor) => {
+                console.log("gggggg",data_doctor)
+
+                res.send({
+                    success:true,
+                    message:"Successfully to Update Doctor",
+                    record:data_doctor
+                })
+            })
+        }else{
+            Patient.findOne({ _id: req.body._id}).then((patient) => {
+                if(patient){
+                    Patient.findOneAndUpdate({ _id: req.body._id }, { $set: { token: req.body.token }}, { new: true }).then((data_patient) => {
+                        res.send({
+                            success:true,
+                            message:"Successfully to Update Patient",
+                            record:data_patient
+                        })
+                    })
+                }else{
+                    res.send({
+                        success:false,
+                        message:"Invalid Email or Password"
+                    })
+                }
+            });
+          
+        }
+    })
+}

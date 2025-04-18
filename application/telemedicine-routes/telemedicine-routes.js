@@ -204,6 +204,7 @@ module.exports = function (app) {
   app.route('/conseltaion').post(adminController.conseltaion);
   app.route('/save_conseltaion').post(adminController.save_conseltaion);
   app.route('/update_conseltaion').post(adminController.update_conseltaion);
+  app.route('/update_token').post(adminController.update_token);
 
 
 
