@@ -3570,7 +3570,212 @@ exports.admn_change_admin_pass = function (req, res) {
     });
 };
 
+//--------------------------------------------------------------------------------------------------
 
+
+//All reports for system
+
+exports.appointmentReport = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+
+            Appointment.aggregate([
+                {
+                    $lookup: {
+                      from: "doctors",
+                      localField: "doctor_id",
+                      foreignField: "_id",
+                      as: "appointmentReport"
+                    }
+                  },
+                  {
+                    $unwind: "$appointmentReport"
+                  },
+                  {
+                    $group: {
+                      _id: "$doctor_id",
+                      doctor_name: { $first: "$appointmentReport.name" },
+                      total_appointments: { $sum: 1 },
+                      total_Pending: {$sum: {$cond: [{ $eq: ["$status", 0] }, 1,0,] }},
+                      total_confirm: {$sum: {$cond: [{ $eq: ["$status", 1] }, 1,0,] }},
+                      total_compelete: {$sum: {$cond: [{ $eq: ["$status", 2] }, 1,0,] }}
+                      }},
+                      
+                      {$project:{
+                          _id:1,
+                          doctor_name:1,
+                          total_appointments:1,
+                          total_Pending:1,
+                          total_confirm:1,
+                          total_compelete:1
+                          }}
+              ]).then((appointmentData)=>{
+                res.render('appointmentReport_list', {
+                    url_data: req.session.menu_array,
+                    detail: appointmentData,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+              })
+        }
+    });
+}
+
+
+
+exports.paymentReport = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Payment.aggregate([
+
+                {
+                  $lookup: {
+                    from: "doctors",
+                    localField: "doctor_id",
+                    foreignField: "_id",
+                    as: "paymentReport"
+                  }
+                },
+                {
+                  $unwind: "$paymentReport"
+                },
+                
+                  {
+                  $group: {
+                    _id: "$doctor_id",
+                    doctor_name: { $first: "$paymentReport.name" },
+                    total_transections: { $sum: 1 },
+                    total_payment:{$sum:"$amount"}
+                    }
+                    
+                },
+                
+                {$project:{
+                    _id:1,
+                    doctor_name:1,
+                    total_transections:1,
+                    total_payment:1
+                    
+                    
+                    }}
+              
+              ]).then((paymentData)=>{
+
+                res.render('paymentReport_list',{
+                    url_data: req.session.menu_array,
+                    detail: paymentData,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                })
+
+              })
+
+        }
+    });
+}
+
+
+
+exports.hospitalReport = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+
+            Doctor.aggregate([
+
+                {
+                  $lookup: {
+                    from: "hospitals",
+                    localField: "hospital_id",
+                    foreignField: "_id",
+                    as: "hospitalReport"
+                  }
+                },
+                
+                {$unwind:"$hospitalReport"},
+                
+                {$group:{
+                     _id: "$hospital_id",
+                     hospital_name:{ $first: "$hospitalReport.name" },
+                     total_doctor:{$sum:1}
+                    
+                    }},
+                    
+                    
+                    {$project:{
+                        _id:1,
+                        hospital_name:1,
+                        total_doctor:1
+                        
+                        }}
+              
+              ]).then((hospitalData)=>{
+                res.render('hospitalReport_list',{
+                    url_data: req.session.menu_array,
+                    detail: hospitalData,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+
+                })
+
+              })
+
+        }
+    });
+}
+
+
+
+exports.feedbackReport = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+
+            Feedback.aggregate([
+
+                {
+                  $lookup: {
+                    from: "doctors",
+                    localField: "doctor_id",
+                    foreignField: "_id",
+                    as: "feedbackReport"
+                  }
+                },
+                {
+                  $unwind: "$feedbackReport"
+                },
+                
+                {$group:{
+                    _id: "$doctor_id",
+                    doctor_name: { $first: "$feedbackReport.name" },
+                    tatal_rating:{$sum:1},
+                    average_rating: { $avg: "$rating" }
+                    }},
+                    
+                    {
+                  $project: {
+                    doctor_name: 1,
+                    tatal_rating: 1,
+                    average_rating: { $round: ["$average_rating", 1] }
+                  }
+                }
+                
+              ]).then((feedbackData)=>{
+                res.render('feedbackReport_list',{
+                    url_data: req.session.menu_array,
+                    detail: feedbackData,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+
+                })
+
+              })
+
+        }
+    });
+}
 
 
 
