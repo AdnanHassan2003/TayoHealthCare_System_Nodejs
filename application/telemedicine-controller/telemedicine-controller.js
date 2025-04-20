@@ -5313,6 +5313,8 @@ exports.conseltaion = function(req, res){
                 doctor_id:"$doctor_data._id",
                 patient_name:"$patient_data.name",
                 patient_id:"$patient_data._id",
+                patient_token:"$patient_data.token",
+                doctor_token:"$doctor_data.token",
                 patient_profile:"$patient_data.picture",
                 shift_time:"$shifts_data.time",
                 shift_day:"$shifts_data.day",
