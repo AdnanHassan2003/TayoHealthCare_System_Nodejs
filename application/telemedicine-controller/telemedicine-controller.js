@@ -32,6 +32,7 @@ const { each } = require('async')
 const { utils } = require('xlsx')
 const { group, Console } = require('console')
 const message = require('../model/message')
+const appointment = require('../model/appointment')
 // const { utils } = require('xlsx/types')
 var ObjectId = require('mongodb').ObjectID;
 
@@ -54,16 +55,16 @@ exports.check_admin_login = function (req, res) {
             user_name['user_name'] = name;
             var password = {};
             password['password'] = hash;
-           // console.log("hash", hash)
+            // console.log("hash", hash)
             Admin.findOne({ $and: [{ $or: [phone, email, user_name] }, { status: 1 }] }).then((admin) => {
-              
+
                 if (!admin) {
                     req.session.error = process.env.user_not_registered;
                     res.redirect("/")
                 } else {
                     if (!admin.comparePassword((req.body.password).toString())) {
-                      //!admin.comparePassword((req.body.password).toString())
-                      //admin.password != hash
+                        //!admin.comparePassword((req.body.password).toString())
+                        //admin.password != hash
                         var login_attempts = admin.login_attempts + 1;
                         Admin.updateOne({ _id: admin._id }, { login_attempt_time: new Date(Date.now()), login_attempts: login_attempts }, { useFindAndModify: false }).then((Admin) => {
                         });
@@ -84,82 +85,82 @@ exports.check_admin_login = function (req, res) {
                         }
                         req.session.admin = admin_data;
                         Admin.updateOne({ _id: admin._id }, { token: token, last_login: new Date(Date.now()), login_attempts: 0 }, { useFindAndModify: false }).then((Adminn) => {
-                                              
-                                            var match = {
-                                                $match: {
-                                                    parent_menu: null,
-                                                },
-                                            };
-                                            var lookup = {
-                                                $lookup: {
-                                                    from: "menus",
-                                                    let: { menu_id: "$_id" },
-                                                    pipeline: [{
-                                                        $match: {
-                                                            $expr: {
-                                                                $eq: [
-                                                                    "$parent_menu",
-                                                                    "$$menu_id",
-                                                                ],
-                                                            },
-                                                            status: 1
-                                                        },
-                                                    },],
-                                                    as: "menu_details",
-                                                },
-                                            };
-                
-                                            if (admin.type != 0) {
-                                                const allowed_urls = admin.allowed_urls.map((url) => ObjectId(url));
-                                                console.log("urls",allowed_urls)
-                                                lookup = {
-                                                    $lookup: {
-                                                        from: "menus",
-                                                        let: { parent_menu: "$_id" },
-                                                        pipeline: [{
-                                                            $match: {
-                                                                $expr: {
-                                                                    $and: [{
-                                                                        $eq: [
-                                                                            "$parent_menu",
-                                                                            "$$parent_menu",
-                                                                        ],
-                                                                    },
-                                                                    { $in: ["$_id", allowed_urls] },
-                                                                    ],
-                                                                },
-                                                                status: 1
-                                                            },
-                                                        },],
-                                                        as: "menu_details",
+
+                            var match = {
+                                $match: {
+                                    parent_menu: null,
+                                },
+                            };
+                            var lookup = {
+                                $lookup: {
+                                    from: "menus",
+                                    let: { menu_id: "$_id" },
+                                    pipeline: [{
+                                        $match: {
+                                            $expr: {
+                                                $eq: [
+                                                    "$parent_menu",
+                                                    "$$menu_id",
+                                                ],
+                                            },
+                                            status: 1
+                                        },
+                                    },],
+                                    as: "menu_details",
+                                },
+                            };
+
+                            if (admin.type != 0) {
+                                const allowed_urls = admin.allowed_urls.map((url) => ObjectId(url));
+                                console.log("urls", allowed_urls)
+                                lookup = {
+                                    $lookup: {
+                                        from: "menus",
+                                        let: { parent_menu: "$_id" },
+                                        pipeline: [{
+                                            $match: {
+                                                $expr: {
+                                                    $and: [{
+                                                        $eq: [
+                                                            "$parent_menu",
+                                                            "$$parent_menu",
+                                                        ],
                                                     },
-                                                };
-                                            }
-                                            var project = {
-                                                $project: {
-                                                    title: 1,
-                                                    icon: 1,
-                                                    status: 1,
-                                                    "menu_details.title": 1,
-                                                    "menu_details.icon": 1,
-                                                    "menu_details.url": 1,
+                                                    { $in: ["$_id", allowed_urls] },
+                                                    ],
                                                 },
-                                            };
-                                            Menu.aggregate([ match,lookup, project]).then((menu_array) => {
-                                                console.log("menu_array",menu_array)
-                                                req.session.menu_array = menu_array;
+                                                status: 1
+                                            },
+                                        },],
+                                        as: "menu_details",
+                                    },
+                                };
+                            }
+                            var project = {
+                                $project: {
+                                    title: 1,
+                                    icon: 1,
+                                    status: 1,
+                                    "menu_details.title": 1,
+                                    "menu_details.icon": 1,
+                                    "menu_details.url": 1,
+                                },
+                            };
+                            Menu.aggregate([match, lookup, project]).then((menu_array) => {
+                                console.log("menu_array", menu_array)
+                                req.session.menu_array = menu_array;
 
-                                                res.redirect("/dashboard")
+                                res.redirect("/dashboard")
 
-                                                // url_data: req.session.menu_array,
-                                                // Totaladmin: totaladmin,
-                                                // Totalsudents: 0,
-                                                // Totalcass: 0,
-                                                // Totalpayment: 0
-                                      
+                                // url_data: req.session.menu_array,
+                                // Totaladmin: totaladmin,
+                                // Totalsudents: 0,
+                                // Totalcass: 0,
+                                // Totalpayment: 0
+
                                 // })
-                                })
-                            
+                            })
+
                         })
                     }
                 }
@@ -180,56 +181,60 @@ exports.dashboard = function (req, res) {
 
             Admin.aggregate([
 
-                {$group:{_id:null,
-                    Total_Admin:{$sum:1}}},
-                    
-                    
-                  
-                ]).then((totaladmin) => {
-                   
-                        Doctor.aggregate([
-        
+                {
+                    $group: {
+                        _id: null,
+                        Total_Admin: { $sum: 1 }
+                    }
+                },
+
+
+
+            ]).then((totaladmin) => {
+
+                Doctor.aggregate([
+
+                    {
+                        $group: {
+                            _id: null,
+                            Total_Doctor: { $sum: 1 }
+                        }
+                    }
+
+
+
+                ]).then((totaldoctor) => {
+                    Patient.aggregate([
+
+                        {
+                            $group: {
+                                _id: null,
+                                Total_Patient: { $sum: 1 }
+                            }
+                        }
+
+
+
+                    ]).then((totalpatient) => {
+                        Hospital.aggregate([
+
                             {
                                 $group: {
                                     _id: null,
-                                    Total_Doctor: { $sum: 1 }
+                                    Total_Hospital: { $sum: 1 }
                                 }
                             }
-        
-        
-                    
-                        ]).then((totaldoctor) => {
-                            Patient.aggregate([
-        
-                                {
-                                    $group: {
-                                        _id: null,
-                                        Total_Patient: { $sum: 1 }
-                                    }
-                                }
-        
-        
-                        
-                            ]).then((totalpatient) => {
-                                Hospital.aggregate([
-        
-                                    {
-                                        $group: {
-                                            _id: null,
-                                            Total_Hospital: { $sum: 1 }
-                                        }
-                                    }
-        
-        
-                            
-                                ]).then((totalhospital) => {
+
+
+
+                        ]).then((totalhospital) => {
                             res.render('home', {
                                 TotalAdmin: totaladmin,
                                 TotalDoctor: totaldoctor,
-                                TotalPatient:totalpatient,
-                                TotalHospital:totalhospital,
+                                TotalPatient: totalpatient,
+                                TotalHospital: totalhospital,
                                 url_data: req.session.menu_array
-                                
+
                             })
                         })
                     })
@@ -284,7 +289,7 @@ exports.list_admin = function (req, res) {
                 end_date = new Date(end_date)
             }
 
-             var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+            var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
 
             f_start_date = moment(start_date).format("YYYY-MM-DD");
             f_end_date = moment(end_date).format("YYYY-MM-DD");
@@ -425,15 +430,15 @@ exports.list_admin = function (req, res) {
 //         }
 //     });
 // };
- 
 
- 
+
+
 
 // Handle menu_list
 exports.menu_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            
+
             var menu_lookup = {
                 $lookup: {
                     from: 'menus',
@@ -448,8 +453,8 @@ exports.menu_list = function (req, res) {
                     path: "$menu_details",
                     preserveNullAndEmptyArrays: true
                 }
-            }  
-             var project = {
+            }
+            var project = {
                 $project: {
                     _id: 1,
                     sequence_id: 1,
@@ -478,7 +483,7 @@ exports.menu_list = function (req, res) {
                 });
             })
         } else {
-           
+
             Utils.redirect_login(req, res);
         }
     });
@@ -575,38 +580,42 @@ exports.doctor_list = function (req, res) {
                     query_search["$match"][search_item] = search_value;
                 }
             }
-            
+
             Doctor.aggregate([
                 query_search,
                 sort,
 
-                { $lookup:{
-                    from:"hospitals",
-                    localField:"hospital_id",
-                    foreignField:"_id",
-                    as:"data"
-                    }},
-                    
-                    
-                    {$unwind:"$data"},
-                    
-                    {$project:{
-                        _id:1,
-                        sequence_id:1,
-                        name:1,
-                        picture:1,
-                        phone:1,
-                        email:1,
-                        hospital_name:"$data.name",
-                        countries:1,
-                        speciality:1,
-                        experience_years:1,
-                        consultation_fee:1,
-                        status:1,
-                        create_date:1
-                        }}
-              
-            ]).then((doctor)=>{
+                {
+                    $lookup: {
+                        from: "hospitals",
+                        localField: "hospital_id",
+                        foreignField: "_id",
+                        as: "data"
+                    }
+                },
+
+
+                { $unwind: "$data" },
+
+                {
+                    $project: {
+                        _id: 1,
+                        sequence_id: 1,
+                        name: 1,
+                        picture: 1,
+                        phone: 1,
+                        email: 1,
+                        hospital_name: "$data.name",
+                        countries: 1,
+                        speciality: 1,
+                        experience_years: 1,
+                        consultation_fee: 1,
+                        status: 1,
+                        create_date: 1
+                    }
+                }
+
+            ]).then((doctor) => {
 
                 res.render('doctor_list', {
                     url_data: req.session.menu_array,
@@ -700,7 +709,7 @@ exports.patient_list = function (req, res) {
             Patient.aggregate([
                 query_search,
                 sort
-            ]).then((patient)=>{
+            ]).then((patient) => {
                 res.render('patient_list', {
                     url_data: req.session.menu_array,
                     detail: patient,
@@ -720,7 +729,7 @@ exports.patient_list = function (req, res) {
 
 
 
-exports.appointment_list = function(req, res){
+exports.appointment_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
@@ -775,85 +784,93 @@ exports.appointment_list = function(req, res){
             }
 
 
-       Doctor.find({}).then((doctor_data)=>{
-        Patient.find({}).then((patient_data)=>{
-            Appointment.find({}).then((appointment)=>{
+            Doctor.find({}).then((doctor_data) => {
+                Patient.find({}).then((patient_data) => {
+                    Appointment.find({}).then((appointment) => {
 
-            
-        Appointment.aggregate([
-            date_filter,
-            filter,
 
-            {$lookup:{
-                
-                from:"doctors",
-                localField:"doctor_id",
-                foreignField:"_id",
-                as:"doctor_data"
-            
-                }},
-                
-                {$unwind:"$doctor_data"},
-                
-                {$lookup:{
-                
-                from:"patients",
-                localField:"patient_id",
-                foreignField:"_id",
-                as:"patient_data"
-            
-                }},
-                
-                {$unwind:"$patient_data"},
-               // -----------------------
-                {$lookup:{
-                
-                    from:"shifts",
-                    localField:"shifts_id",
-                    foreignField:"_id",
-                    as:"shifts_data"
-                
-                    }},
-                    
-                    {$unwind:"$shifts_data"},
-                
-                
-                {$project:{
-                    _id:1,
-                    doctor_name:"$doctor_data.name",
-                    patient_name:"$patient_data.name",
-                    shift_time:"$shifts_data.time",
-                    shift_day:"$shifts_data.day",
-                    sequence_id:1,
-                    appointment_date:1,
-                    status:1,
-                    create_date:1
-                          
-                    }}
-            
-            ]).then((appointment_data)=>{
+                        Appointment.aggregate([
+                            date_filter,
+                            filter,
 
-                res.render('appointment_list', {
-                    url_data: req.session.menu_array,
-                    detail: appointment_data,
-                    patient_data:patient_data,
-                    doctor_data:doctor_data,
-                    appointment_data:appointment_data,
-                    appointment:appointment,
-                    msg: req.session.error,
-                    moment: moment,
-                    admin_type: req.session.admin.usertype,
-                    //filters
-                    status: status
-                });
+                            {
+                                $lookup: {
+
+                                    from: "doctors",
+                                    localField: "doctor_id",
+                                    foreignField: "_id",
+                                    as: "doctor_data"
+
+                                }
+                            },
+
+                            { $unwind: "$doctor_data" },
+
+                            {
+                                $lookup: {
+
+                                    from: "patients",
+                                    localField: "patient_id",
+                                    foreignField: "_id",
+                                    as: "patient_data"
+
+                                }
+                            },
+
+                            { $unwind: "$patient_data" },
+                            // -----------------------
+                            {
+                                $lookup: {
+
+                                    from: "shifts",
+                                    localField: "shifts_id",
+                                    foreignField: "_id",
+                                    as: "shifts_data"
+
+                                }
+                            },
+
+                            { $unwind: "$shifts_data" },
+
+
+                            {
+                                $project: {
+                                    _id: 1,
+                                    doctor_name: "$doctor_data.name",
+                                    patient_name: "$patient_data.name",
+                                    shift_time: "$shifts_data.time",
+                                    shift_day: "$shifts_data.day",
+                                    sequence_id: 1,
+                                    appointment_date: 1,
+                                    status: 1,
+                                    create_date: 1
+
+                                }
+                            }
+
+                        ]).then((appointment_data) => {
+
+                            res.render('appointment_list', {
+                                url_data: req.session.menu_array,
+                                detail: appointment_data,
+                                patient_data: patient_data,
+                                doctor_data: doctor_data,
+                                appointment_data: appointment_data,
+                                appointment: appointment,
+                                msg: req.session.error,
+                                moment: moment,
+                                admin_type: req.session.admin.usertype,
+                                //filters
+                                status: status
+                            });
+
+                        })
+                    })
+
+                })
 
             })
-        })
 
-        })
-
-       })
-            
 
         }
     })
@@ -937,7 +954,7 @@ exports.hospital_list = function (req, res) {
                 query_search,
                 sort,
 
-            ]).then((data_hospital)=>{
+            ]).then((data_hospital) => {
                 res.render('hospital_list', {
                     url_data: req.session.menu_array,
                     detail: data_hospital,
@@ -947,7 +964,7 @@ exports.hospital_list = function (req, res) {
                 });
 
             })
-        
+
         } else {
 
             Utils.redirect_login(req, res);
@@ -958,7 +975,7 @@ exports.hospital_list = function (req, res) {
 
 
 
-exports.payment_list = function(req, res){
+exports.payment_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
@@ -1010,70 +1027,76 @@ exports.payment_list = function(req, res){
             if (status != "ALL" && status != undefined && status != "") {
                 filter["$match"]["status"] = Number(status);
             }
-            
-       Doctor.find({}).then((doctor_data)=>{
-        Patient.find({}).then((patient_data)=>{
-        Payment.aggregate([
-            date_filter,
-            filter,
 
-            {$lookup:{
-                
-                from:"doctors",
-                localField:"doctor_id",
-                foreignField:"_id",
-                as:"doctor_data"
-            
-                }},
-                
-                {$unwind:"$doctor_data"},
-                
-                {$lookup:{
-                
-                from:"patients",
-                localField:"patient_id",
-                foreignField:"_id",
-                as:"patient_data"
-            
-                }},
-                
-                {$unwind:"$patient_data"},
-                
-                
-                {$project:{
-                    _id:1,
-                    doctor_name:"$doctor_data.name",
-                    patient_name:"$patient_data.name",
-                    sequence_id:1,
-                    amount:1,
-                    payment_method:1,
-                    sender_phone:1,
-                    reciver_phone:1,
-                    status:1,
-                    create_date:1
-                          
-                    }}
-            
-            ]).then((payment_data)=>{
+            Doctor.find({}).then((doctor_data) => {
+                Patient.find({}).then((patient_data) => {
+                    Payment.aggregate([
+                        date_filter,
+                        filter,
 
-                res.render('payment_list', {
-                    url_data: req.session.menu_array,
-                    detail: payment_data,
-                    patient_data:patient_data,
-                    doctor_data:doctor_data,
-                    msg: req.session.error,
-                    moment: moment,
-                    admin_type: req.session.admin.usertype,
-                    //filters
-                    status:status
-                });
+                        {
+                            $lookup: {
+
+                                from: "doctors",
+                                localField: "doctor_id",
+                                foreignField: "_id",
+                                as: "doctor_data"
+
+                            }
+                        },
+
+                        { $unwind: "$doctor_data" },
+
+                        {
+                            $lookup: {
+
+                                from: "patients",
+                                localField: "patient_id",
+                                foreignField: "_id",
+                                as: "patient_data"
+
+                            }
+                        },
+
+                        { $unwind: "$patient_data" },
+
+
+                        {
+                            $project: {
+                                _id: 1,
+                                doctor_name: "$doctor_data.name",
+                                patient_name: "$patient_data.name",
+                                sequence_id: 1,
+                                amount: 1,
+                                payment_method: 1,
+                                sender_phone: 1,
+                                reciver_phone: 1,
+                                status: 1,
+                                create_date: 1
+
+                            }
+                        }
+
+                    ]).then((payment_data) => {
+
+                        res.render('payment_list', {
+                            url_data: req.session.menu_array,
+                            detail: payment_data,
+                            patient_data: patient_data,
+                            doctor_data: doctor_data,
+                            msg: req.session.error,
+                            moment: moment,
+                            admin_type: req.session.admin.usertype,
+                            //filters
+                            status: status
+                        });
+
+                    })
+
+                })
 
             })
 
-        })
-
-       })
-            
 
         }
     })
@@ -1110,7 +1133,7 @@ exports.message_list = function (req, res) {
 
 
 
-exports.feedback_list = function(req, res){
+exports.feedback_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
@@ -1165,73 +1188,79 @@ exports.feedback_list = function(req, res){
             }
 
 
-       Doctor.find({}).then((doctor_data)=>{
-        Patient.find({}).then((patient_data)=>{
-            Feedback.find({}).then((feedback)=>{
+            Doctor.find({}).then((doctor_data) => {
+                Patient.find({}).then((patient_data) => {
+                    Feedback.find({}).then((feedback) => {
 
-            
-        Feedback.aggregate([
-            // date_filter,
-            // filter,
 
-            {$lookup:{
-                
-                from:"doctors",
-                localField:"doctor_id",
-                foreignField:"_id",
-                as:"doctor_data"
-            
-                }},
-                
-                {$unwind:"$doctor_data"},
-                
-                {$lookup:{
-                
-                from:"patients",
-                localField:"patient_id",
-                foreignField:"_id",
-                as:"patient_data"
-            
-                }},
-                
-                {$unwind:"$patient_data"},
-                
-                
-                {$project:{
-                    _id:1,
-                    doctor_name:"$doctor_data.name",
-                    patient_name:"$patient_data.name",
-                    sequence_id:1,
-                    rating:1,
-                    comments:1,
-                    create_date:1
-                          
-                    }}
-            
-            ]).then((feedback_data)=>{
-                console.log("feedback", feedback_data)
+                        Feedback.aggregate([
+                            // date_filter,
+                            // filter,
 
-                res.render('feedback_list', {
-                    url_data: req.session.menu_array,
-                    detail: feedback_data,
-                    patient_data:patient_data,
-                    doctor_data:doctor_data,
-                    
-                    feedback:feedback,
-                    msg: req.session.error,
-                    moment: moment,
-                    admin_type: req.session.admin.usertype,
-                    //filters
-                    status: status
-                });
+                            {
+                                $lookup: {
+
+                                    from: "doctors",
+                                    localField: "doctor_id",
+                                    foreignField: "_id",
+                                    as: "doctor_data"
+
+                                }
+                            },
+
+                            { $unwind: "$doctor_data" },
+
+                            {
+                                $lookup: {
+
+                                    from: "patients",
+                                    localField: "patient_id",
+                                    foreignField: "_id",
+                                    as: "patient_data"
+
+                                }
+                            },
+
+                            { $unwind: "$patient_data" },
+
+
+                            {
+                                $project: {
+                                    _id: 1,
+                                    doctor_name: "$doctor_data.name",
+                                    patient_name: "$patient_data.name",
+                                    sequence_id: 1,
+                                    rating: 1,
+                                    comments: 1,
+                                    create_date: 1
+
+                                }
+                            }
+
+                        ]).then((feedback_data) => {
+                            console.log("feedback", feedback_data)
+
+                            res.render('feedback_list', {
+                                url_data: req.session.menu_array,
+                                detail: feedback_data,
+                                patient_data: patient_data,
+                                doctor_data: doctor_data,
+
+                                feedback: feedback,
+                                msg: req.session.error,
+                                moment: moment,
+                                admin_type: req.session.admin.usertype,
+                                //filters
+                                status: status
+                            });
+
+                        })
+                    })
+
+                })
 
             })
-        })
 
-        })
-
-       })
-            
 
         }
     })
@@ -1241,36 +1270,40 @@ exports.feedback_list = function(req, res){
 
 
 
-exports.shifts_list = function(req, res){
+exports.shifts_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            
-         Shifts.aggregate([
 
-            {$lookup:{
-                
-                from:"doctors",
-                localField:"doctor_id",
-                foreignField:"_id",
-                as:"doctor_data"
-            
-                }},
-                
-                {$unwind:"$doctor_data"},
-                
-                
-                {$project:{
-                    _id:1,
-                    doctor_name:"$doctor_data.name",
-                    sequence_id:1,
-                    day:1,
-                    time:1,
-                    status: 1,
-                    create_date:1
-                          
-                    }}
-            
-            ]).then((shifts_data)=>{
+            Shifts.aggregate([
+
+                {
+                    $lookup: {
+
+                        from: "doctors",
+                        localField: "doctor_id",
+                        foreignField: "_id",
+                        as: "doctor_data"
+
+                    }
+                },
+
+                { $unwind: "$doctor_data" },
+
+
+                {
+                    $project: {
+                        _id: 1,
+                        doctor_name: "$doctor_data.name",
+                        sequence_id: 1,
+                        day: 1,
+                        time: 1,
+                        status: 1,
+                        create_date: 1
+
+                    }
+                }
+
+            ]).then((shifts_data) => {
 
                 res.render('shifts_list', {
                     url_data: req.session.menu_array,
@@ -1280,7 +1313,7 @@ exports.shifts_list = function(req, res){
                     admin_type: req.session.admin.usertype,
                 });
 
-            })           
+            })
 
         }
     })
@@ -1289,7 +1322,7 @@ exports.shifts_list = function(req, res){
 
 
 
-exports.adds_list = function(req, res){
+exports.adds_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
@@ -1304,29 +1337,31 @@ exports.adds_list = function(req, res){
 
             Adds.aggregate([
                 filter,
-     
-                    {$project:{
-                        _id:1,
-                        sequence_id:1,
-                        extra_detail:1,
-                        picture:1,
-                        status:1,
-                        create_date:1
-                              
-                        }}
-                
-                ]).then((adds_data)=>{
+
+                {
+                    $project: {
+                        _id: 1,
+                        sequence_id: 1,
+                        extra_detail: 1,
+                        picture: 1,
+                        status: 1,
+                        create_date: 1
+
+                    }
+                }
+
+            ]).then((adds_data) => {
                 res.render('adds_list', {
                     url_data: req.session.menu_array,
                     detail: adds_data,
                     msg: req.session.error,
                     moment: moment,
                     admin_type: req.session.admin.usertype,
-                    status:status
+                    status: status
                 });
             })
-            
-        }else {
+
+        } else {
 
             Utils.redirect_login(req, res);
         }
@@ -1337,7 +1372,7 @@ exports.adds_list = function(req, res){
 
 
 
-exports.selfmanagment_list = function(req, res){
+exports.selfmanagment_list = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
@@ -1351,31 +1386,33 @@ exports.selfmanagment_list = function(req, res){
 
             SelfManagment.aggregate([
                 filter,
-     
-                    {$project:{
-                        _id:1,
-                        sequence_id:1,
-                        title:1,
-                        extra_detail:1,
-                        picture:1,
-                        status:1,
-                        create_date:1
-                              
-                        }}
 
-            ]).then((selfmanagment_data)=>{
-                
+                {
+                    $project: {
+                        _id: 1,
+                        sequence_id: 1,
+                        title: 1,
+                        extra_detail: 1,
+                        picture: 1,
+                        status: 1,
+                        create_date: 1
+
+                    }
+                }
+
+            ]).then((selfmanagment_data) => {
+
                 res.render('selfmanagment_list', {
                     url_data: req.session.menu_array,
                     detail: selfmanagment_data,
                     msg: req.session.error,
                     moment: moment,
                     admin_type: req.session.admin.usertype,
-                    status:status
+                    status: status
                 });
             })
-            
-        }else {
+
+        } else {
 
             Utils.redirect_login(req, res);
         }
@@ -1389,18 +1426,18 @@ exports.selfmanagment_list = function(req, res){
 exports.add_admin = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Menu.find({type:1}).then((menu)=>{
+            Menu.find({ type: 1 }).then((menu) => {
 
-       
-            res.render("add_admin", { 
-                menu: menu,
-                msg: req.session.error,
-                url_data: req.session.menu_array,
-                moment: moment,
-                admin_type: req.session.admin.usertype
-                
+
+                res.render("add_admin", {
+                    menu: menu,
+                    msg: req.session.error,
+                    url_data: req.session.menu_array,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+
                 })
-        })
+            })
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1412,8 +1449,8 @@ exports.add_admin = function (req, res) {
 exports.add_menu = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            
-            Menu.find({type:0 }).then((menu) => {
+
+            Menu.find({ type: 0 }).then((menu) => {
                 res.render('add_menu', {
                     menu: menu,
                     msg: req.session.error,
@@ -1422,7 +1459,7 @@ exports.add_menu = function (req, res) {
                 });
             })
         } else {
-           
+
             Utils.redirect_login(req, res);
         }
     });
@@ -1437,7 +1474,7 @@ exports.add_user = function (req, res) {
         if (response.success) {
             res.render("add_user",
                 {
-                    systen_urls: systen_urls, 
+                    systen_urls: systen_urls,
                     msg: req.session.error,
                     url_data: req.session.menu_array,
                     moment: moment,
@@ -1456,16 +1493,16 @@ exports.add_user = function (req, res) {
 exports.add_doctor = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Hospital.find({}).then((hospital)=>{
-            res.render("add_doctor",
-                {
-                    systen_urls: systen_urls, 
-                    msg: req.session.error,
-                    hospital_data:hospital,
-                    url_data: req.session.menu_array,
-                    moment: moment,
-                    admin_type: req.session.admin.usertype
-                })
+            Hospital.find({}).then((hospital) => {
+                res.render("add_doctor",
+                    {
+                        systen_urls: systen_urls,
+                        msg: req.session.error,
+                        hospital_data: hospital,
+                        url_data: req.session.menu_array,
+                        moment: moment,
+                        admin_type: req.session.admin.usertype
+                    })
             })
         } else {
             Utils.redirect_login(req, res);
@@ -1484,18 +1521,18 @@ exports.add_patient = function (req, res) {
         if (response.success) {
             res.render("add_patient",
                 {
-                    systen_urls: systen_urls, 
+                    systen_urls: systen_urls,
                     msg: req.session.error,
                     url_data: req.session.menu_array,
                     moment: moment,
                     admin_type: req.session.admin.usertype
                 })
-            
+
         } else {
             Utils.redirect_login(req, res);
         }
     });
-    
+
 };
 
 
@@ -1506,21 +1543,21 @@ exports.add_patient = function (req, res) {
 exports.add_appointment = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Doctor.find({}).then((doctor_array)=>{
-            Patient.find({}).then((patient_array)=>{
-                res.render("add_appointment",
-                    {
-                        systen_urls: systen_urls,
-                        msg: req.session.error,
-                        url_data: req.session.menu_array,
-                        moment: moment,
-                        admin_type: req.session.admin.usertype,
-                        doctor_data:doctor_array,
-                        patient_data:patient_array
-                    })
+            Doctor.find({}).then((doctor_array) => {
+                Patient.find({}).then((patient_array) => {
+                    res.render("add_appointment",
+                        {
+                            systen_urls: systen_urls,
+                            msg: req.session.error,
+                            url_data: req.session.menu_array,
+                            moment: moment,
+                            admin_type: req.session.admin.usertype,
+                            doctor_data: doctor_array,
+                            patient_data: patient_array
+                        })
                 })
             })
-           
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1538,7 +1575,7 @@ exports.add_hospital = function (req, res) {
         if (response.success) {
             res.render("add_hospital",
                 {
-                    systen_urls: systen_urls, 
+                    systen_urls: systen_urls,
                     msg: req.session.error,
                     url_data: req.session.menu_array,
                     moment: moment,
@@ -1556,21 +1593,21 @@ exports.add_hospital = function (req, res) {
 exports.add_payment = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Doctor.find({}).then((doctor_array)=>{
-            Patient.find({}).then((patient_array)=>{
-                res.render("add_payment",
-                    {
-                        systen_urls: systen_urls,
-                        msg: req.session.error,
-                        url_data: req.session.menu_array,
-                        moment: moment,
-                        admin_type: req.session.admin.usertype,
-                        doctor_data:doctor_array,
-                        patient_data:patient_array
-                    })
+            Doctor.find({}).then((doctor_array) => {
+                Patient.find({}).then((patient_array) => {
+                    res.render("add_payment",
+                        {
+                            systen_urls: systen_urls,
+                            msg: req.session.error,
+                            url_data: req.session.menu_array,
+                            moment: moment,
+                            admin_type: req.session.admin.usertype,
+                            doctor_data: doctor_array,
+                            patient_data: patient_array
+                        })
                 })
             })
-           
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1604,21 +1641,21 @@ exports.add_message = function (req, res) {
 exports.add_feedback = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Doctor.find({}).then((doctor_array)=>{
-            Patient.find({}).then((patient_array)=>{
-                res.render("add_feedback",
-                    {
-                        systen_urls: systen_urls,
-                        msg: req.session.error,
-                        url_data: req.session.menu_array,
-                        moment: moment,
-                        admin_type: req.session.admin.usertype,
-                        doctor_data:doctor_array,
-                        patient_data:patient_array
-                    })
+            Doctor.find({}).then((doctor_array) => {
+                Patient.find({}).then((patient_array) => {
+                    res.render("add_feedback",
+                        {
+                            systen_urls: systen_urls,
+                            msg: req.session.error,
+                            url_data: req.session.menu_array,
+                            moment: moment,
+                            admin_type: req.session.admin.usertype,
+                            doctor_data: doctor_array,
+                            patient_data: patient_array
+                        })
                 })
             })
-           
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1634,7 +1671,7 @@ exports.add_feedback = function (req, res) {
 exports.add_shifts = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Doctor.find({}).then((doctor_array)=>{
+            Doctor.find({}).then((doctor_array) => {
                 res.render("add_shifts",
                     {
                         systen_urls: systen_urls,
@@ -1642,10 +1679,10 @@ exports.add_shifts = function (req, res) {
                         url_data: req.session.menu_array,
                         moment: moment,
                         admin_type: req.session.admin.usertype,
-                        doctor_data:doctor_array,
+                        doctor_data: doctor_array,
                     })
             })
-           
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1660,15 +1697,15 @@ exports.add_shifts = function (req, res) {
 exports.add_adds = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-                res.render("add_adds",
-                    {
-                        systen_urls: systen_urls,
-                        msg: req.session.error,
-                        url_data: req.session.menu_array,
-                        moment: moment,
-                        admin_type: req.session.admin.usertype,
-                    })
-           
+            res.render("add_adds",
+                {
+                    systen_urls: systen_urls,
+                    msg: req.session.error,
+                    url_data: req.session.menu_array,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype,
+                })
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1681,15 +1718,15 @@ exports.add_adds = function (req, res) {
 exports.add_selfmanagment = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-                res.render("add_selfmanagment",
-                    {
-                        systen_urls: systen_urls,
-                        msg: req.session.error,
-                        url_data: req.session.menu_array,
-                        moment: moment,
-                        admin_type: req.session.admin.usertype,
-                    })
-           
+            res.render("add_selfmanagment",
+                {
+                    systen_urls: systen_urls,
+                    msg: req.session.error,
+                    url_data: req.session.menu_array,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype,
+                })
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1729,9 +1766,9 @@ exports.save_admin_details = function (req, res) {
                             sequence_id: Utils.get_unique_id(),
                             email: req.body.email,
                             phone: req.body.phone,
-                            type:req.body.type,
+                            type: req.body.type,
                             status: 1,
-                            allowed_urls:req.body.allowed_urls,
+                            allowed_urls: req.body.allowed_urls,
                             extra_detail: req.body.extra_detail,
                             picture: "",
                             password: Bcrypt.hashSync(req.body.password, 10)
@@ -1776,7 +1813,7 @@ exports.save_admin_details = function (req, res) {
 
 
 
-exports.save_menu=function(req,res){
+exports.save_menu = function (req, res) {
     console.log("body", req.body)
     Menu.findOne({
         "title": req.body.title
@@ -1902,7 +1939,7 @@ exports.save_doctor_data = function (req, res) {
 
                     if (schema.validate(req.body.password)) {
                         var profile_file = req.files;
-                        var name = req.body.name;                       
+                        var name = req.body.name;
                         var doctor = new Doctor({
                             name: name,
                             sequence_id: Utils.get_unique_id(),
@@ -1929,8 +1966,8 @@ exports.save_doctor_data = function (req, res) {
                             liner = "admin_profile/" + image_name;
 
                             fs.readFile(req.files[0].path, function (err, data) {
-                                fs.writeFile(url, data, 'binary', function (err) {});
-                                fs.unlink(req.files[0].path, function (err, file) {});
+                                fs.writeFile(url, data, 'binary', function (err) { });
+                                fs.unlink(req.files[0].path, function (err, file) { });
                             });
 
                             doctor.picture = liner;
@@ -1981,13 +2018,13 @@ exports.save_patient_data = function (req, res) {
                             name: name,
                             sequence_id: Utils.get_unique_id(),
                             email: req.body.email,
-                            address:req.body.address,
-                            gender:req.body.gender,
-                            age:req.body.age,
-                            license_number:Utils.get_unique_id(),
+                            address: req.body.address,
+                            gender: req.body.gender,
+                            age: req.body.age,
+                            license_number: Utils.get_unique_id(),
                             phone: req.body.phone,
                             status: 1,
-                            type:1,
+                            type: 1,
                             extra_detail: req.body.extra_detail,
                             picture: "",
                             user_name: req.body.user_name,
@@ -2031,22 +2068,22 @@ exports.save_appointment_data = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         console.log("body", req.body)
         if (response.success) {
-           
-                        var reason = req.body.reason
-                        var appointment = new Appointment({
-                            reason: reason,
-                            sequence_id: Utils.get_unique_id(),
-                            status: 1,
-                            doctor_id:req.body.doctor_id,
-                            patient_id:req.body.patient_id,
-                            appointment_date:req.body.appointment_date,
-                        });
-                
-                        appointment.save().then((admin) => {
-                            req.session.error = "Congrates, appointment was created successfully.........";
-                            res.redirect("/appointment_list");
-                        });
- 
+
+            var reason = req.body.reason
+            var appointment = new Appointment({
+                reason: reason,
+                sequence_id: Utils.get_unique_id(),
+                status: 1,
+                doctor_id: req.body.doctor_id,
+                patient_id: req.body.patient_id,
+                appointment_date: req.body.appointment_date,
+            });
+
+            appointment.save().then((admin) => {
+                req.session.error = "Congrates, appointment was created successfully.........";
+                res.redirect("/appointment_list");
+            });
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -2069,37 +2106,37 @@ exports.save_hospital_data = function (req, res) {
                     Utils.redirect_login(req, res);
                 } else {
 
-                        var profile_file = req.files;
-                        var name = req.body.name
-                        var hospital = new Hospital({
-                            name: name,
-                            sequence_id: Utils.get_unique_id(),
-                            email: req.body.email,
-                            address:req.body.address,
-                            phone: req.body.phone,
-                            extra_detail: req.body.extra_detail,
-                            picture: "",
-                           
-                        });
-                        if (profile_file != undefined && profile_file.length > 0) {
-                            image_name = Utils.tokenGenerator(29) + '.jpg';
-                            url = "./uploads/admin_profile/" + image_name;
-                            liner = "admin_profile/" + image_name;
+                    var profile_file = req.files;
+                    var name = req.body.name
+                    var hospital = new Hospital({
+                        name: name,
+                        sequence_id: Utils.get_unique_id(),
+                        email: req.body.email,
+                        address: req.body.address,
+                        phone: req.body.phone,
+                        extra_detail: req.body.extra_detail,
+                        picture: "",
 
-                            fs.readFile(req.files[0].path, function (err, data) {
-                                fs.writeFile(url, data, 'binary', function (err) { });
-                                fs.unlink(req.files[0].path, function (err, file) {
+                    });
+                    if (profile_file != undefined && profile_file.length > 0) {
+                        image_name = Utils.tokenGenerator(29) + '.jpg';
+                        url = "./uploads/admin_profile/" + image_name;
+                        liner = "admin_profile/" + image_name;
 
-                                });
+                        fs.readFile(req.files[0].path, function (err, data) {
+                            fs.writeFile(url, data, 'binary', function (err) { });
+                            fs.unlink(req.files[0].path, function (err, file) {
+
                             });
-
-                            hospital.picture = liner;
-                        }
-                        hospital.save().then((admin) => {
-                            req.session.error = "Congrates, hospital was created successfully.........";
-                            res.redirect("/hospital_list");
                         });
-                
+
+                        hospital.picture = liner;
+                    }
+                    hospital.save().then((admin) => {
+                        req.session.error = "Congrates, hospital was created successfully.........";
+                        res.redirect("/hospital_list");
+                    });
+
                 }
             })
         } else {
@@ -2114,23 +2151,23 @@ exports.save_payment_data = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         console.log("body", req.body)
         if (response.success) {
-           
-                        var amount = req.body.amount
-                        var payment = new Payment({
-                            amount: amount,
-                            sequence_id: Utils.get_unique_id(),
-                            doctor_id:req.body.doctor_id,
-                            patient_id:req.body.patient_id,
-                            status: 1,
-                            payment_method:"EVC-Plus"
-                            
-                        });
-                
-                        payment.save().then((admin) => {
-                            req.session.error = "Congrates, payment was created successfully.........";
-                            res.redirect("/payment_list");
-                        });
- 
+
+            var amount = req.body.amount
+            var payment = new Payment({
+                amount: amount,
+                sequence_id: Utils.get_unique_id(),
+                doctor_id: req.body.doctor_id,
+                patient_id: req.body.patient_id,
+                status: 1,
+                payment_method: "EVC-Plus"
+
+            });
+
+            payment.save().then((admin) => {
+                req.session.error = "Congrates, payment was created successfully.........";
+                res.redirect("/payment_list");
+            });
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -2197,21 +2234,21 @@ exports.save_feedback_data = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         console.log("body", req.body)
         if (response.success) {
-           
-                        var comments = req.body.comments
-                        var feedback = new Feedback({
-                            comments: comments,
-                            sequence_id: Utils.get_unique_id(),
-                            doctor_id:req.body.doctor_id,
-                            patient_id:req.body.patient_id,
-                            rating:req.body.rating,
-                        });
-                
-                        feedback.save().then((admin) => {
-                            req.session.error = "Congrates, feedback was created successfully........";
-                            res.redirect("/feedback_list");
-                        });
- 
+
+            var comments = req.body.comments
+            var feedback = new Feedback({
+                comments: comments,
+                sequence_id: Utils.get_unique_id(),
+                doctor_id: req.body.doctor_id,
+                patient_id: req.body.patient_id,
+                rating: req.body.rating,
+            });
+
+            feedback.save().then((admin) => {
+                req.session.error = "Congrates, feedback was created successfully........";
+                res.redirect("/feedback_list");
+            });
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -2308,34 +2345,34 @@ exports.save_adds_data = function (req, res) {
         console.log("body", req.body)
         if (response.success) {
 
-                        var profile_file = req.files;
-                        var adds = new Adds({
-                            sequence_id: Utils.get_unique_id(),
-                            extra_detail: req.body.extra_detail,
-                            status: 1,
-                            picture: "",
-                           
-                        });
-                        if (profile_file != undefined && profile_file.length > 0) {
-                            image_name = Utils.tokenGenerator(29) + '.jpg';
-                            url = "./uploads/admin_profile/" + image_name;
-                            liner = "admin_profile/" + image_name;
+            var profile_file = req.files;
+            var adds = new Adds({
+                sequence_id: Utils.get_unique_id(),
+                extra_detail: req.body.extra_detail,
+                status: 1,
+                picture: "",
 
-                            fs.readFile(req.files[0].path, function (err, data) {
-                                fs.writeFile(url, data, 'binary', function (err) { });
-                                fs.unlink(req.files[0].path, function (err, file) {
+            });
+            if (profile_file != undefined && profile_file.length > 0) {
+                image_name = Utils.tokenGenerator(29) + '.jpg';
+                url = "./uploads/admin_profile/" + image_name;
+                liner = "admin_profile/" + image_name;
 
-                                });
-                            });
+                fs.readFile(req.files[0].path, function (err, data) {
+                    fs.writeFile(url, data, 'binary', function (err) { });
+                    fs.unlink(req.files[0].path, function (err, file) {
 
-                            adds.picture = liner;
-                        }
-                        adds.save().then((admin) => {
-                            req.session.error = "Congrates, adds was created successfully.........";
-                            res.redirect("/adds_list");
-                        });
-                
-              
+                    });
+                });
+
+                adds.picture = liner;
+            }
+            adds.save().then((admin) => {
+                req.session.error = "Congrates, adds was created successfully.........";
+                res.redirect("/adds_list");
+            });
+
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -2352,35 +2389,35 @@ exports.save_selfmanagment_data = function (req, res) {
         console.log("body", req.body)
         if (response.success) {
 
-                        var profile_file = req.files;
-                        var selfmanagment = new SelfManagment({
-                            sequence_id: Utils.get_unique_id(),
-                            title:req.body.title,
-                            extra_detail: req.body.extra_detail,
-                            status: 1,
-                            picture: "",
-                           
-                        });
-                        if (profile_file != undefined && profile_file.length > 0) {
-                            image_name = Utils.tokenGenerator(29) + '.jpg';
-                            url = "./uploads/admin_profile/" + image_name;
-                            liner = "admin_profile/" + image_name;
+            var profile_file = req.files;
+            var selfmanagment = new SelfManagment({
+                sequence_id: Utils.get_unique_id(),
+                title: req.body.title,
+                extra_detail: req.body.extra_detail,
+                status: 1,
+                picture: "",
 
-                            fs.readFile(req.files[0].path, function (err, data) {
-                                fs.writeFile(url, data, 'binary', function (err) { });
-                                fs.unlink(req.files[0].path, function (err, file) {
+            });
+            if (profile_file != undefined && profile_file.length > 0) {
+                image_name = Utils.tokenGenerator(29) + '.jpg';
+                url = "./uploads/admin_profile/" + image_name;
+                liner = "admin_profile/" + image_name;
 
-                                });
-                            });
+                fs.readFile(req.files[0].path, function (err, data) {
+                    fs.writeFile(url, data, 'binary', function (err) { });
+                    fs.unlink(req.files[0].path, function (err, file) {
 
-                            selfmanagment.picture = liner;
-                        }
-                        selfmanagment.save().then((admin) => {
-                            req.session.error = "Congrates, selfmanagment was created successfully.........";
-                            res.redirect("/selfmanagment_list");
-                        });
-                
-              
+                    });
+                });
+
+                selfmanagment.picture = liner;
+            }
+            selfmanagment.save().then((admin) => {
+                req.session.error = "Congrates, selfmanagment was created successfully.........";
+                res.redirect("/selfmanagment_list");
+            });
+
+
         } else {
             Utils.redirect_login(req, res);
         }
@@ -2436,23 +2473,23 @@ exports.edit_doctor = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
             Doctor.findOne({ _id: req.body.doctor_id }, { password: 0 }).then((doctor) => {
-                Hospital.find({}).then((hospital)=>{
+                Hospital.find({}).then((hospital) => {
 
-                if (doctor) {
-                    // console.log(admin)
-                    res.render("add_doctor",
-                         { 
-                            doctor_data: doctor,
-                            systen_urls: systen_urls,
-                            Hospital:hospital,
-                            hospital_id:doctor.hospital_id.toString()
-                    
-                        })
-                } else {
-                    res.redirect("/doctor_list")
-                }
-            });
-        })
+                    if (doctor) {
+                        // console.log(admin)
+                        res.render("add_doctor",
+                            {
+                                doctor_data: doctor,
+                                systen_urls: systen_urls,
+                                Hospital: hospital,
+                                hospital_id: doctor.hospital_id.toString()
+
+                            })
+                    } else {
+                        res.redirect("/doctor_list")
+                    }
+                });
+            })
         } else {
             Utils.redirect_login(req, res);
         }
@@ -2489,20 +2526,21 @@ exports.edit_appointment = function (req, res) {
         if (response.success) {
             Appointment.findOne({ _id: req.body.appointment_id }, { password: 0 }).then((appointment) => {
                 console.log("data_appointment", appointment)
-                Doctor.find({}).then((doctor)=>{
-                    Patient.find({}).then((patient)=>{
+                Doctor.find({}).then((doctor) => {
+                    Patient.find({}).then((patient) => {
 
                         if (appointment) {
-                
-                            res.render("add_appointment", 
-                                { appointment_data: appointment,
-                                  Doctor:doctor,
-                                  Patient:patient,
-                                  doctor_id: appointment.doctor_id.toString(),
-                                  patient_id:appointment.patient_id.toString(),
-                                  systen_urls: systen_urls,
-                                  moment: moment 
-                                
+
+                            res.render("add_appointment",
+                                {
+                                    appointment_data: appointment,
+                                    Doctor: doctor,
+                                    Patient: patient,
+                                    doctor_id: appointment.doctor_id.toString(),
+                                    patient_id: appointment.patient_id.toString(),
+                                    systen_urls: systen_urls,
+                                    moment: moment
+
                                 })
                         } else {
                             res.redirect("/appointment_list")
@@ -2547,20 +2585,21 @@ exports.edit_payment = function (req, res) {
         if (response.success) {
             Payment.findOne({ _id: req.body.payment_id }, { password: 0 }).then((payment) => {
                 console.log("data_appointment", payment)
-                Doctor.find({}).then((doctor)=>{
-                    Patient.find({}).then((patient)=>{
+                Doctor.find({}).then((doctor) => {
+                    Patient.find({}).then((patient) => {
 
                         if (payment) {
-                
-                            res.render("add_payment", 
-                                { payment_data: payment,
-                                  Doctor:doctor,
-                                  Patient:patient,
-                                  doctor_id: payment.doctor_id.toString(),
-                                  patient_id:payment.patient_id.toString(),
-                                  systen_urls: systen_urls,
-                                  moment: moment 
-                                
+
+                            res.render("add_payment",
+                                {
+                                    payment_data: payment,
+                                    Doctor: doctor,
+                                    Patient: patient,
+                                    doctor_id: payment.doctor_id.toString(),
+                                    patient_id: payment.patient_id.toString(),
+                                    systen_urls: systen_urls,
+                                    moment: moment
+
                                 })
                         } else {
                             res.redirect("/payment_list")
@@ -2585,20 +2624,21 @@ exports.edit_feedback = function (req, res) {
         if (response.success) {
             Feedback.findOne({ _id: req.body.feedback_id }, { password: 0 }).then((feedback) => {
                 console.log("data_feedback", feedback)
-                Doctor.find({}).then((doctor)=>{
-                    Patient.find({}).then((patient)=>{
+                Doctor.find({}).then((doctor) => {
+                    Patient.find({}).then((patient) => {
 
                         if (feedback) {
-                
-                            res.render("add_feedback", 
-                                { feedback_data: feedback,
-                                  Doctor:doctor,
-                                  Patient:patient,
-                                  doctor_id: feedback.doctor_id.toString(),
-                                  patient_id:feedback.patient_id.toString(),
-                                  systen_urls: systen_urls,
-                                  moment: moment 
-                                
+
+                            res.render("add_feedback",
+                                {
+                                    feedback_data: feedback,
+                                    Doctor: doctor,
+                                    Patient: patient,
+                                    doctor_id: feedback.doctor_id.toString(),
+                                    patient_id: feedback.patient_id.toString(),
+                                    systen_urls: systen_urls,
+                                    moment: moment
+
                                 })
                         } else {
                             res.redirect("/feedback_list")
@@ -2689,41 +2729,41 @@ exports.update_admin_details = function (req, res) {
                     if (admin.picture) {
                         Utils.deleteImageFromFolderTosaveNewOne(admin.picture, 1);
                     }
-                   // Samee magaca sawirka cusub
-                   var image_name = admin._id + "_" + Utils.tokenGenerator(4) + '.jpg';
-                   var url = "./uploads/admin_profile/" + image_name;
+                    // Samee magaca sawirka cusub
+                    var image_name = admin._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                    var url = "./uploads/admin_profile/" + image_name;
 
-                   fs.readFile(req.files[0].path, function (err, data) {
-                       if (err) {
-                           console.error("Error reading file:", err);
-                           return res.redirect("/doctor_list");
-                       }
-
-                       fs.writeFile(url, data, 'binary', function (err) {
-                           if (err) {
-                               console.error("Error writing file:", err);
-                               return res.redirect("/doctor_list");
-                           }
-
-                           fs.unlink(req.files[0].path, function (err) {
-                               if (err) console.error("Error deleting temp file:", err);
-                           });
-
-                           // Cusbooneysii database
-                           req.body.picture = "admin_profile/" + image_name;
-                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
-                    Admin.findByIdAndUpdate(req.body.admin_id, req.body, { useFindAndModify: false }).then((data) => {
-                        if (data._id.equals(req.session.admin.user_id)) {
-                            Utils.redirect_login(req, res);
-                        } else {
-                            res.redirect("/admin_list");
+                    fs.readFile(req.files[0].path, function (err, data) {
+                        if (err) {
+                            console.error("Error reading file:", err);
+                            return res.redirect("/doctor_list");
                         }
-                    }, (err) => {
-                        res.redirect("/admin_list");
+
+                        fs.writeFile(url, data, 'binary', function (err) {
+                            if (err) {
+                                console.error("Error writing file:", err);
+                                return res.redirect("/doctor_list");
+                            }
+
+                            fs.unlink(req.files[0].path, function (err) {
+                                if (err) console.error("Error deleting temp file:", err);
+                            });
+
+                            // Cusbooneysii database
+                            req.body.picture = "admin_profile/" + image_name;
+                            // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                            Admin.findByIdAndUpdate(req.body.admin_id, req.body, { useFindAndModify: false }).then((data) => {
+                                if (data._id.equals(req.session.admin.user_id)) {
+                                    Utils.redirect_login(req, res);
+                                } else {
+                                    res.redirect("/admin_list");
+                                }
+                            }, (err) => {
+                                res.redirect("/admin_list");
+                            });
+                        });
                     });
                 });
-            });
-        });
             }
         } else {
             Utils.redirect_login(req, res);
@@ -2823,22 +2863,22 @@ exports.update_doctor_detail = function (req, res) {
 
                             // Cusbooneysii database
                             req.body.picture = "admin_profile/" + image_name;
-                    
-                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
-                    Doctor.findByIdAndUpdate(req.body.doctor_id, req.body, { useFindAndModify: false }).then((data) => {
-                        if (data._id.equals(req.session.admin.doctor_id)) {
-                            Utils.redirect_login(req, res);
-                        } else {
-                            res.redirect("/doctor_list");
-                        }
-                    }, (err) => {
-                        
-                        res.redirect("/doctor_list");
+
+                            // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                            Doctor.findByIdAndUpdate(req.body.doctor_id, req.body, { useFindAndModify: false }).then((data) => {
+                                if (data._id.equals(req.session.admin.doctor_id)) {
+                                    Utils.redirect_login(req, res);
+                                } else {
+                                    res.redirect("/doctor_list");
+                                }
+                            }, (err) => {
+
+                                res.redirect("/doctor_list");
+                            });
+                        });
+
                     });
-                });
-                    
-            });
-                    
+
                 });
             }
         } else {
@@ -2893,19 +2933,19 @@ exports.update_patient_detail = function (req, res) {
 
                             // Cusbooneysii database
                             req.body.picture = "admin_profile/" + image_name;
-                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
-                    Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
-                        if (data._id.equals(req.session.admin.patient_id)) {
-                            Utils.redirect_login(req, res);
-                        } else {
-                            res.redirect("/patient_list");
-                        }
-                    }, (err) => {
-                        res.redirect("/patient_list");
+                            // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                            Patient.findByIdAndUpdate(req.body.patient_id, req.body, { useFindAndModify: false }).then((data) => {
+                                if (data._id.equals(req.session.admin.patient_id)) {
+                                    Utils.redirect_login(req, res);
+                                } else {
+                                    res.redirect("/patient_list");
+                                }
+                            }, (err) => {
+                                res.redirect("/patient_list");
+                            });
+                        });
                     });
                 });
-            });
-         });
             }
         } else {
             Utils.redirect_login(req, res);
@@ -3008,19 +3048,19 @@ exports.update_hospital_detail = function (req, res) {
 
                             // Cusbooneysii database
                             req.body.picture = "admin_profile/" + image_name;
-                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
-                    Hospital.findByIdAndUpdate(req.body.hospital_id, req.body, { useFindAndModify: false }).then((data) => {
-                        if (data._id.equals(req.session.admin.hospital_id)) {
-                            Utils.redirect_login(req, res);
-                        } else {
-                            res.redirect("/hospital_list");
-                        }
-                    }, (err) => {
-                        res.redirect("/hospital_list");
+                            // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                            Hospital.findByIdAndUpdate(req.body.hospital_id, req.body, { useFindAndModify: false }).then((data) => {
+                                if (data._id.equals(req.session.admin.hospital_id)) {
+                                    Utils.redirect_login(req, res);
+                                } else {
+                                    res.redirect("/hospital_list");
+                                }
+                            }, (err) => {
+                                res.redirect("/hospital_list");
+                            });
+                        });
                     });
                 });
-            });
-        });
             }
         } else {
             Utils.redirect_login(req, res);
@@ -3166,19 +3206,19 @@ exports.update_adds_detail = function (req, res) {
 
                             // Cusbooneysii database
                             req.body.picture = "admin_profile/" + image_name;
-                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
-                    Adds.findByIdAndUpdate(req.body.adds_id, req.body, { useFindAndModify: false }).then((data) => {
-                        if (data._id.equals(req.session.admin.adds_id)) {
-                            Utils.redirect_login(req, res);
-                        } else {
-                            res.redirect("/adds_list");
-                        }
-                    }, (err) => {
-                        res.redirect("/adds_list");
+                            // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                            Adds.findByIdAndUpdate(req.body.adds_id, req.body, { useFindAndModify: false }).then((data) => {
+                                if (data._id.equals(req.session.admin.adds_id)) {
+                                    Utils.redirect_login(req, res);
+                                } else {
+                                    res.redirect("/adds_list");
+                                }
+                            }, (err) => {
+                                res.redirect("/adds_list");
+                            });
+                        });
                     });
                 });
-            });
-        });
             }
         } else {
             Utils.redirect_login(req, res);
@@ -3230,19 +3270,19 @@ exports.update_selfmanagment_detail = function (req, res) {
 
                             // Cusbooneysii database
                             req.body.picture = "admin_profile/" + image_name;
-                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
-                    SelfManagment.findByIdAndUpdate(req.body.selfmanagment_id, req.body, { useFindAndModify: false }).then((data) => {
-                        if (data._id.equals(req.session.admin.selfmanagment_id)) {
-                            Utils.redirect_login(req, res);
-                        } else {
-                            res.redirect("/selfmanagment_list");
-                        }
-                    }, (err) => {
-                        res.redirect("/selfmanagment_list");
+                            // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                            SelfManagment.findByIdAndUpdate(req.body.selfmanagment_id, req.body, { useFindAndModify: false }).then((data) => {
+                                if (data._id.equals(req.session.admin.selfmanagment_id)) {
+                                    Utils.redirect_login(req, res);
+                                } else {
+                                    res.redirect("/selfmanagment_list");
+                                }
+                            }, (err) => {
+                                res.redirect("/selfmanagment_list");
+                            });
+                        });
                     });
                 });
-            });
-        });
             }
         } else {
             Utils.redirect_login(req, res);
@@ -3575,41 +3615,44 @@ exports.admn_change_admin_pass = function (req, res) {
 
 //All reports for system
 
-exports.appointmentReport = function(req, res){
+exports.appointmentReport = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
             Appointment.aggregate([
                 {
                     $lookup: {
-                      from: "doctors",
-                      localField: "doctor_id",
-                      foreignField: "_id",
-                      as: "appointmentReport"
+                        from: "doctors",
+                        localField: "doctor_id",
+                        foreignField: "_id",
+                        as: "appointmentReport"
                     }
-                  },
-                  {
+                },
+                {
                     $unwind: "$appointmentReport"
-                  },
-                  {
+                },
+                {
                     $group: {
-                      _id: "$doctor_id",
-                      doctor_name: { $first: "$appointmentReport.name" },
-                      total_appointments: { $sum: 1 },
-                      total_Pending: {$sum: {$cond: [{ $eq: ["$status", 0] }, 1,0,] }},
-                      total_confirm: {$sum: {$cond: [{ $eq: ["$status", 1] }, 1,0,] }},
-                      total_compelete: {$sum: {$cond: [{ $eq: ["$status", 2] }, 1,0,] }}
-                      }},
-                      
-                      {$project:{
-                          _id:1,
-                          doctor_name:1,
-                          total_appointments:1,
-                          total_Pending:1,
-                          total_confirm:1,
-                          total_compelete:1
-                          }}
-              ]).then((appointmentData)=>{
+                        _id: "$doctor_id",
+                        doctor_name: { $first: "$appointmentReport.name" },
+                        total_appointments: { $sum: 1 },
+                        total_Pending: { $sum: { $cond: [{ $eq: ["$status", 0] }, 1, 0,] } },
+                        total_confirm: { $sum: { $cond: [{ $eq: ["$status", 1] }, 1, 0,] } },
+                        total_compelete: { $sum: { $cond: [{ $eq: ["$status", 2] }, 1, 0,] } }
+                    }
+                },
+
+                {
+                    $project: {
+                        _id: 1,
+                        doctor_name: 1,
+                        total_appointments: 1,
+                        total_Pending: 1,
+                        total_confirm: 1,
+                        total_compelete: 1
+                    }
+                }
+            ]).then((appointmentData) => {
                 res.render('appointmentReport_list', {
                     url_data: req.session.menu_array,
                     detail: appointmentData,
@@ -3617,52 +3660,54 @@ exports.appointmentReport = function(req, res){
                     moment: moment,
                     admin_type: req.session.admin.usertype
                 });
-              })
+            })
         }
     });
 }
 
 
 
-exports.paymentReport = function(req, res){
+exports.paymentReport = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
             Payment.aggregate([
 
                 {
-                  $lookup: {
-                    from: "doctors",
-                    localField: "doctor_id",
-                    foreignField: "_id",
-                    as: "paymentReport"
-                  }
+                    $lookup: {
+                        from: "doctors",
+                        localField: "doctor_id",
+                        foreignField: "_id",
+                        as: "paymentReport"
+                    }
                 },
                 {
-                  $unwind: "$paymentReport"
+                    $unwind: "$paymentReport"
                 },
-                
-                  {
-                  $group: {
-                    _id: "$doctor_id",
-                    doctor_name: { $first: "$paymentReport.name" },
-                    total_transections: { $sum: 1 },
-                    total_payment:{$sum:"$amount"}
-                    }
-                    
-                },
-                
-                {$project:{
-                    _id:1,
-                    doctor_name:1,
-                    total_transections:1,
-                    total_payment:1
-                    
-                    
-                    }}
-              
-              ]).then((paymentData)=>{
 
-                res.render('paymentReport_list',{
+                {
+                    $group: {
+                        _id: "$doctor_id",
+                        doctor_name: { $first: "$paymentReport.name" },
+                        total_transections: { $sum: 1 },
+                        total_payment: { $sum: "$amount" }
+                    }
+
+                },
+
+                {
+                    $project: {
+                        _id: 1,
+                        doctor_name: 1,
+                        total_transections: 1,
+                        total_payment: 1
+
+
+                    }
+                }
+
+            ]).then((paymentData) => {
+
+                res.render('paymentReport_list', {
                     url_data: req.session.menu_array,
                     detail: paymentData,
                     msg: req.session.error,
@@ -3670,7 +3715,7 @@ exports.paymentReport = function(req, res){
                     admin_type: req.session.admin.usertype
                 })
 
-              })
+            })
 
         }
     });
@@ -3678,40 +3723,44 @@ exports.paymentReport = function(req, res){
 
 
 
-exports.hospitalReport = function(req, res){
+exports.hospitalReport = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
             Doctor.aggregate([
 
                 {
-                  $lookup: {
-                    from: "hospitals",
-                    localField: "hospital_id",
-                    foreignField: "_id",
-                    as: "hospitalReport"
-                  }
+                    $lookup: {
+                        from: "hospitals",
+                        localField: "hospital_id",
+                        foreignField: "_id",
+                        as: "hospitalReport"
+                    }
                 },
-                
-                {$unwind:"$hospitalReport"},
-                
-                {$group:{
-                     _id: "$hospital_id",
-                     hospital_name:{ $first: "$hospitalReport.name" },
-                     total_doctor:{$sum:1}
-                    
-                    }},
-                    
-                    
-                    {$project:{
-                        _id:1,
-                        hospital_name:1,
-                        total_doctor:1
-                        
-                        }}
-              
-              ]).then((hospitalData)=>{
-                res.render('hospitalReport_list',{
+
+                { $unwind: "$hospitalReport" },
+
+                {
+                    $group: {
+                        _id: "$hospital_id",
+                        hospital_name: { $first: "$hospitalReport.name" },
+                        total_doctor: { $sum: 1 }
+
+                    }
+                },
+
+
+                {
+                    $project: {
+                        _id: 1,
+                        hospital_name: 1,
+                        total_doctor: 1
+
+                    }
+                }
+
+            ]).then((hospitalData) => {
+                res.render('hospitalReport_list', {
                     url_data: req.session.menu_array,
                     detail: hospitalData,
                     msg: req.session.error,
@@ -3720,7 +3769,7 @@ exports.hospitalReport = function(req, res){
 
                 })
 
-              })
+            })
 
         }
     });
@@ -3728,41 +3777,43 @@ exports.hospitalReport = function(req, res){
 
 
 
-exports.feedbackReport = function(req, res){
+exports.feedbackReport = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
 
             Feedback.aggregate([
 
                 {
-                  $lookup: {
-                    from: "doctors",
-                    localField: "doctor_id",
-                    foreignField: "_id",
-                    as: "feedbackReport"
-                  }
+                    $lookup: {
+                        from: "doctors",
+                        localField: "doctor_id",
+                        foreignField: "_id",
+                        as: "feedbackReport"
+                    }
                 },
                 {
-                  $unwind: "$feedbackReport"
+                    $unwind: "$feedbackReport"
                 },
-                
-                {$group:{
-                    _id: "$doctor_id",
-                    doctor_name: { $first: "$feedbackReport.name" },
-                    tatal_rating:{$sum:1},
-                    average_rating: { $avg: "$rating" }
-                    }},
-                    
-                    {
-                  $project: {
-                    doctor_name: 1,
-                    tatal_rating: 1,
-                    average_rating: { $round: ["$average_rating", 1] }
-                  }
+
+                {
+                    $group: {
+                        _id: "$doctor_id",
+                        doctor_name: { $first: "$feedbackReport.name" },
+                        tatal_rating: { $sum: 1 },
+                        average_rating: { $avg: "$rating" }
+                    }
+                },
+
+                {
+                    $project: {
+                        doctor_name: 1,
+                        tatal_rating: 1,
+                        average_rating: { $round: ["$average_rating", 1] }
+                    }
                 }
-                
-              ]).then((feedbackData)=>{
-                res.render('feedbackReport_list',{
+
+            ]).then((feedbackData) => {
+                res.render('feedbackReport_list', {
                     url_data: req.session.menu_array,
                     detail: feedbackData,
                     msg: req.session.error,
@@ -3771,7 +3822,7 @@ exports.feedbackReport = function(req, res){
 
                 })
 
-              })
+            })
 
         }
     });
@@ -3785,108 +3836,108 @@ exports.feedbackReport = function(req, res){
 //---------------------------------------------------------------------------------------------------
 
 
-  // All Apis That Use Our Telemedicine Application
+// All Apis That Use Our Telemedicine Application
 
- 
+
 //Api login doctor and patient information
-exports.login_DoctorAndPatient = function(req, res){
-        Doctor.findOne({ email: req.body.email,PassWord:req.body.PassWord}).then((doctor) => {
-            if(doctor){
-                Doctor.findOneAndUpdate({ email: req.body.email }, { $set: { token: req.body.token }}, { new: true }).then((data_doctor) => {
-                    console.log("gggggg",data_doctor)
+exports.login_DoctorAndPatient = function (req, res) {
+    Doctor.findOne({ email: req.body.email, PassWord: req.body.PassWord }).then((doctor) => {
+        if (doctor) {
+            Doctor.findOneAndUpdate({ email: req.body.email }, { $set: { token: req.body.token } }, { new: true }).then((data_doctor) => {
+                console.log("gggggg", data_doctor)
 
-                    res.send({
-                        success:true,
-                        message:"Successfully to Login Doctor",
-                        record:data_doctor
-                    })
+                res.send({
+                    success: true,
+                    message: "Successfully to Login Doctor",
+                    record: data_doctor
                 })
-            }else{
-                Patient.findOne({ email: req.body.email, PassWord:req.body.PassWord}).then((patient) => {
-                    if(patient){
-                        Patient.findOneAndUpdate({ email: req.body.email }, { $set: { token: req.body.token }}, { new: true }).then((data_patient) => {
-                            res.send({
-                                success:true,
-                                message:"Successfully to Login Patient",
-                                record:data_patient
-                            })
-                        })
-                    }else{
+            })
+        } else {
+            Patient.findOne({ email: req.body.email, PassWord: req.body.PassWord }).then((patient) => {
+                if (patient) {
+                    Patient.findOneAndUpdate({ email: req.body.email }, { $set: { token: req.body.token } }, { new: true }).then((data_patient) => {
                         res.send({
-                            success:false,
-                            message:"Invalid Email or Password"
+                            success: true,
+                            message: "Successfully to Login Patient",
+                            record: data_patient
                         })
-                    }
-                });
-              
-            }
-        })
+                    })
+                } else {
+                    res.send({
+                        success: false,
+                        message: "Invalid Email or Password"
+                    })
+                }
+            });
+
+        }
+    })
 }
 
 
 
 
-  //Api registration patient
+//Api registration patient
 exports.register_Patient = function (req, res) {
-        console.log("body", req.body)
-            Patient.findOne({ "phone": req.body.phone }).then((patient) => {
-                console.log("user", patient)
-                if (patient) {
-                    res.send({
-                        success:false,
-                        message:"Sorry, There is an patient with this phone, please check the phone",
-                    })
-                } else {
-                        var profile_file = req.files;
-                        var name = req.body.name
-                        var patient = new Patient({
-                            name: name,
-                            sequence_id: Utils.get_unique_id(),
-                            email: req.body.email,
-                            address:req.body.address,
-                            gender:req.body.gender,
-                            age:req.body.age,
-                            license_number:Utils.get_unique_id(),
-                            phone: req.body.phone,
-                            status: 1,
-                            type:1,
-                            extra_detail: req.body.extra_detail,
-                            picture: "",
-                            user_name: req.body.user_name,
-                            PassWord: req.body.PassWord,
-                            password: Bcrypt.hashSync(req.body.PassWord, 10)
-                        });
-                        if (profile_file != undefined && profile_file.length > 0) {
-                            image_name = Utils.tokenGenerator(29) + '.jpg';
-                            url = "./uploads/admin_profile/" + image_name;
-                            liner = "admin_profile/" + image_name;
-
-                            fs.readFile(req.files[0].path, function (err, data) {
-                                fs.writeFile(url, data, 'binary', function (err) { });
-                                fs.unlink(req.files[0].path, function (err, file) {
-
-                                });
-                            });
-
-                            patient.picture = liner;
-                        }
-                        patient.save().then((patient) => {
-
-                            res.send({
-                                success:true,
-                                message:"patient was created successfully",
-                                record:patient
-                            })
-                        });
-                }
+    console.log("body", req.body)
+    Patient.findOne({ "phone": req.body.phone }).then((patient) => {
+        console.log("user", patient)
+        if (patient) {
+            res.send({
+                success: false,
+                message: "Sorry, There is an patient with this phone, please check the phone",
             })
+        } else {
+            var profile_file = req.files;
+            var name = req.body.name
+            var patient = new Patient({
+                name: name,
+                sequence_id: Utils.get_unique_id(),
+                email: req.body.email,
+                address: req.body.address,
+                gender: req.body.gender,
+                age: req.body.age,
+                license_number: Utils.get_unique_id(),
+                phone: req.body.phone,
+                status: 1,
+                type: 1,
+                extra_detail: req.body.extra_detail,
+                picture: "",
+                user_name: req.body.user_name,
+                PassWord: req.body.PassWord,
+                password: Bcrypt.hashSync(req.body.PassWord, 10)
+            });
+            if (profile_file != undefined && profile_file.length > 0) {
+                image_name = Utils.tokenGenerator(29) + '.jpg';
+                url = "./uploads/admin_profile/" + image_name;
+                liner = "admin_profile/" + image_name;
+
+                fs.readFile(req.files[0].path, function (err, data) {
+                    fs.writeFile(url, data, 'binary', function (err) { });
+                    fs.unlink(req.files[0].path, function (err, file) {
+
+                    });
+                });
+
+                patient.picture = liner;
+            }
+            patient.save().then((patient) => {
+
+                res.send({
+                    success: true,
+                    message: "patient was created successfully",
+                    record: patient
+                })
+            });
+        }
+    })
 
 };
 
 
 
 // //Api get all doctors information
-exports.getAll_Doctors = async function(req, res) {
+exports.getAll_Doctors = async function (req, res) {
     try {
         let doctors = await Doctor.aggregate([
             {
@@ -3951,88 +4002,96 @@ exports.getAll_Doctors = async function(req, res) {
 };
 
 
- 
+
 
 //Api get all appointments patient
-exports.patient_appointements = function(req, res){
-        Appointment.aggregate([
+exports.patient_appointements = function (req, res) {
+    Appointment.aggregate([
 
-            {
-                $match: {
-                    "patient_id": ObjectId(req.body.patient_id)
-                }
-            },
+        {
+            $match: {
+                "patient_id": ObjectId(req.body.patient_id)
+            }
+        },
 
-            {$lookup:{
-                
-                from:"doctors",
-                localField:"doctor_id",
-                foreignField:"_id",
-                as:"doctor_data"
-            
-                }},
-                
-                {$unwind:"$doctor_data"},
-                
-                {$lookup:{
-                
-                from:"patients",
-                localField:"patient_id",
-                foreignField:"_id",
-                as:"patient_data"
-            
-                }},
-                
-                {$unwind:"$patient_data"},
+        {
+            $lookup: {
 
-                {$lookup:{
-                
-                    from:"shifts",
-                    localField:"shifts_id",
-                    foreignField:"_id",
-                    as:"shifts_data"
-                
-                    }},
-                    
-                    {$unwind:"$shifts_data"},
-                
-                
-                {$project:{
-                    _id:1,
-                    doctor_name:"$doctor_data.name",
-                    doctor_profile:"$doctor_data.picture",
-                    patient_name:"$patient_data.name",
-                    patient_token:"$patient_data.token",
-                    doctor_token:"$doctor_data.token",
-                    shift_time:"$shifts_data.time",
-                    shift_day:"$shifts_data.day",
-                    sequence_id:1,
-                    appointment_date:1,
-                    status:1,
-                    create_date:1
-                          
-                    }}
-            
-            ]).then((appointment_data)=>{
+                from: "doctors",
+                localField: "doctor_id",
+                foreignField: "_id",
+                as: "doctor_data"
 
-                if(appointment_data){
+            }
+        },
 
-                    res.send({
-                        success:true,
-                        message:"Successfully to fetch All Appointements for Patient",
-                        record:appointment_data
-                    })
-                }else{
-                    res.send({
-                        success:false,
-                        message:"Sorry! to fetch Appointements for Patient"
-                    })
-        
-                }
+        { $unwind: "$doctor_data" },
+
+        {
+            $lookup: {
+
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient_data"
+
+            }
+        },
+
+        { $unwind: "$patient_data" },
+
+        {
+            $lookup: {
+
+                from: "shifts",
+                localField: "shifts_id",
+                foreignField: "_id",
+                as: "shifts_data"
+
+            }
+        },
+
+        { $unwind: "$shifts_data" },
 
 
+        {
+            $project: {
+                _id: 1,
+                doctor_name: "$doctor_data.name",
+                doctor_profile: "$doctor_data.picture",
+                patient_name: "$patient_data.name",
+                patient_token: "$patient_data.token",
+                doctor_token: "$doctor_data.token",
+                shift_time: "$shifts_data.time",
+                shift_day: "$shifts_data.day",
+                sequence_id: 1,
+                appointment_date: 1,
+                status: 1,
+                create_date: 1
+
+            }
+        }
+
+    ]).then((appointment_data) => {
+
+        if (appointment_data) {
+
+            res.send({
+                success: true,
+                message: "Successfully to fetch All Appointements for Patient",
+                record: appointment_data
             })
-            
+        } else {
+            res.send({
+                success: false,
+                message: "Sorry! to fetch Appointements for Patient"
+            })
+
+        }
+
+
+    })
+
 }
 
 
@@ -4040,7 +4099,7 @@ exports.patient_appointements = function(req, res){
 
 
 //Api get all appointments for doctor
-exports.doctor_appointements = function(req, res){
+exports.doctor_appointements = function (req, res) {
     Appointment.aggregate([
 
         {
@@ -4049,82 +4108,90 @@ exports.doctor_appointements = function(req, res){
             }
         },
 
-        {$lookup:{
-            
-            from:"doctors",
-            localField:"doctor_id",
-            foreignField:"_id",
-            as:"doctor_data"
-        
-            }},
-            
-            {$unwind:"$doctor_data"},
-            
-            {$lookup:{
-            
-            from:"patients",
-            localField:"patient_id",
-            foreignField:"_id",
-            as:"patient_data"
-        
-            }},
-            
-            {$unwind:"$patient_data"},
+        {
+            $lookup: {
 
-            {$lookup:{
-            
-                from:"shifts",
-                localField:"shifts_id",
-                foreignField:"_id",
-                as:"shifts_data"
-            
-                }},
-                
-                {$unwind:"$shifts_data"},
-            
-            
-            {$project:{
-                _id:1,
-                doctor_name:"$doctor_data.name",
-                patient_name:"$patient_data.name",
-                patient_token:"$patient_data.token",
-                doctor_token:"$doctor_data.token",
-                patient_profile:"$patient_data.picture",
-                shift_time:"$shifts_data.time",
-                shift_day:"$shifts_data.day",
-                sequence_id:1,
-                appointment_date:1,
-                status:1,
-                create_date:1
-                      
-                }}
-        
-        ]).then((appointment_data)=>{
+                from: "doctors",
+                localField: "doctor_id",
+                foreignField: "_id",
+                as: "doctor_data"
 
-            if(appointment_data){
-
-                res.send({
-                    success:true,
-                    message:"Successfully to fetch All Appointements for Doctor",
-                    record:appointment_data
-                })
-            }else{
-                res.send({
-                    success:false,
-                    message:"Sorry! to fetch Appointements for Doctor"
-                })
-    
             }
+        },
+
+        { $unwind: "$doctor_data" },
+
+        {
+            $lookup: {
+
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient_data"
+
+            }
+        },
+
+        { $unwind: "$patient_data" },
+
+        {
+            $lookup: {
+
+                from: "shifts",
+                localField: "shifts_id",
+                foreignField: "_id",
+                as: "shifts_data"
+
+            }
+        },
+
+        { $unwind: "$shifts_data" },
 
 
-        })
-        
+        {
+            $project: {
+                _id: 1,
+                doctor_name: "$doctor_data.name",
+                patient_name: "$patient_data.name",
+                patient_token: "$patient_data.token",
+                doctor_token: "$doctor_data.token",
+                patient_profile: "$patient_data.picture",
+                shift_time: "$shifts_data.time",
+                shift_day: "$shifts_data.day",
+                sequence_id: 1,
+                appointment_date: 1,
+                status: 1,
+                create_date: 1
+
+            }
+        }
+
+    ]).then((appointment_data) => {
+
+        if (appointment_data) {
+
+            res.send({
+                success: true,
+                message: "Successfully to fetch All Appointements for Doctor",
+                record: appointment_data
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Sorry! to fetch Appointements for Doctor"
+            })
+
+        }
+
+
+    })
+
 }
 
 
 
 
-exports.patient_transection = function(req, res){
+exports.patient_transection = function (req, res) {
     Payment.aggregate([
 
         {
@@ -4133,67 +4200,73 @@ exports.patient_transection = function(req, res){
             }
         },
 
-        {$lookup:{
-            
-            from:"doctors",
-            localField:"doctor_id",
-            foreignField:"_id",
-            as:"doctor_data"
-        
-            }},
-            
-            {$unwind:"$doctor_data"},
-            
-            {$lookup:{
-            
-            from:"patients",
-            localField:"patient_id",
-            foreignField:"_id",
-            as:"patient_data"
-        
-            }},
-            
-            {$unwind:"$patient_data"},
-            
-            
-            {$project:{
-                _id:1,
-                doctor_name:"$doctor_data.name",
-                patient_name:"$patient_data.name",
-                amount:1,
-                sequence_id:1,
-                payment_method:1,
-                sender_phone:1,
-                reciver_phone:1,
-                status:1,
-                create_date:1
-                      
-                }}
-        
-        ]).then((payment_data)=>{
-            if(payment_data){
+        {
+            $lookup: {
 
-                     res.send({
-                    success:true,
-                    message:"Successfully to fetch All  for Patient",
-                    record:payment_data
-                })
-            }else{
-                res.send({
-                    success:false,
-                    message:"Sorry! to fetch Transactions for Patient"
-                })
-    
+                from: "doctors",
+                localField: "doctor_id",
+                foreignField: "_id",
+                as: "doctor_data"
+
             }
+        },
 
-        })
+        { $unwind: "$doctor_data" },
+
+        {
+            $lookup: {
+
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient_data"
+
+            }
+        },
+
+        { $unwind: "$patient_data" },
+
+
+        {
+            $project: {
+                _id: 1,
+                doctor_name: "$doctor_data.name",
+                patient_name: "$patient_data.name",
+                amount: 1,
+                sequence_id: 1,
+                payment_method: 1,
+                sender_phone: 1,
+                reciver_phone: 1,
+                status: 1,
+                create_date: 1
+
+            }
+        }
+
+    ]).then((payment_data) => {
+        if (payment_data) {
+
+            res.send({
+                success: true,
+                message: "Successfully to fetch All  for Patient",
+                record: payment_data
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Sorry! to fetch Transactions for Patient"
+            })
+
+        }
+
+    })
 }
 
 
 
 
 
-exports.doctor_transection = function(req, res){
+exports.doctor_transection = function (req, res) {
     Payment.aggregate([
 
         {
@@ -4202,60 +4275,66 @@ exports.doctor_transection = function(req, res){
             }
         },
 
-        {$lookup:{
-            
-            from:"doctors",
-            localField:"doctor_id",
-            foreignField:"_id",
-            as:"doctor_data"
-        
-            }},
-            
-            {$unwind:"$doctor_data"},
-            
-            {$lookup:{
-            
-            from:"patients",
-            localField:"patient_id",
-            foreignField:"_id",
-            as:"patient_data"
-        
-            }},
-            
-            {$unwind:"$patient_data"},
-            
-            
-            {$project:{
-                _id:1,
-                doctor_name:"$doctor_data.name",
-                patient_name:"$patient_data.name",
-                amount:1,
-                sequence_id:1,
-                payment_method:1,
-                sender_phone:1,
-                reciver_phone:1,
-                status:1,
-                create_date:1
-                      
-                }}
-        
-        ]).then((payment_data)=>{
-            if(payment_data){
+        {
+            $lookup: {
 
-                     res.send({
-                    success:true,
-                    message:"Successfully to fetch All Transactions for Doctor",
-                    record:payment_data
-                })
-            }else{
-                res.send({
-                    success:false,
-                    message:"Sorry! to fetch Transactions for Doctor",n
-                })
-    
+                from: "doctors",
+                localField: "doctor_id",
+                foreignField: "_id",
+                as: "doctor_data"
+
             }
+        },
 
-        })
+        { $unwind: "$doctor_data" },
+
+        {
+            $lookup: {
+
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient_data"
+
+            }
+        },
+
+        { $unwind: "$patient_data" },
+
+
+        {
+            $project: {
+                _id: 1,
+                doctor_name: "$doctor_data.name",
+                patient_name: "$patient_data.name",
+                amount: 1,
+                sequence_id: 1,
+                payment_method: 1,
+                sender_phone: 1,
+                reciver_phone: 1,
+                status: 1,
+                create_date: 1
+
+            }
+        }
+
+    ]).then((payment_data) => {
+        if (payment_data) {
+
+            res.send({
+                success: true,
+                message: "Successfully to fetch All Transactions for Doctor",
+                record: payment_data
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Sorry! to fetch Transactions for Doctor", n
+            })
+
+        }
+
+    })
 }
 
 exports.booking_Appointement = function (req, res) {
@@ -4293,37 +4372,37 @@ exports.booking_Appointement = function (req, res) {
 
 //Api pay payment doctor
 exports.payPayement = function (req, res) {
-           
-                        var amount = req.body.amount
-                        var payment = new Payment({
-                            amount: amount,
-                            sequence_id: Utils.get_unique_id(),
-                            doctor_id:req.body.doctor_id,
-                            patient_id:req.body.patient_id,
-                            status: 1,
-                            payment_method:"EVC-Plus"
-                            
-                        });
-                
-                        payment.save().then((admin) => {
-                            if(bookingappointment){
-                                res.send({
-                                    success:true,
-                                    message:"Successfully to Pay Payment",
-                                    record:bookingappointment
-                                })
-                            }
-                            else{
-                                res.send({
-                                    success:false,
-                                    message:"Sorry! to Pay Payment Failed"
-                                })
-                            }
-                        });
+
+    var amount = req.body.amount
+    var payment = new Payment({
+        amount: amount,
+        sequence_id: Utils.get_unique_id(),
+        doctor_id: req.body.doctor_id,
+        patient_id: req.body.patient_id,
+        status: 1,
+        payment_method: "EVC-Plus"
+
+    });
+
+    payment.save().then((admin) => {
+        if (bookingappointment) {
+            res.send({
+                success: true,
+                message: "Successfully to Pay Payment",
+                record: bookingappointment
+            })
+        }
+        else {
+            res.send({
+                success: false,
+                message: "Sorry! to Pay Payment Failed"
+            })
+        }
+    });
 
 };
 
-  
+
 
 exports.bookAndPay = function (req, res) {
     // Marka hore, wax ka bixi lacag bixinta (Payment)
@@ -4333,36 +4412,36 @@ exports.bookAndPay = function (req, res) {
         sequence_id: Utils.get_unique_id(),
         doctor_id: req.body.doctor_id,
         patient_id: req.body.patient_id,
-        sender_phone:req.body.sender_phone,
-        reciver_phone:req.body.reciver_phone,
+        sender_phone: req.body.sender_phone,
+        reciver_phone: req.body.reciver_phone,
         status: 1, // Payment successful 
         payment_method: "EVC-Plus"
     });
 
     payment.save().then((savedPayment) => {
-            if (!savedPayment) {
-                return res.send({
-                    success: false,
-                    message: "Sorry! Payment failed"
-                });
-            }
-
-            // Haddii Payment lagu guuleystay, samee appointment booking
-            const appointmentDate = new Date(req.body.appointment_date);
-            const formattedDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(appointmentDate);
-
-            var appointment = new Appointment({
-                reason: req.body.reason,
-                sequence_id: Utils.get_unique_id(),
-                status: 1,
-                doctor_id: req.body.doctor_id,
-                patient_id: req.body.patient_id,
-                shifts_id: req.body.shifts_id,
-                appointment_date: formattedDate // Store as "25 March 2025"
+        if (!savedPayment) {
+            return res.send({
+                success: false,
+                message: "Sorry! Payment failed"
             });
+        }
 
-            return appointment.save();
-        })
+        // Haddii Payment lagu guuleystay, samee appointment booking
+        const appointmentDate = new Date(req.body.appointment_date);
+        const formattedDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(appointmentDate);
+
+        var appointment = new Appointment({
+            reason: req.body.reason,
+            sequence_id: Utils.get_unique_id(),
+            status: 1,
+            doctor_id: req.body.doctor_id,
+            patient_id: req.body.patient_id,
+            shifts_id: req.body.shifts_id,
+            appointment_date: formattedDate // Store as "25 March 2025"
+        });
+
+        return appointment.save();
+    })
         .then((savedAppointment) => {
             if (!savedAppointment) {
                 return res.send({
@@ -4384,18 +4463,18 @@ exports.bookAndPay = function (req, res) {
 
 
 
-exports.getAll_Hospitals = function(req,res){
-    Hospital.find().then((hospital_data)=>{
-        if(hospital_data){
+exports.getAll_Hospitals = function (req, res) {
+    Hospital.find().then((hospital_data) => {
+        if (hospital_data) {
             res.send({
-                success:true,
-                message:"Successfully to fetch All Hospitals",
-                record:hospital_data
+                success: true,
+                message: "Successfully to fetch All Hospitals",
+                record: hospital_data
             })
-        }else{
+        } else {
             res.send({
-                success:false,
-                message:"Sorry! to fetch Hospitals"
+                success: false,
+                message: "Sorry! to fetch Hospitals"
             })
         }
     })
@@ -4403,179 +4482,186 @@ exports.getAll_Hospitals = function(req,res){
 
 
 
-exports.shifts = function(req, res){
+exports.shifts = function (req, res) {
     Shifts.aggregate([
 
-        {$match:{
-            "doctor_id" : ObjectId(req.body.doctor_id),
+        {
+            $match: {
+                "doctor_id": ObjectId(req.body.doctor_id),
             }
+        },
+        {
+            $match: {
+                "day": "Saturday" // Match shifts where the day is Saturday
+            }
+        }
+
+    ]).then((Saturday) => {
+
+        Shifts.aggregate([
+
+            {
+                $match: {
+                    "doctor_id": ObjectId(req.body.doctor_id),
+                }
             },
             {
                 $match: {
-                    "day": "Saturday" // Match shifts where the day is Saturday
+                    "day": "Sunday" // Match shifts where the day is Saturday
                 }
             }
-        
-        ]).then((Saturday)=>{
+
+        ]).then((Sunday) => {
 
             Shifts.aggregate([
 
-                {$match:{
-                    "doctor_id" : ObjectId(req.body.doctor_id),
+                {
+                    $match: {
+                        "doctor_id": ObjectId(req.body.doctor_id),
                     }
+                },
+                {
+                    $match: {
+                        "day": "Monday" // Match shifts where the day is Saturday
+                    }
+                }
+
+            ]).then((Monday) => {
+                Shifts.aggregate([
+
+                    {
+                        $match: {
+                            "doctor_id": ObjectId(req.body.doctor_id),
+                        }
                     },
                     {
                         $match: {
-                            "day": "Sunday" // Match shifts where the day is Saturday
+                            "day": "Tuesday" // Match shifts where the day is Saturday
                         }
                     }
-                
-                ]).then((Sunday)=>{
 
+                ]).then((Tuesday) => {
                     Shifts.aggregate([
 
-                        {$match:{
-                            "doctor_id" : ObjectId(req.body.doctor_id),
+                        {
+                            $match: {
+                                "doctor_id": ObjectId(req.body.doctor_id),
                             }
+                        },
+                        {
+                            $match: {
+                                "day": "Wednesday" // Match shifts where the day is Saturday
+                            }
+                        }
+
+                    ]).then((Wednesday) => {
+                        Shifts.aggregate([
+
+                            {
+                                $match: {
+                                    "doctor_id": ObjectId(req.body.doctor_id),
+                                }
                             },
                             {
                                 $match: {
-                                    "day": "Monday" // Match shifts where the day is Saturday
+                                    "day": "Thursday" // Match shifts where the day is Saturday
                                 }
                             }
-                        
-                        ]).then((Monday)=>{
+
+                        ]).then((Thursday) => {
                             Shifts.aggregate([
 
-                                {$match:{
-                                    "doctor_id" : ObjectId(req.body.doctor_id),
+                                {
+                                    $match: {
+                                        "doctor_id": ObjectId(req.body.doctor_id),
                                     }
-                                    },
-                                    {
-                                        $match: {
-                                            "day": "Tuesday" // Match shifts where the day is Saturday
-                                        }
+                                },
+                                {
+                                    $match: {
+                                        "day": "Friday" // Match shifts where the day is Saturday
                                     }
-                                
-                                ]).then((Tuesday)=>{
-                                    Shifts.aggregate([
+                                }
 
-                                        {$match:{
-                                            "doctor_id" : ObjectId(req.body.doctor_id),
-                                            }
-                                            },
-                                            {
-                                                $match: {
-                                                    "day": "Wednesday" // Match shifts where the day is Saturday
-                                                }
-                                            }
-                                        
-                                        ]).then((Wednesday)=>{
-                                            Shifts.aggregate([
+                            ]).then((Friday) => {
 
-                                                {$match:{
-                                                    "doctor_id" : ObjectId(req.body.doctor_id),
-                                                    }
-                                                    },
-                                                    {
-                                                        $match: {
-                                                            "day": "Thursday" // Match shifts where the day is Saturday
-                                                        }
-                                                    }
-                                                
-                                                ]).then((Thursday)=>{
-                                                    Shifts.aggregate([
 
-                                                        {$match:{
-                                                            "doctor_id" : ObjectId(req.body.doctor_id),
-                                                            }
-                                                            },
-                                                            {
-                                                                $match: {
-                                                                    "day": "Friday" // Match shifts where the day is Saturday
-                                                                }
-                                                            }
-                                                        
-                                                        ]).then((Friday)=>{
-                            
-       
 
-            
-            if(Saturday && Sunday && Monday && Tuesday && Wednesday && Thursday || Friday){
-                res.send({
-                    success:true,
-                    message:"Successfully to  Fetch all shifts",
-                    Saturday:Saturday,
-                    Sunday:Sunday,
-                    Monday:Monday,
-                    Tuesday:Tuesday,
-                    Wednesday:Wednesday,
-                    Thursday:Thursday,
-                    Friday:Friday
+
+                                if (Saturday && Sunday && Monday && Tuesday && Wednesday && Thursday || Friday) {
+                                    res.send({
+                                        success: true,
+                                        message: "Successfully to  Fetch all shifts",
+                                        Saturday: Saturday,
+                                        Sunday: Sunday,
+                                        Monday: Monday,
+                                        Tuesday: Tuesday,
+                                        Wednesday: Wednesday,
+                                        Thursday: Thursday,
+                                        Friday: Friday
+                                    })
+                                }
+                                else {
+                                    res.send({
+                                        success: false,
+                                        message: "Failed to fetch all shifts"
+                                    })
+                                }
+
+                            })
+                        })
+                    })
                 })
-            }
-            else{
-                res.send({
-                    success:false,
-                    message:"Failed to fetch all shifts"
-                })
-            }
-
+            })
         })
     })
-})
-})
-})
-})
-})
 }
 
 
 
-exports.check_shifts = function(req, res) {
+exports.check_shifts = function (req, res) {
     Appointment.findOne({ shifts_id: req.body.shifts_id, appointment_date: req.body.appointment_date }).then((shiftes_appointment) => {
-            if (shiftes_appointment) {
+        if (shiftes_appointment) {
+            return res.send({
+                success: false,
+                message: "The shift has already been booked"
+            });
+        }
+        else {
+            let appointmentDate = new Date(req.body.appointment_date);
+            let currentDate = new Date();
+            if (appointmentDate < currentDate.setHours(0, 0, 0, 0)) {
                 return res.send({
                     success: false,
-                    message: "The shift has already been booked"
+                    message: "The date you selected has already passed"
                 });
             }
-            else{   
-                    let appointmentDate = new Date(req.body.appointment_date);
-                    let currentDate = new Date(); 
-                    if (appointmentDate < currentDate.setHours(0, 0, 0, 0)) {
+            else {
+                Shifts.findOne({ _id: req.body.shifts_id }).then((shiftes) => {
+
+                    let shiftTime = shiftes.time;
+                    let currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
+                    console.log("shiftDateTime", shiftDateTime)
+                    let currentDateTime = new Date(`${new Date().toDateString()} ${currentTime}`);
+                    console.log("currentDateTime", currentDateTime)
+
+                    if (currentDateTime > shiftDateTime) {
                         return res.send({
                             success: false,
-                            message: "The date you selected has already passed"
+                            message: "The time you selected has already passed"
                         });
                     }
-                    else{
-                       Shifts.findOne({ _id: req.body.shifts_id }).then((shiftes) => {
-
-                        let shiftTime = shiftes.time; 
-                        let currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                        let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
-                        console.log("shiftDateTime", shiftDateTime)
-                        let currentDateTime = new Date(`${new Date().toDateString()} ${currentTime}`);
-                        console.log("currentDateTime", currentDateTime)
-
-                        if (currentDateTime > shiftDateTime) {
-                            return res.send({
-                                success: false,
-                                message: "The time you selected has already passed"
-                            });
-                        }
-                        else{
-                            return res.send({
-                                success: true,
-                                message: "You can book this shifts"
-                            });
-                        }
-                    });
+                    else {
+                        return res.send({
+                            success: true,
+                            message: "You can book this shifts"
+                        });
                     }
-                
-            } 
-        })
+                });
+            }
+
+        }
+    })
         .catch((err) => {
             console.error(err);
             res.status(500).send({
@@ -4589,7 +4675,7 @@ exports.check_shifts = function(req, res) {
 
 
 
-exports.Saturday_Shifts = async function(req, res) {
+exports.Saturday_Shifts = async function (req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
         const appointmentDate = new Date(req.body.appointment_date);
@@ -4665,7 +4751,7 @@ exports.Saturday_Shifts = async function(req, res) {
 };
 
 
-exports.Sunday_Shifts = async function(req, res) {
+exports.Sunday_Shifts = async function (req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
         const appointmentDate = new Date(req.body.appointment_date);
@@ -4708,8 +4794,8 @@ exports.Sunday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
-                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
-                 nowDateTime.setHours(nowDateTime.getHours() + 3);
+                // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4741,7 +4827,7 @@ exports.Sunday_Shifts = async function(req, res) {
 };
 
 
-exports.Monday_Shifts = async function(req, res) {
+exports.Monday_Shifts = async function (req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
         const appointmentDate = new Date(req.body.appointment_date);
@@ -4784,8 +4870,8 @@ exports.Monday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
-                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
-                 nowDateTime.setHours(nowDateTime.getHours() + 3);
+                // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4818,7 +4904,7 @@ exports.Monday_Shifts = async function(req, res) {
 
 
 
-exports.Tuesday_Shifts = async function(req, res) {
+exports.Tuesday_Shifts = async function (req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
         const appointmentDate = new Date(req.body.appointment_date);
@@ -4861,8 +4947,8 @@ exports.Tuesday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
-                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
-                 nowDateTime.setHours(nowDateTime.getHours() + 3);
+                // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4895,7 +4981,7 @@ exports.Tuesday_Shifts = async function(req, res) {
 
 
 
-exports.Wednesday_Shifts = async function(req, res) {
+exports.Wednesday_Shifts = async function (req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
         const appointmentDate = new Date(req.body.appointment_date);
@@ -4938,8 +5024,8 @@ exports.Wednesday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
-                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
-                 nowDateTime.setHours(nowDateTime.getHours() + 3);
+                // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -4972,7 +5058,7 @@ exports.Wednesday_Shifts = async function(req, res) {
 
 
 
-exports.Thursday_Shifts = async function(req, res) {
+exports.Thursday_Shifts = async function (req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
         const appointmentDate = new Date(req.body.appointment_date);
@@ -5015,8 +5101,8 @@ exports.Thursday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
-                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
-                 nowDateTime.setHours(nowDateTime.getHours() + 3);
+                // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -5048,7 +5134,7 @@ exports.Thursday_Shifts = async function(req, res) {
 };
 
 
-exports.Friday_Shifts = async function(req, res) {
+exports.Friday_Shifts = async function (req, res) {
     try {
         const doctorId = ObjectId(req.body.doctor_id);
         const appointmentDate = new Date(req.body.appointment_date);
@@ -5091,8 +5177,8 @@ exports.Friday_Shifts = async function(req, res) {
                 let now = new Date();
                 let shiftDateTime = new Date(`${appointmentDate.toDateString()} ${shiftTime}`);
                 let nowDateTime = new Date();
-                 // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
-                 nowDateTime.setHours(nowDateTime.getHours() + 3);
+                // In local time waa ok lakin In Server ka 3 hours ayuu danbeyaa sidas dartee use this
+                nowDateTime.setHours(nowDateTime.getHours() + 3);
 
                 if (
                     appointmentDate.toDateString() === now.toDateString() &&
@@ -5125,20 +5211,20 @@ exports.Friday_Shifts = async function(req, res) {
 
 
 
-exports.adds = function(req, res){
+exports.adds = function (req, res) {
     Adds.aggregate([
-        {$match:{"status":1}}   
-        ]).then((adds_data)=>{
-        if(adds_data){
+        { $match: { "status": 1 } }
+    ]).then((adds_data) => {
+        if (adds_data) {
             res.send({
-                success:true,
-                message:"Successfully to fetch all Adds",
-                record:adds_data
+                success: true,
+                message: "Successfully to fetch all Adds",
+                record: adds_data
             })
-        }else{
+        } else {
             res.send({
-                success:false,
-                message:"Sorry! to fetch Adds"
+                success: false,
+                message: "Sorry! to fetch Adds"
             })
         }
 
@@ -5149,20 +5235,20 @@ exports.adds = function(req, res){
 
 
 
-exports.selfmanagment = function(req, res){
+exports.selfmanagment = function (req, res) {
     SelfManagment.aggregate([
-        {$match:{"status":1}}   
-        ]).then((selfmanagment_data)=>{
-        if(selfmanagment_data){
+        { $match: { "status": 1 } }
+    ]).then((selfmanagment_data) => {
+        if (selfmanagment_data) {
             res.send({
-                success:true,
-                message:"Successfully to fetch all Self Managment",
-                record:selfmanagment_data
+                success: true,
+                message: "Successfully to fetch all Self Managment",
+                record: selfmanagment_data
             })
-        }else{
+        } else {
             res.send({
-                success:false,
-                message:"Sorry! to fetch Self Managment"
+                success: false,
+                message: "Sorry! to fetch Self Managment"
             })
         }
 
@@ -5236,21 +5322,21 @@ exports.updateProfile = function (req, res) {
 
 
 
-exports.docAndpat = function(req, res){
-    Doctor.find({}).then((doctorData)=>{
-        Patient.find({}).then((patientData)=>{
-            if(doctorData && patientData){
-                
+exports.docAndpat = function (req, res) {
+    Doctor.find({}).then((doctorData) => {
+        Patient.find({}).then((patientData) => {
+            if (doctorData && patientData) {
+
                 res.send({
-                    success:true,
-                    message:"Successfully to fetch all Doctors And Patients",
-                    record:doctorData,patientData
+                    success: true,
+                    message: "Successfully to fetch all Doctors And Patients",
+                    record: doctorData, patientData
                 })
 
-            }else{
+            } else {
                 res.send({
-                    success:false,
-                    message:"Sorry! to fetch  Doctors And Patients"
+                    success: false,
+                    message: "Sorry! to fetch  Doctors And Patients"
                 })
             }
 
@@ -5261,9 +5347,9 @@ exports.docAndpat = function(req, res){
 
 
 
- 
+
 //Api get all appointments for doctor
-exports.conseltaion = function(req, res){
+exports.conseltaion = function (req, res) {
     Appointment.aggregate([
 
         {
@@ -5273,106 +5359,114 @@ exports.conseltaion = function(req, res){
             }
         },
 
-        {$lookup:{
-            
-            from:"doctors",
-            localField:"doctor_id",
-            foreignField:"_id",
-            as:"doctor_data"
-        
-            }},
-            
-            {$unwind:"$doctor_data"},
-            
-            {$lookup:{
-            
-            from:"patients",
-            localField:"patient_id",
-            foreignField:"_id",
-            as:"patient_data"
-        
-            }},
-            
-            {$unwind:"$patient_data"},
+        {
+            $lookup: {
 
-            {$lookup:{
-            
-                from:"shifts",
-                localField:"shifts_id",
-                foreignField:"_id",
-                as:"shifts_data"
-            
-                }},
-                
-                {$unwind:"$shifts_data"},
-            
-            
-            {$project:{
-                _id:1,
-                doctor_name:"$doctor_data.name",
-                doctor_id:"$doctor_data._id",
-                patient_name:"$patient_data.name",
-                patient_id:"$patient_data._id",
-                patient_token:"$patient_data.token",
-                doctor_token:"$doctor_data.token",
-                patient_profile:"$patient_data.picture",
-                shift_time:"$shifts_data.time",
-                shift_day:"$shifts_data.day",
-                sequence_id:1,
-                appointment_date:1,
-                status:1,
-                create_date:1
-                      
-                }}
-        
-        ]).then((conseltation_data)=>{
+                from: "doctors",
+                localField: "doctor_id",
+                foreignField: "_id",
+                as: "doctor_data"
 
-            if(conseltation_data){
-
-                res.send({
-                    success:true,
-                    message:"Successfully to fetch All Patients pending conseltation",
-                    record:conseltation_data
-                })
-            }else{
-                res.send({
-                    success:false,
-                    message:"Sorry! to fetch  Patients pending conseltation"
-                })
-    
             }
+        },
+
+        { $unwind: "$doctor_data" },
+
+        {
+            $lookup: {
+
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient_data"
+
+            }
+        },
+
+        { $unwind: "$patient_data" },
+
+        {
+            $lookup: {
+
+                from: "shifts",
+                localField: "shifts_id",
+                foreignField: "_id",
+                as: "shifts_data"
+
+            }
+        },
+
+        { $unwind: "$shifts_data" },
 
 
-        })
-        
+        {
+            $project: {
+                _id: 1,
+                doctor_name: "$doctor_data.name",
+                doctor_id: "$doctor_data._id",
+                patient_name: "$patient_data.name",
+                patient_id: "$patient_data._id",
+                patient_token: "$patient_data.token",
+                doctor_token: "$doctor_data.token",
+                patient_profile: "$patient_data.picture",
+                shift_time: "$shifts_data.time",
+                shift_day: "$shifts_data.day",
+                sequence_id: 1,
+                appointment_date: 1,
+                status: 1,
+                create_date: 1
+
+            }
+        }
+
+    ]).then((conseltation_data) => {
+
+        if (conseltation_data) {
+
+            res.send({
+                success: true,
+                message: "Successfully to fetch All Patients pending conseltation",
+                record: conseltation_data
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Sorry! to fetch  Patients pending conseltation"
+            })
+
+        }
+
+
+    })
+
 }
 
 
 
-exports.save_conseltaion = function(req, res){
+exports.save_conseltaion = function (req, res) {
 
     var roomID = req.body.roomID
     var conseltaion = new Conseltaion({
-        roomID:roomID,
-        sequence_id:Utils.get_unique_id(),
-        doctor_id:req.body.doctor_id,
-        patient_id:req.body.patient_id,
-        status:"pending",
-    
+        roomID: roomID,
+        sequence_id: Utils.get_unique_id(),
+        doctor_id: req.body.doctor_id,
+        patient_id: req.body.patient_id,
+        status: "pending",
+
     });
 
-    conseltaion.save().then((conseltaion)=>{
-        if(conseltaion){
+    conseltaion.save().then((conseltaion) => {
+        if (conseltaion) {
             res.send({
-                success:true,
-                message:"successfully to register conseltation",
-                record:conseltaion
+                success: true,
+                message: "successfully to register conseltation",
+                record: conseltaion
             })
         }
-        else{
+        else {
             res.send({
-                success:false,
-                message:"Sorry! not register conseltation",
+                success: false,
+                message: "Sorry! not register conseltation",
             })
 
         }
@@ -5383,18 +5477,18 @@ exports.save_conseltaion = function(req, res){
 
 
 
-exports.update_conseltaion = function(req,res){
-    Conseltaion.findOneAndUpdate({roomID:req.body.roomID}, { $set: { status: req.body.status } }).then((updateConsel)=>{
-        if(updateConsel){
+exports.update_conseltaion = function (req, res) {
+    Conseltaion.findOneAndUpdate({ roomID: req.body.roomID }, { $set: { status: req.body.status } }).then((updateConsel) => {
+        if (updateConsel) {
             res.send({
-                success:true,
-                message:"Successfully to update conseltation status",
-                record:updateConsel
+                success: true,
+                message: "Successfully to update conseltation status",
+                record: updateConsel
             })
-        }else{
+        } else {
             res.send({
-                success:false,
-                message:"Sorry! not update conseltation status"
+                success: false,
+                message: "Sorry! not update conseltation status"
             })
         }
 
@@ -5405,36 +5499,73 @@ exports.update_conseltaion = function(req,res){
 
 
 
-exports.update_token = function(req, res){
-    Doctor.findOne({ _id:req.body._id}).then((doctor) => {
-        if(doctor){
-            Doctor.findOneAndUpdate({ _id: req.body._id }, { $set: { token: req.body.token }}, { new: true }).then((data_doctor) => {
-                console.log("gggggg",data_doctor)
+exports.update_token = function (req, res) {
+    Doctor.findOne({ _id: req.body._id }).then((doctor) => {
+        if (doctor) {
+            Doctor.findOneAndUpdate({ _id: req.body._id }, { $set: { token: req.body.token } }, { new: true }).then((data_doctor) => {
+                console.log("gggggg", data_doctor)
 
                 res.send({
-                    success:true,
-                    message:"Successfully to Update Doctor",
-                    record:data_doctor
+                    success: true,
+                    message: "Successfully to Update Doctor",
+                    record: data_doctor
                 })
             })
-        }else{
-            Patient.findOne({ _id: req.body._id}).then((patient) => {
-                if(patient){
-                    Patient.findOneAndUpdate({ _id: req.body._id }, { $set: { token: req.body.token }}, { new: true }).then((data_patient) => {
+        } else {
+            Patient.findOne({ _id: req.body._id }).then((patient) => {
+                if (patient) {
+                    Patient.findOneAndUpdate({ _id: req.body._id }, { $set: { token: req.body.token } }, { new: true }).then((data_patient) => {
                         res.send({
-                            success:true,
-                            message:"Successfully to Update Patient",
-                            record:data_patient
+                            success: true,
+                            message: "Successfully to Update Patient",
+                            record: data_patient
                         })
                     })
-                }else{
+                } else {
                     res.send({
-                        success:false,
-                        message:"Invalid Email or Password"
+                        success: false,
+                        message: "Invalid Email or Password"
                     })
                 }
             });
-          
+
         }
     })
 }
+
+
+exports.re_appointment = function (req, res) {
+    Appointment.findOne({
+      doctor_id: req.body.doctor_id,
+      patient_id: req.body.patient_id,
+      appointment_date: req.body.appointment_date,
+      shifts_id: req.body.shifts_id,
+    }).then((re_appointment) => {
+        console.log('..........',req.body.doctor_id)
+      if (re_appointment) {
+        Appointment.findOneAndUpdate(
+          { _id: req.body._id },
+          { $set: { status: req.body.status } },
+          { new: true }
+        ).then((data_re_appointment) => {
+          console.log("gggggg", data_re_appointment);
+  
+          res.send({
+            success: true,
+            message: "Successfully to re_appointement",
+            record: data_re_appointment,
+          });
+        });
+      } else {
+        res.send({
+          success: false,
+          message: "Failed to re_appointement",
+        });
+      }
+    });
+  };
+
+
+
+
+

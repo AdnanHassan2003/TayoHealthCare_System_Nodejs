@@ -213,6 +213,7 @@ module.exports = function (app) {
   app.route('/save_conseltaion').post(adminController.save_conseltaion);  // not work
   app.route('/update_conseltaion').post(adminController.update_conseltaion);  // not work
   app.route('/update_token').post(adminController.update_token);
+  app.route('/re_appointment').post(adminController.re_appointment)
 
 
 
