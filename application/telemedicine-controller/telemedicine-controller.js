@@ -4014,65 +4014,59 @@ exports.patient_appointements = function (req, res) {
             }
         },
 
-        {
-            $lookup: {
+            {$lookup:{
+                
+                from:"doctors",
+                localField:"doctor_id",
+                foreignField:"_id",
+                as:"doctor_data"
+            
+                }},
+                
+                {$unwind:"$doctor_data"},
+                
+                {$lookup:{
+                
+                from:"patients",
+                localField:"patient_id",
+                foreignField:"_id",
+                as:"patient_data"
+            
+                }},
+                
+                {$unwind:"$patient_data"},
 
-                from: "doctors",
-                localField: "doctor_id",
-                foreignField: "_id",
-                as: "doctor_data"
-
-            }
-        },
-
-        { $unwind: "$doctor_data" },
-
-        {
-            $lookup: {
-
-                from: "patients",
-                localField: "patient_id",
-                foreignField: "_id",
-                as: "patient_data"
-
-            }
-        },
-
-        { $unwind: "$patient_data" },
-
-        {
-            $lookup: {
-
-                from: "shifts",
-                localField: "shifts_id",
-                foreignField: "_id",
-                as: "shifts_data"
-
-            }
-        },
-
-        { $unwind: "$shifts_data" },
-
-
-        {
-            $project: {
-                _id: 1,
-                doctor_name: "$doctor_data.name",
-                doctor_profile: "$doctor_data.picture",
-                patient_name: "$patient_data.name",
-                patient_token: "$patient_data.token",
-                doctor_token: "$doctor_data.token",
-                shift_time: "$shifts_data.time",
-                shift_day: "$shifts_data.day",
-                sequence_id: 1,
-                appointment_date: 1,
-                status: 1,
-                create_date: 1
-
-            }
-        }
-
-    ]).then((appointment_data) => {
+                {$lookup:{
+                
+                    from:"shifts",
+                    localField:"shifts_id",
+                    foreignField:"_id",
+                    as:"shifts_data"
+                
+                    }},
+                    
+                    {$unwind:"$shifts_data"},
+                
+                
+                {$project:{
+                    _id:1,
+                    doctor_name:"$doctor_data.name",
+                    doctor_profile:"$doctor_data.picture",
+                    patient_name:"$patient_data.name",
+                    patient_token:"$patient_data.token",
+                    doctor_token:"$doctor_data.token",
+                    patient_id:"$patient_data._id",
+                    doctor_id:"$doctor_data._id",
+                    shift_time:"$shifts_data.time",
+                    shift_day:"$shifts_data.day",
+                    sequence_id:1,
+                    appointment_date:1,
+                    status:1,
+                    create_date:1
+                          
+                    }}
+            
+            ]).then((appointment_data)=>{
 
         if (appointment_data) {
 
@@ -4134,39 +4128,37 @@ exports.doctor_appointements = function (req, res) {
 
         { $unwind: "$patient_data" },
 
-        {
-            $lookup: {
-
-                from: "shifts",
-                localField: "shifts_id",
-                foreignField: "_id",
-                as: "shifts_data"
-
-            }
-        },
-
-        { $unwind: "$shifts_data" },
-
-
-        {
-            $project: {
-                _id: 1,
-                doctor_name: "$doctor_data.name",
-                patient_name: "$patient_data.name",
-                patient_token: "$patient_data.token",
-                doctor_token: "$doctor_data.token",
-                patient_profile: "$patient_data.picture",
-                shift_time: "$shifts_data.time",
-                shift_day: "$shifts_data.day",
-                sequence_id: 1,
-                appointment_date: 1,
-                status: 1,
-                create_date: 1
-
-            }
-        }
-
-    ]).then((appointment_data) => {
+            {$lookup:{
+            
+                from:"shifts",
+                localField:"shifts_id",
+                foreignField:"_id",
+                as:"shifts_data"
+            
+                }},
+                
+                {$unwind:"$shifts_data"},
+            
+            
+            {$project:{
+                _id:1,
+                doctor_name:"$doctor_data.name",
+                patient_name:"$patient_data.name",
+                patient_token:"$patient_data.token",
+                doctor_token:"$doctor_data.token",
+                patient_id:"$patient_data._id",
+                doctor_id:"$doctor_data._id",
+                patient_profile:"$patient_data.picture",
+                shift_time:"$shifts_data.time",
+                shift_day:"$shifts_data.day",
+                sequence_id:1,
+                appointment_date:1,
+                status:1,
+                create_date:1
+                      
+                }}
+        
+        ]).then((appointment_data)=>{
 
         if (appointment_data) {
 
