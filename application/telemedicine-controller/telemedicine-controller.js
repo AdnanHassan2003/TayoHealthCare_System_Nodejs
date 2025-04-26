@@ -5461,24 +5461,21 @@ exports.re_appointment = function (req, res) {
                 { $set: { status: req.body.status } },
                 { new: true }
               ).then((data_re_appointment) => {
-                console.log("gggggg", data_re_appointment);
         
                 res.send({
                   success: true,
-                  message: "Successfully to re_appointement",
+                  message: "Successfully to Compelete appointement",
                   record: data_re_appointment,
                 });
               });
         }
         else if(req.body.status==4){
             var updateDate = req.body.updateDate;
-            console.log("updatesssssssss ",re_appointment)
             Appointment.findOneAndUpdate(
               { _id: req.body._id },
               { $set: { status: req.body.status, appointment_date: updateDate } },
               { new: true }
             ).then((data_re_appointment) => {
-              console.log("gggggg", data_re_appointment);
       
               res.send({
                 success: true,

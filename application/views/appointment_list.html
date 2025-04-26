@@ -61,7 +61,8 @@
                               <option value="ALL"  >All</option>
                               <option value="0" selected> Pending</option>
                               <option value="1"> Confirmed</option>
-                              <option value="2" selected> Completed</option>
+                              <option value="2"> Completed</option>
+                              <option value="4"> Re-appointment</option>
                               <option value="3"> Cancelled</option>
                               
                             <%}else if(status == 1){%>
@@ -69,6 +70,7 @@
                               <option value="0"> Pending</option>
                               <option value="1" selected> Confirmed</option>
                               <option value="2"> Completed</option>
+                              <option value="4"> Re-appointment</option>
                               <option value="3"> Cancelled</option>
       
                             <%}else if(status == 2){%>
@@ -76,6 +78,7 @@
                               <option value="0"> Pending</option>
                               <option value="1"> Confirmed</option>
                               <option value="2" selected> Completed</option>
+                              <option value="4"> Re-appointment</option>
                               <option value="3"> Cancelled</option>
 
                             <%}else if(status == 3){%>
@@ -83,13 +86,24 @@
                               <option value="0"> Pending</option>
                               <option value="1"> Confirmed</option>
                               <option value="2"> Completed</option>
+                              <option value="4"> Re-appointment</option>
                               <option value="3" selected> Cancelled</option>
+
+                            <%}
+                            else if(status == 4){%>
+                              <option value="ALL"  >All</option>
+                              <option value="0"> Pending</option>
+                              <option value="1"> Confirmed</option>
+                              <option value="2"> Completed</option>
+                              <option value="4" selected> Re-appointment</option>
+                              <option value="3"> Cancelled</option>
 
                             <%}else if(status=='ALL' || status==undefined) {%>
                               <option value="ALL">All</option>
                               <option value="0"> Pending</option>
                               <option value="1"> Confirmed</option>
                               <option value="2"> Completed</option>
+                              <option value="4"> Re-appointment</option>
                               <option value="3"> Cancelled</option>
                               
                             <%}%> 
@@ -210,6 +224,10 @@
                                   <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
                                     Completed
                                   </span>
+                                  <% }  else if (entry.status == "4") { %>
+                                    <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
+                                      Re-appointment
+                                    </span>
                                 <% } else { %>
                                   <span class="btn-danger" style="padding: 5px; border-radius: 4px;">
                                     Cancelled

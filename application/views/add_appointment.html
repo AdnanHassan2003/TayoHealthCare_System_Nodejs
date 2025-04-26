@@ -116,6 +116,9 @@
                           <option value="2">
                             Completed
                           </option>
+                          <option value="4">
+                            Re-appointment
+                        </option>
                           <option value="3">
                             Cancelled
                           </option>
@@ -129,6 +132,9 @@
                             <option value="2" >
                                 Completed
                             </option>
+                            <option value="4">
+                              Re-appointment
+                          </option>
                             <option value="3" >
                                 Cancelled
                             </option>
@@ -142,11 +148,32 @@
                                 <option value="2" selected="selected" >
                                     Completed
                                 </option>
+                                <option value="4">
+                                  Re-appointment
+                              </option>
                                 <option value="3" >
                                     Cancelled
                                 </option>
 
-                                <%} else {%>
+                                <%}
+                                else if(appointment_data.status=="4") {%>
+                                  <option value="0" >
+                                      Pending
+                                  </option>
+                                  <option value="1" >
+                                    Confirmed
+                                </option>
+                                  <option value="2" >
+                                      Completed
+                                  </option>
+                                  <option value="4" selected="selected" >
+                                    Re-appointment
+                                </option>
+                                  <option value="3" >
+                                      Cancelled
+                                  </option>
+  
+                                  <%} else {%>
                                   <option value="0">
                                     Pending
                                 </option>
@@ -156,6 +183,9 @@
                                     <option value="2">
                                         Completed
                                     </option>
+                                    <option value="4">
+                                      Re-appointment
+                                  </option>
                                     <option value="3" selected="selected" >
                                         Cancelled
                                     </option>
