@@ -5454,11 +5454,12 @@ exports.re_appointment = function (req, res) {
       appointment_date: req.body.appointment_date,
       shifts_id: req.body.shifts_id,
     }).then((re_appointment) => {
-        console.log('..........',req.body.doctor_id)
       if (re_appointment) {
+        var updateDate = req.body.updateDate;
+        console.log("updatesssssssss ",updateDate)
         Appointment.findOneAndUpdate(
           { _id: req.body._id },
-          { $set: { status: req.body.status } },
+          { $set: { status: req.body.status, appointment_date: updateDate } },
           { new: true }
         ).then((data_re_appointment) => {
           console.log("gggggg", data_re_appointment);
