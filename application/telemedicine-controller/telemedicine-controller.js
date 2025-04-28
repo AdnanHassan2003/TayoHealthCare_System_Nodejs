@@ -5448,12 +5448,7 @@ exports.update_token = function(req, res){
 
 
 exports.re_appointment = function (req, res) {
-    Appointment.findOne({
-      doctor_id: req.body.doctor_id,
-      patient_id: req.body.patient_id,
-      appointment_date: req.body.appointment_date,
-      shifts_id: req.body.shifts_id,
-    }).then((re_appointment) => {
+    Appointment.findOne({_id:req.body._id }).then((re_appointment) => {
       if (re_appointment) {
         if(req.body.status==2){
             Appointment.findOneAndUpdate(
@@ -5470,10 +5465,9 @@ exports.re_appointment = function (req, res) {
               });
         }
         else if(req.body.status==4){
-            var updateDate = req.body.updateDate;
             Appointment.findOneAndUpdate(
               { _id: req.body._id },
-              { $set: { status: req.body.status, appointment_date: updateDate } },
+              { $set: { status: req.body.status, appointment_date: req.body.appointment_date, shifts_id:req.body.shifts_id } },
               { new: true }
             ).then((data_re_appointment) => {
       
