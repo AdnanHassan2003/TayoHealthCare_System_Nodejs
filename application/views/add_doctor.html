@@ -106,12 +106,29 @@
                         <input type="text" id="countries" name="countries" style="text-transform: capitalize;" class="form-control"
                           value="<%= doctor_data.countries %>" required>
                       </div>
-                      <div class="form-group">
-                        <label for="name">
+                      <div class="form-group" name = "doctor">
+                        <label for="speciality_id">
                           Speciality
                         </label>
-                        <input type="text" id="speciality" name="speciality" style="text-transform: capitalize;" class="form-control"
-                          value="<%= doctor_data.speciality %>" required>
+                        <select class="form-control custom-select"  id="speciality_id" name="speciality_id" required>
+                          <option value=""> All</option>
+                          <% if(Speciality.length > 0){  %>
+                          
+                            <% Speciality.forEach(function(data){%>
+                
+    
+                              <%if(speciality_id == data._id){%>
+                                
+                                <option value="<%=data._id%>"  selected><%=data.name%></option>
+                                
+                              <%}else{%>
+                                <option value="<%=data._id%>"  ><%=data.name%></option>
+                              <%}%>
+                             
+                               
+                        <%})%>
+                        <%}%>
+                        </select>
                       </div>
                       <div class="form-group">
                         <label for="experience_years">
@@ -245,10 +262,18 @@
                         <input type="text" id="countries" name="countries" class="form-control" required>
                       </div>
                       <div class="form-group">
-                        <label for="speciality">
+                        <label for="speciality_id">
                           Speciality
                         </label>
-                        <input type="text" id="speciality" name="speciality" class="form-control" required>
+                        <select class="form-control custom-select2" id="speciality_id" name="speciality_id" required>
+                            <% if(speciality_data.length > 0){  %>
+                              <option>Select Speciality</option>
+                              <% speciality_data.forEach(function(data){%>
+                               
+                          <option value="<%=data._id%>"  ><%=data.name%></option>
+                          <%})%>
+                          <%}%>
+                          </select>
                       </div>
                       <div class="form-group">
                         <label for="consultation_fee">

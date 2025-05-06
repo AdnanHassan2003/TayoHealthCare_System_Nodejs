@@ -170,6 +170,18 @@ module.exports = function (app) {
 
 
 
+  app.route('/speciality_list').get(adminController.speciality_list);
+  app.route('/speciality_list').post(adminController.speciality_list);
+  app.route('/add_speciality').get(adminController.add_speciality);
+  app.route('/add_speciality').post(adminController.add_speciality);
+  app.route('/save_speciality_data').post(adminController.save_speciality_data)
+  app.route('/edit_speciality').post(adminController.edit_speciality)
+  app.route('/update_speciality_detail').post(adminController.update_speciality_detail)
+  app.route('/delete_speciality').post(adminController.delete_speciality);
+
+
+
+
   // get is impotent post is not importent
   app.route('/appointmentReport').post(adminController.appointmentReport)
   app.route('/appointmentReport').get(adminController.appointmentReport) 
@@ -214,6 +226,7 @@ module.exports = function (app) {
   app.route('/update_conseltaion').post(adminController.update_conseltaion);  // not work
   app.route('/update_token').post(adminController.update_token);
   app.route('/re_appointment').post(adminController.re_appointment)
+  app.route('/feedbackPatient').post(adminController.feedbackPatient)
 
 
 

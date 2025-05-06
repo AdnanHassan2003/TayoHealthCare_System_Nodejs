@@ -11,6 +11,7 @@ var Shifts = require('mongoose').model('shifts')
 var Adds = require('mongoose').model('adds')
 var SelfManagment = require('mongoose').model('selfmanagment')
 var Conseltaion = require('mongoose').model('conseltation')
+var Speciality = require('mongoose').model('speciality')
 var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
@@ -589,6 +590,16 @@ exports.doctor_list = function (req, res) {
                     
                     
                     {$unwind:"$data"},
+
+
+                    { $lookup:{
+                        from:"specialities",
+                        localField:"speciality_id",
+                        foreignField:"_id",
+                        as:"speciality_data"
+                        }},
+
+                        {$unwind:"$speciality_data"},
                     
                     {$project:{
                         _id:1,
@@ -599,7 +610,7 @@ exports.doctor_list = function (req, res) {
                         email:1,
                         hospital_name:"$data.name",
                         countries:1,
-                        speciality:1,
+                        speciality_name:"$speciality_data.name",
                         experience_years:1,
                         consultation_fee:1,
                         status:1,
@@ -1381,6 +1392,33 @@ exports.selfmanagment_list = function(req, res){
         }
     })
 }
+
+
+
+
+exports.speciality_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Speciality.find({}).then((speciality_data)=>{
+
+                res.render('speciality_list', {
+                    url_data: req.session.menu_array,
+                    detail: speciality_data,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+
+
+            })
+        }else {
+
+            Utils.redirect_login(req, res);
+        }
+
+    })
+    
+}
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1457,16 +1495,19 @@ exports.add_doctor = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
             Hospital.find({}).then((hospital)=>{
+                Speciality.find({}).then((speciality)=>{ 
             res.render("add_doctor",
                 {
                     systen_urls: systen_urls, 
                     msg: req.session.error,
                     hospital_data:hospital,
+                    speciality_data:speciality,
                     url_data: req.session.menu_array,
                     moment: moment,
                     admin_type: req.session.admin.usertype
                 })
             })
+        })
         } else {
             Utils.redirect_login(req, res);
         }
@@ -1695,6 +1736,27 @@ exports.add_selfmanagment = function (req, res) {
         }
     });
 };
+
+
+
+
+exports.add_speciality = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+                res.render("add_speciality",
+                    {
+                        systen_urls: systen_urls,
+                        msg: req.session.error,
+                        url_data: req.session.menu_array,
+                        moment: moment,
+                        admin_type: req.session.admin.usertype,
+                    })
+           
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -1909,7 +1971,7 @@ exports.save_doctor_data = function (req, res) {
                             email: req.body.email,
                             consultation_fee: req.body.consultation_fee,
                             experience_years: req.body.experience_years,
-                            speciality: req.body.speciality,
+                            speciality_id: req.body.speciality_id,
                             countries: req.body.countries,
                             hospital_id: req.body.hospital_id,
                             license_number: Utils.get_unique_id(),
@@ -2387,6 +2449,50 @@ exports.save_selfmanagment_data = function (req, res) {
     });
 
 };
+
+
+
+
+exports.save_speciality_data = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("body", req.body)
+        if (response.success) {
+
+                        var profile_file = req.files;
+                        var speciality = new Speciality({
+                            sequence_id: Utils.get_unique_id(),
+                            name:req.body.name,
+                            extra_detail: req.body.extra_detail,
+                            status: 1,
+                            picture: "",
+                           
+                        });
+                        if (profile_file != undefined && profile_file.length > 0) {
+                            image_name = Utils.tokenGenerator(29) + '.jpg';
+                            url = "./uploads/admin_profile/" + image_name;
+                            liner = "admin_profile/" + image_name;
+
+                            fs.readFile(req.files[0].path, function (err, data) {
+                                fs.writeFile(url, data, 'binary', function (err) { });
+                                fs.unlink(req.files[0].path, function (err, file) {
+
+                                });
+                            });
+
+                            speciality.picture = liner;
+                        }
+                        speciality.save().then((admin) => {
+                            req.session.error = "Congrates, speciality was created successfully.........";
+                            res.redirect("/speciality_list");
+                        });
+                
+              
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -2437,6 +2543,7 @@ exports.edit_doctor = function (req, res) {
         if (response.success) {
             Doctor.findOne({ _id: req.body.doctor_id }, { password: 0 }).then((doctor) => {
                 Hospital.find({}).then((hospital)=>{
+                    Speciality.find({}).then((speciality)=>{
 
                 if (doctor) {
                     // console.log(admin)
@@ -2445,13 +2552,16 @@ exports.edit_doctor = function (req, res) {
                             doctor_data: doctor,
                             systen_urls: systen_urls,
                             Hospital:hospital,
-                            hospital_id:doctor.hospital_id.toString()
+                            Speciality:speciality,
+                            hospital_id:doctor.hospital_id.toString(),
+                            speciality_id:doctor.speciality_id.toString()
                     
                         })
                 } else {
                     res.redirect("/doctor_list")
                 }
             });
+        });
         })
         } else {
             Utils.redirect_login(req, res);
@@ -2657,6 +2767,25 @@ exports.edit_selfmanagment = function (req, res) {
     });
 };
 
+
+
+
+exports.edit_speciality = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Speciality.findOne({ _id: req.body.speciality_id }, { password: 0 }).then((speciality) => {
+                if (speciality) {
+                    // console.log(admin)
+                    res.render("add_speciality", { speciality_data: speciality, systen_urls: systen_urls })
+                } else {
+                    res.redirect("/speciality_list")
+                }
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -3246,6 +3375,71 @@ exports.update_selfmanagment_detail = function (req, res) {
         }
     });
 };
+
+
+
+
+
+exports.update_speciality_detail = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            var profile_file = req.files;
+            if (profile_file == '' || profile_file == 'undefined') {
+                Speciality.findByIdAndUpdate(req.body.speciality_id, req.body, { useFindAndModify: false }).then((data) => {
+                    if (data._id.equals(req.session.admin.speciality_id)) {
+                        Utils.redirect_login(req, res);
+                    } else {
+                        res.redirect("/speciality_list");
+                    }
+                }, (err) => {
+                    res.redirect("/speciality_list");
+                });
+            } else {
+                Speciality.findById(req.body.speciality_id).then((user) => {
+                    if (user.picture) {
+                        Utils.deleteImageFromFolderTosaveNewOne(user.picture, 1);
+                    }
+                    // Samee magaca sawirka cusub
+                    var image_name = user._id + "_" + Utils.tokenGenerator(4) + '.jpg';
+                    var url = "./uploads/admin_profile/" + image_name;
+
+                    fs.readFile(req.files[0].path, function (err, data) {
+                        if (err) {
+                            console.error("Error reading file:", err);
+                            return res.redirect("/doctor_list");
+                        }
+
+                        fs.writeFile(url, data, 'binary', function (err) {
+                            if (err) {
+                                console.error("Error writing file:", err);
+                                return res.redirect("/doctor_list");
+                            }
+
+                            fs.unlink(req.files[0].path, function (err) {
+                                if (err) console.error("Error deleting temp file:", err);
+                            });
+
+                            // Cusbooneysii database
+                            req.body.picture = "admin_profile/" + image_name;
+                    // req.body.passport_expire_date = moment(req.body.passport_expire_date).format("MMM Do YYYY");
+                    Speciality.findByIdAndUpdate(req.body.speciality_id, req.body, { useFindAndModify: false }).then((data) => {
+                        if (data._id.equals(req.session.admin.speciality_id)) {
+                            Utils.redirect_login(req, res);
+                        } else {
+                            res.redirect("/speciality_list");
+                        }
+                    }, (err) => {
+                        res.redirect("/speciality_list");
+                    });
+                });
+            });
+        });
+            }
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -3416,6 +3610,20 @@ exports.delete_selfmanagment = function (req, res) {
         if (response.success) {
             SelfManagment.deleteOne({ _id: req.body.selfmanagment_id }).then((user) => {
                 res.redirect("/selfmanagment_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+exports.delete_speciality = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Speciality.deleteOne({ _id: req.body.speciality_id }).then((user) => {
+                res.redirect("/speciality_list")
             });
         } else {
             Utils.redirect_login(req, res);
@@ -5487,3 +5695,37 @@ exports.re_appointment = function (req, res) {
       }
     });
   };
+
+
+
+
+
+  exports.feedbackPatient = function (req, res) {
+                        var comments = req.body.comments
+                        var feedback = new Feedback({
+                            comments: comments,
+                            sequence_id: Utils.get_unique_id(),
+                            doctor_id:req.body.doctor_id,
+                            patient_id:req.body.patient_id,
+                            rating:req.body.rating,
+                        });
+                
+                        feedback.save().then((feedback) => {
+                            if(feedback){
+                                res.send({
+                                    success:true,
+                                    message:"Successfully to review this doctor",
+                                    record:feedback
+                                })
+                            }
+                            else{
+                                res.send({
+                                    success:false,
+                                    message:"Field to review this doctor",
+                                })
+                            }
+                           
+                        });
+
+
+};
