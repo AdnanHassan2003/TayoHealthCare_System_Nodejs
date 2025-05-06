@@ -228,7 +228,4 @@ module.exports = function (app) {
   app.route('/re_appointment').post(adminController.re_appointment)
   app.route('/feedbackPatient').post(adminController.feedbackPatient)
 
-
-
-  
 }

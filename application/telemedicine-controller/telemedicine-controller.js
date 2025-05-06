@@ -4103,6 +4103,15 @@ exports.getAll_Doctors = async function(req, res) {
                 }
             },
             { $unwind: "$data" },
+
+            { $lookup:{
+                from:"specialities",
+                localField:"speciality_id",
+                foreignField:"_id",
+                as:"speciality_data"
+                }},
+
+                {$unwind:"$speciality_data"},
             {
                 $project: {
                     _id: 1,
@@ -4113,7 +4122,7 @@ exports.getAll_Doctors = async function(req, res) {
                     email: 1,
                     hospital_name: "$data.name",
                     countries: 1,
-                    speciality: 1,
+                    speciality:"$speciality_data.name",
                     experience_years: 1,
                     consultation_fee: 1,
                     status: 1,
