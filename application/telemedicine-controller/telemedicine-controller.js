@@ -5738,3 +5738,171 @@ exports.re_appointment = function (req, res) {
 
 
 };
+
+
+
+
+exports.filter_Hospital = function(req, res){
+    Doctor.aggregate([
+
+        {
+            $match: {
+                "hospital_id": ObjectId(req.body.hospital_id)
+            }
+        },
+
+        {$lookup:{
+            
+            from:"hospitals",
+            localField:"hospital_id",
+            foreignField:"_id",
+            as:"hospital_data"
+        
+            }},
+            
+            {$unwind:"$hospital_data"},
+            
+            {$lookup:{
+            
+            from:"specialities",
+            localField:"speciality_id",
+            foreignField:"_id",
+            as:"speciality_data"
+        
+            }},
+            
+            {$unwind:"$speciality_data"},
+            
+            
+            {$project:{
+                _id: 1,
+                sequence_id: 1,
+                name: 1,
+                picture: 1,
+                phone: 1,
+                email: 1,
+                hospital_name: "$data.name",
+                countries: 1,
+                speciality:"$speciality_data.name",
+                experience_years: 1,
+                consultation_fee: 1,
+                status: 1,
+                create_date: 1
+                      
+                }}
+        
+        ]).then((doctor_data)=>{
+
+            if(doctor_data){
+
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch All doctor register this Hospital",
+                    record:doctor_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch Doctors to register this hospital"
+                })
+    
+            }
+
+        
+    })
+
+}
+
+
+
+
+exports.filter_Speciality = function(req, res){
+    Doctor.aggregate([
+
+        {
+            $match: {
+                "speciality_id": ObjectId(req.body.speciality_id)
+            }
+        },
+
+        {$lookup:{
+            
+            from:"hospitals",
+            localField:"hospital_id",
+            foreignField:"_id",
+            as:"hospital_data"
+        
+            }},
+            
+            {$unwind:"$hospital_data"},
+            
+            {$lookup:{
+            
+            from:"specialities",
+            localField:"speciality_id",
+            foreignField:"_id",
+            as:"speciality_data"
+        
+            }},
+            
+            {$unwind:"$speciality_data"},
+            
+            
+            {$project:{
+                _id: 1,
+                sequence_id: 1,
+                name: 1,
+                picture: 1,
+                phone: 1,
+                email: 1,
+                hospital_name: "$data.name",
+                countries: 1,
+                speciality:"$speciality_data.name",
+                experience_years: 1,
+                consultation_fee: 1,
+                status: 1,
+                create_date: 1
+                      
+                }}
+        
+        ]).then((doctor_data)=>{
+
+            if(doctor_data){
+
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch All doctor register this Speciality",
+                    record:doctor_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch Doctors to register this Speciality"
+                })
+    
+            }
+
+        
+    })
+
+}
+
+  
+
+
+exports.getAll_Speciality = function(req,res){
+    Speciality.find().then((speciality_data)=>{
+        if(speciality_data){
+            res.send({
+                success:true,
+                message:"Successfully to fetch All Speciality",
+                record:speciality_data
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch Speciality"
+            })
+        }
+    })
+}

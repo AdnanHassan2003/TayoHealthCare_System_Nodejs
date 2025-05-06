@@ -227,5 +227,7 @@ module.exports = function (app) {
   app.route('/update_token').post(adminController.update_token);
   app.route('/re_appointment').post(adminController.re_appointment)
   app.route('/feedbackPatient').post(adminController.feedbackPatient)
-
+  app.route('/filter_Hospital').post(adminController.filter_Hospital)
+  app.route('/filter_Speciality').post(adminController.filter_Speciality)
+  app.route('/getAll_Speciality').post(adminController.getAll_Speciality);
 }
