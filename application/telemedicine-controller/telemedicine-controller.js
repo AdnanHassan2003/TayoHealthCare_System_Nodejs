@@ -4167,6 +4167,7 @@ exports.getAll_Doctors = async function(req, res) {
 };
 
 
+
  
 
 //Api get all appointments patient
@@ -5783,14 +5784,15 @@ exports.filter_Hospital = function(req, res){
                 picture: 1,
                 phone: 1,
                 email: 1,
-                hospital_name: "$data.name",
+                rating:1,
+                hospital_name: "$hospital_data.name",
                 countries: 1,
                 speciality:"$speciality_data.name",
                 experience_years: 1,
                 consultation_fee: 1,
                 status: 1,
                 create_date: 1
-                      
+
                 }}
         
         ]).then((doctor_data)=>{
@@ -5857,7 +5859,8 @@ exports.filter_Speciality = function(req, res){
                 picture: 1,
                 phone: 1,
                 email: 1,
-                hospital_name: "$data.name",
+                rating: 1,
+                hospital_name: "$hospital_data.name",
                 countries: 1,
                 speciality:"$speciality_data.name",
                 experience_years: 1,
