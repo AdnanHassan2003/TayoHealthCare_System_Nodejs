@@ -5981,26 +5981,26 @@ exports.save_prescription = function(req, res) {
         });
     }
 };
-  exports.update_prescription = function(req,res){
-    var duration = req.body.duration
-    var medicine_name=req.body.medicine_name
-    var dosage = req.body.dosage
-    Prescription.findOneAndUpdate({_id:req.body._id}, { $set: { duration:duration,medicine_name:medicine_name,dosage:dosage } }).then((update_prescription)=>{
-        if(update_prescription){
-            res.send({
-                success:true,
-                message:"Successfully to update  prescription",
-                record:update_prescription
-            })
-        }else{
-            res.send({
-                success:false,
-                message:"Sorry! not update prescription"
-            })
-        }
+//   exports.update_prescription = function(req,res){
+//     var duration = req.body.duration
+//     var medicine_name=req.body.medicine_name
+//     var dosage = req.body.dosage
+//     Prescription.findOneAndUpdate({_id:req.body._id}, { $set: { duration:duration,medicine_name:medicine_name,dosage:dosage } }).then((update_prescription)=>{
+//         if(update_prescription){
+//             res.send({
+//                 success:true,
+//                 message:"Successfully to update  prescription",
+//                 record:update_prescription
+//             })
+//         }else{
+//             res.send({
+//                 success:false,
+//                 message:"Sorry! not update prescription"
+//             })
+//         }
 
-    })
-}
+//     })
+// }
 
 //Api get all prescriptions patient
 exports.patient_prescription = function(req, res){
