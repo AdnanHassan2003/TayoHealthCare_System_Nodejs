@@ -16,6 +16,7 @@ var Setting = require('mongoose').model('setting')
 var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
 var moment = require('moment-timezone');
+const Prescription = require('mongoose').model('Prescription')
 var Excel = require('exceljs');
 var fs = require('fs');
 var node_gcm = require("node-gcm")
@@ -33,6 +34,7 @@ const { each } = require('async')
 const { utils } = require('xlsx')
 const { group, Console } = require('console')
 const message = require('../model/message')
+
 // const { utils } = require('xlsx/types')
 var ObjectId = require('mongodb').ObjectID;
 
@@ -5906,3 +5908,279 @@ exports.getAll_Speciality = function(req,res){
         }
     })
 }
+
+
+
+// abtiga aa qoray .............
+
+
+exports.save_prescription = function(req, res) {
+    try {
+        // Validate required fields
+        if (!req.body.medicines || !Array.isArray(req.body.medicines)) {
+            return res.status(400).send({
+                success: false,
+                message: "Medicines array is required"
+            });
+        }
+
+        // Validate each medicine in the array
+        const medicinesValidation = req.body.medicines.every(med => {
+            return med.medicine_name && med.dosage && med.duration && med.frequency;
+        });
+
+        if (!medicinesValidation) {
+            return res.status(400).send({
+                success: false,
+                message: "Each medicine must have name, dosage, duration and frequency"
+            });
+        }
+
+        // Create the prescription
+        const prescription = new Prescription({
+            medicines: req.body.medicines.map(med => ({
+                medicine_name: med.medicine_name,
+                dosage: med.dosage,
+                duration: med.duration,
+                frequency: med.frequency
+            })),
+            sequence_id: Utils.get_unique_id(),
+            patient_id: req.body.patient_id,
+            doctor_id: req.body.doctor_id,
+            appointment_id: req.body.appointment_id,
+            extra_detail: req.body.extra_detail
+        });
+
+        // Save to database
+        prescription.save()
+            .then((savedPrescription) => {
+                console.log("Prescription saved:", savedPrescription);
+                res.status(201).send({
+                    success: true,
+                    message: "Prescription registered successfully",
+                    record: savedPrescription
+                });
+            })
+            .catch(err => {
+                console.error("Save error:", err);
+                res.status(500).send({
+                    success: false,
+                    message: "Failed to save prescription",
+                    error: err.message
+                });
+            });
+    } catch (err) {
+        console.error("Unexpected error:", err);
+        res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+  exports.update_prescription = function(req,res){
+    var duration = req.body.duration
+    var medicine_name=req.body.medicine_name
+    var dosage = req.body.dosage
+    Prescription.findOneAndUpdate({_id:req.body._id}, { $set: { duration:duration,medicine_name:medicine_name,dosage:dosage } }).then((update_prescription)=>{
+        if(update_prescription){
+            res.send({
+                success:true,
+                message:"Successfully to update  prescription",
+                record:update_prescription
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! not update prescription"
+            })
+        }
+
+    })
+}
+
+//Api get all prescriptions patient
+exports.patient_prescription = function(req, res){
+    Prescription.aggregate([
+
+        {
+            $match: {
+                "patient_id": ObjectId(req.body.patient_id)
+            }
+        },
+
+        {$lookup:{
+            
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        
+            }},
+            
+            {$unwind:"$doctor_data"},
+            
+            {$lookup:{
+            
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        
+            }},
+            
+            {$unwind:"$patient_data"},
+
+            {$lookup:{
+            
+                from:"appointments",
+                localField:"appointment_id",
+                foreignField:"_id",
+                as:"appointment_data"
+            
+                }},
+                
+                {$unwind:"$appointment_data"},
+                {
+                    $lookup: {
+                        from: "shifts",  
+                        localField: "appointment_data.shifts_id",  
+                        foreignField: "_id",
+                        as: "shifts_data"
+                    }
+                },
+                { $unwind: "$shifts_data" },
+            
+            
+            {$project:{
+                _id:1,
+                medicines: 1,
+                doctor_name:"$doctor_data.name",
+                patient_name:"$patient_data.name",
+                patient_token:"$patient_data.token",
+                doctor_token:"$doctor_data.token",
+                patient_id:"$patient_data._id",
+                doctor_id:"$doctor_data._id",
+                appointment_id:"$appointment_data._id",
+                shift_time:"$shifts_data.time",
+                shift_day:"$shifts_data.day",
+                sequence_id:1,
+                appointment_date:1,
+                status:1,
+                create_date:1
+                      
+                }}
+        
+        ]).then((appointment_data)=>{
+
+            if(appointment_data){
+
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch All prescriptions for Patient",
+                    record:appointment_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch prescriptions for Patient"
+                })
+    
+            }
+
+
+        })
+        
+}
+
+
+
+
+
+//Api get all prescriptions doctor
+exports.doctor_prescriptions = function(req, res){
+    Prescription.aggregate([
+
+        {
+            $match: {
+                "doctor_id": ObjectId(req.body.doctor_id)
+            }
+        },
+        {$lookup:{
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        }},
+        
+        {$unwind:"$doctor_data"},
+        
+        {$lookup:{
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        }},
+        
+        {$unwind:"$patient_data"},
+
+        {$lookup:{
+            from:"appointments",
+            localField:"appointment_id",
+            foreignField:"_id",
+            as:"appointment_data"
+        }},
+        
+        {$unwind:"$appointment_data"},
+
+        {$lookup:{
+            from:"shifts",
+            localField:"appointment_data.shifts_id",
+            foreignField:"_id",
+            as:"shifts_data"
+        }},
+        
+        {$unwind:"$shifts_data"},
+        
+        {$project:{
+            _id:1,
+            medicines: 1,
+            doctor_name:"$doctor_data.name",
+            patient_name:"$patient_data.name",
+            patient_token:"$patient_data.token",
+            doctor_token:"$doctor_data.token",
+            patient_id:"$patient_data._id",
+            doctor_id:"$doctor_data._id",
+            appointment_id:"$appointment_data._id",
+            patient_phone:"$patient_data.phone",
+            doctor_phone:"$doctor_data.phone",
+            patient_profile:"$patient_data.picture",
+             shift_time:"$shifts_data.time",
+             shift_day:"$shifts_data.day",
+            sequence_id:1,
+            dosage:1,
+            duration:1,
+            medicine_name:1,
+            status:1,
+            create_date:1          
+        }}
+        
+    ]).then((prescription_data)=>{
+        console.log("dataaaa",prescription_data)
+        if(prescription_data){
+            res.send({
+                success:true,
+                message:"Successfully to fetch All Appointements for Doctor",
+                record:prescription_data
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch Appointements for Doctor"
+            })
+        }
+    })
+}
+
+
+

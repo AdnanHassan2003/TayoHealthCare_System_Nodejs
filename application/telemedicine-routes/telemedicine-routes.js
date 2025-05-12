@@ -230,4 +230,7 @@ module.exports = function (app) {
   app.route('/filter_Hospital').post(adminController.filter_Hospital)
   app.route('/filter_Speciality').post(adminController.filter_Speciality)
   app.route('/getAll_Speciality').post(adminController.getAll_Speciality);
+  app.route("/save_prescription").post(adminController.save_prescription);
+  app.route('/patient_prescriptions').post(adminController.patient_prescription); // waa all appointments uu patients uu qabsaday
+  app.route('/doctor_prescriptions').post(adminController.doctor_prescriptions);
 }

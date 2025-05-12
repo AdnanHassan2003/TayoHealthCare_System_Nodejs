@@ -29,6 +29,7 @@ module.exports = function () {
     require("../application/model/selfmanagment");
     require("../application/model/conseltation");
     require("../application/model/speciality");
+    require("../application/model/prescription")
 
     return db;
 };
