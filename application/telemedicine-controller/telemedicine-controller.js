@@ -6012,7 +6012,8 @@ exports.patient_prescription = function(req, res){
 
         {
             $match: {
-                "patient_id": ObjectId(req.body.patient_id)
+                "patient_id": ObjectId(req.body.patient_id),
+                 "doctor_id": ObjectId(req.body.doctor_id)
             }
         },
 
@@ -6073,6 +6074,8 @@ exports.patient_prescription = function(req, res){
                 shift_day:"$shifts_data.day",
                 patient_Gender: "$patient_data.gender",
                 patient_Age: "$patient_data.age",
+                doctor_phone:"$patient_data.phone",
+                patient_phone:"$patient_data.phone",
                 sequence_id:1,
                 appointment_date:1,
                 status:1,
