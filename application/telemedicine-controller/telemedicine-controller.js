@@ -6080,7 +6080,7 @@ exports.patient_prescription = function(req, res){
                 appointment_date:1,
                 status:1,
                 create_date:1,
-                extra_detail
+                extra_detail:1
                       
                 }}
         
