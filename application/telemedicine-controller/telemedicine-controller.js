@@ -3997,42 +3997,6 @@ exports.feedbackReport = function(req, res){
 
  
 // Api login doctor and patient information
-// exports.login_DoctorAndPatient = function(req, res){
-//         Doctor.findOne({ email: req.body.email,PassWord:req.body.PassWord}).then((doctor) => {
-//             if(doctor){
-//                 Doctor.findOneAndUpdate({ email: req.body.email }, { $set: { token: req.body.token }}, { new: true }).then((data_doctor) => {
-//                     console.log("gggggg",data_doctor)
-                       
-//                     res.send({
-//                         success:true,
-//                         message:"Successfully to Login Doctor",
-//                         record:data_doctor
-//                     })
-//                 })
-//             }else{
-//                 Patient.findOne({ email: req.body.email, PassWord:req.body.PassWord}).then((patient) => {
-//                     if(patient){
-//                         Patient.findOneAndUpdate({ email: req.body.email }, { $set: { token: req.body.token }}, { new: true }).then((data_patient) => {
-//                             res.send({
-//                                 success:true,
-//                                 message:"Successfully to Login Patient",
-//                                 record:data_patient
-//                             })
-//                         })
-//                     }else{
-//                         res.send({
-//                             success:false,
-//                             message:"Invalid Email or Password"
-//                         })
-//                     }
-//                 });
-              
-//             }
-//         })
-// }
-
-
-
 exports.login_DoctorAndPatient = function(req, res){
         Doctor.findOne({ email: req.body.email,PassWord:req.body.PassWord}).then((doctor) => {
             if(doctor){
