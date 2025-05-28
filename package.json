@@ -26,6 +26,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "express-validator": "^6.10.0",
+    "fcm-node": "^1.6.1",
     "file-system": "^2.2.2",
     "google-auth-library": "^9.15.1",
     "lodash": "^4.17.20",
