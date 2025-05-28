@@ -6013,7 +6013,8 @@ exports.patient_prescription = function(req, res){
         {
             $match: {
                 "patient_id": ObjectId(req.body.patient_id),
-                 "doctor_id": ObjectId(req.body.doctor_id)
+                 "doctor_id": ObjectId(req.body.doctor_id),
+                 "appointment_id":ObjectId(req.body.appointment_id)
             }
         },
 
