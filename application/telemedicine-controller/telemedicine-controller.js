@@ -5976,39 +5976,7 @@ exports.save_prescription = function(req, res) {
 
             // Save prescription
             return prescription.save().then(savedPrescription => {
-                // Prepare notification payload for patient
-                const patientPayload = {
-                    message: {
-                        token: patient.token,
-                        notification: {
-                            title: "New Prescription",
-                            body: `Dr. ${doctor.name} has prescribed new medicines for you`
-                        },
-                        android: {
-                            priority: "high",
-                            notification: {
-                                click_action: "PATIENT_PRESCRIPTION",
-                                channel_id: "prescription_channel"
-                            }
-                        },
-                        data: {
-                            type: "new_prescription",
-                            prescriptionId: savedPrescription._id.toString(),
-                            doctorId: doctor._id.toString()
-                        }
-                    }
-                };
-
-                // Send notification if patient has a token
-                if (patient.token) {
-                    sendCallNotification({
-                        token: patient.token,
-                        message: "New prescription received", 
-                        projectId: "telemedicine-b0a88",
-                        payload: patientPayload
-                    });
-                }
-
+    
                 return res.status(201).send({
                     success: true,
                     message: "Prescription registered successfully",
