@@ -139,8 +139,7 @@ module.exports = function (app) {
   app.route('/add_shifts').get(adminController.add_shifts);
   app.route('/add_shifts').post(adminController.add_shifts);
   app.route('/save_shifts_data').post(adminController.save_shifts_data)
-  
-  
+  app.route('/delete_shifts').post(adminController.delete_shifts);
 
 
 

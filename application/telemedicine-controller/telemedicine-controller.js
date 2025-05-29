@@ -3590,6 +3590,18 @@ exports.delete_feedback = function (req, res) {
 
 
 
+exports.delete_shifts = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Shifts.deleteOne({ _id: req.body.shift_id }).then((user) => {
+                res.redirect("/shifts_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
 
 
 exports.delete_adds = function (req, res) {
