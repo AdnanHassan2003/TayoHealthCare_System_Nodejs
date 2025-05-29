@@ -3476,7 +3476,7 @@ exports.delete_admin = function (req, res) {
 exports.delete_menus = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Menus.deleteOne({ _id: req.body.menus_id }).then((user) => {
+            Menu.deleteOne({ _id: req.body.menus_id }).then((user) => {
                 res.redirect("/menus_list")
             });
         } else {
