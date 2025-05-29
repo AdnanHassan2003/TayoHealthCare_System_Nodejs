@@ -27,6 +27,7 @@ module.exports = function (app) {
   app.route("/add_menu").post(adminController.add_menu)
   app.route("/add_menu").get(adminController.add_menu)
   app.route("/save_menu").post(adminController.save_menu)
+  app.route("/delete_menus").post(adminController.delete_menus)
 
 
 

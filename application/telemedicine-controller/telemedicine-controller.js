@@ -3473,6 +3473,20 @@ exports.delete_admin = function (req, res) {
 
 
 ////  delete user function
+exports.delete_menus = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Menus.deleteOne({ _id: req.body.menus_id }).then((user) => {
+                res.redirect("/menus_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+////  delete user function
 exports.delete_user = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
