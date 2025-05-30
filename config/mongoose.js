@@ -30,6 +30,7 @@ module.exports = function () {
     require("../application/model/conseltation");
     require("../application/model/speciality");
     require("../application/model/prescription")
+    require("../application/model/labs")
 
     return db;
 };

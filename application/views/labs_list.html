@@ -1,0 +1,120 @@
+<% include header.html %>
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <div class="row" style="margin-bottom:10px;">
+      <div class="col-md-4"></div>
+      <div class="col-md-4" style="text-align: center;"></div>
+      <div class="col-md-4"></div>
+    </div>
+    <div id="tbl_parent_div">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="tbl_data">
+              <thead>
+                <tr>
+                  <th>Labs ID</th>
+                  <th>Image</th>
+                  <th>Doctor</th>
+                  <th>Patient</th>
+                  <th>Date</th>
+                  <th>Extra Detail</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% detail.forEach(function(entry) { %>
+                  <tr>
+                    <td><%= entry.sequence_id %></td>
+                    <td>
+                      <% if (entry.report_url) { %>
+                        <img src="/<%= entry.report_url %>" alt="Lab Report" style="max-width: 100px; max-height: 80px;" />
+                      <% } else { %>
+                        N/A
+                      <% } %>
+                    </td>
+                    <td><%= entry.doctor_name %></td>
+                    <td><%= entry.patient_name %></td>
+                    <td><%= moment(entry.create_date).format('DD-MM-YYYY') %></td>
+                    <td><%= entry.extra_detail %></td>
+                    <td>
+                      <% if(admin_type==0 ) { %>
+                        <div>
+                          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                            <%= process.env.action || 'Actions' %>
+                            <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu">
+                            <li class="dropdown-submenu" style="margin: 2px;">
+                              <form method="POST" action="/delete_labs" >
+                                <input type="hidden" name="lab_id" value="<%= entry._id %>" />
+                                <button type="submit" class="btn btn-default" style="width: 100%;">
+                                  <i class="fas fa-trash"></i>
+                                  <%= process.env.delete || 'Delete' %>
+                                </button>
+                              </form>
+                            </li>
+                          </ul>
+                        </div>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- View Modal -->
+<!-- <div class="modal fade" id="prescriptionViewModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Prescription Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group list-group-unbordered mb-3">
+          <li class="list-group-item"><b>Prescription ID:</b> <span id="vPrescriptionId"></span></li>
+          <li class="list-group-item"><b>Doctor:</b> <span id="vDoctorName"></span></li>
+          <li class="list-group-item"><b>Patient:</b> <span id="vPatientName"></span></li>
+          <li class="list-group-item"><b>Date:</b> <span id="vPrescriptionDate"></span></li>
+          <li class="list-group-item"><b>Medicines:</b> <div id="vMedicines"></div></li>
+          <li class="list-group-item"><b>Extra Detail:</b> <span id="vExtraDetail"></span></li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+
+<script>
+// View Modal Function
+function showViewModal(sequence_id, doctor_name, patient_name, date, medicines, extra_detail) {
+  $('#vPrescriptionId').text(sequence_id);
+  $('#vDoctorName').text(doctor_name);
+  $('#vPatientName').text(patient_name);
+  $('#vPrescriptionDate').text(date);
+  $('#vMedicines').html(medicines);
+  $('#vExtraDetail').text(extra_detail);
+  $('#prescriptionViewModal').modal('show');
+};
+
+
+                                  
+
+
+</script>
+
+<% include footer.html %>

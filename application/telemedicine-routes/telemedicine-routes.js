@@ -193,7 +193,20 @@ module.exports = function (app) {
   app.route('/feedbackReport').get(adminController.feedbackReport)
 
 
+
+
+  // prescription
+  app.route('/prescriptions_list').get(adminController.prescription_list);
+  app.route('/prescriptions_list').post(adminController.prescription_list);
+  app.route('/delete_prescription').post(adminController.delete_prescription);
   
+  
+  
+  // labs 
+  app.route('/labs').get(adminController.labs_list);
+  app.route('/labs').post(adminController.labs_list);
+  app.route('/delete_labs').post(adminController.delete_labs);
+
   
 
   // All Apis That Use Our Telemedicine Application
@@ -233,4 +246,7 @@ module.exports = function (app) {
   app.route("/save_prescription").post(adminController.save_prescription);
   app.route('/patient_prescriptions').post(adminController.patient_prescription); // waa all appointments uu patients uu qabsaday
   app.route('/doctor_prescriptions').post(adminController.doctor_prescriptions);
+  app.route('/save_labs_record').post(adminController.save_labs_record);
+  app.route('/patient_labs').post(adminController.patient_labs);
+  app.route('/doctor_labs').post(adminController.doctor_labs);
 }

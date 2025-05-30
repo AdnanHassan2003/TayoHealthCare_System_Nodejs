@@ -17,6 +17,7 @@ var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
 var moment = require('moment-timezone');
 const Prescription = require('mongoose').model('Prescription')
+const labs = require('mongoose').model('labs')
 var Excel = require('exceljs');
 var fs = require('fs');
 var node_gcm = require("node-gcm")
@@ -34,6 +35,7 @@ const { each } = require('async')
 const { utils } = require('xlsx')
 const { group, Console } = require('console')
 const message = require('../model/message')
+const path = require('path')
 // const sendCallNotification = require('../nofications/fcmSender')
 
 // const { utils } = require('xlsx/types')
@@ -1418,9 +1420,104 @@ exports.speciality_list = function(req, res){
 
             Utils.redirect_login(req, res);
         }
-
+        
     })
     
+} 
+
+exports.prescription_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Prescription.aggregate([
+                {
+                    $lookup: {
+                        from: "doctors",
+                        localField: "doctor_id",
+                        foreignField: "_id",
+                        as: "doctor_data"
+                    }
+                },
+                { $unwind: { path: "$doctor_data", preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: "patients",
+                        localField: "patient_id",
+                        foreignField: "_id",
+                        as: "patient_data"
+                    }
+                },
+                { $unwind: { path: "$patient_data", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        sequence_id: 1,
+                        medicines: 1,
+                        create_date: 1,
+                        extra_detail: 1,
+                        doctor_name: "$doctor_data.name",
+                        patient_name: "$patient_data.name"
+                    }
+                }
+            ]).then((prescription_data) => {
+                res.render('prescriptions_list', {
+                    url_data: req.session.menu_array,
+                    detail: prescription_data,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+}
+
+
+exports.labs_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            labs.aggregate([
+                {
+                    $lookup: {
+                        from: "doctors",
+                        localField: "doctor_id",
+                        foreignField: "_id",
+                        as: "doctor_data"
+                    }
+                },
+                { $unwind: { path: "$doctor_data", preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: "patients",
+                        localField: "patient_id",
+                        foreignField: "_id",
+                        as: "patient_data"
+                    }
+                },
+                { $unwind: { path: "$patient_data", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        sequence_id: 1,
+                        report_url:1,
+                        create_date: 1,
+                        extra_detail: 1,
+                        doctor_name: "$doctor_data.name",
+                        patient_name: "$patient_data.name"
+                    }
+                }
+            ]).then((prescription_data) => {
+                res.render('labs_list', {
+                    url_data: req.session.menu_array,
+                    detail: prescription_data,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
 }
 //---------------------------------------------------------------------------------------------------
 
@@ -3653,6 +3750,32 @@ exports.delete_speciality = function (req, res) {
         if (response.success) {
             Speciality.deleteOne({ _id: req.body.speciality_id }).then((user) => {
                 res.redirect("/speciality_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+exports.delete_prescription = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            Prescription.deleteOne({ _id: req.body.prescription_id }).then((user) => {
+                res.redirect("/prescriptions_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+
+
+
+exports.delete_labs = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            labs.deleteOne({ _id: req.body.lab_id }).then((user) => {
+                res.redirect("labs")
             });
         } else {
             Utils.redirect_login(req, res);
@@ -6241,3 +6364,254 @@ exports.doctor_prescriptions = function(req, res){
 
 
 
+// labs 
+
+
+exports.save_labs_record = function(req, res) {
+    var report_file = req.files;
+    
+    // Check if file was uploaded
+    if (!report_file || report_file == '' || report_file == 'undefined') {
+        return res.send({
+            success: false,
+            message: "No lab report file uploaded"
+        });
+    } else {
+        // Generate unique filename
+        const sequenceId = Utils.get_unique_id();
+        const fileExtension = path.extname(report_file[0].originalname);
+        const fileName = `lab_report_${sequenceId}${fileExtension}`;
+        const url = "./uploads/lab_reports/" + fileName;
+
+        // Read the uploaded file
+        fs.readFile(report_file[0].path, function(err, data) {
+            if (err) {
+                console.error("Error reading file:", err);
+                return res.send({
+                    success: false,
+                    message: "Failed to read uploaded file"
+                });
+            }
+
+            // Save to permanent location
+            fs.writeFile(url, data, 'binary', function(err) {
+                if (err) {
+                    console.error("Error writing file:", err);
+                    return res.send({
+                        success: false,
+                        message: "Failed to save lab report"
+                    });
+                }
+
+                // Delete temporary file
+                fs.unlink(report_file[0].path, function(err) {
+                    if (err) console.error("Error deleting temp file:", err);
+                });
+
+                // Create lab record
+                const labRecord = new labs({
+                    sequence_id: sequenceId,
+                    patient_id: req.body.patient_id,
+                    doctor_id: req.body.doctor_id,
+                    appointment_id: req.body.appointment_id,
+                    report_url: "lab_reports/" + fileName
+                });
+
+                labRecord.save().then((savedLab) => {
+                    res.send({
+                        success: true,
+                        message: "Lab report saved successfully",
+                        record: savedLab
+                    });
+                }).catch((err) => {
+                    console.error("Error saving lab record:", err);
+                    res.send({
+                        success: false,
+                        message: "Error saving lab record",
+                        error: err.message
+                    });
+                });
+            });
+        });
+    }
+};
+
+
+
+exports.patient_labs = function(req, res){
+    labs.aggregate([
+
+        {
+            $match: {
+                "patient_id": ObjectId(req.body.patient_id),
+                "doctor_id": ObjectId(req.body.doctor_id),
+                "appointment_id": ObjectId(req.body.appointment_id),
+            }
+        },
+
+        {$lookup:{
+            
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        
+            }},
+            
+            {$unwind:"$doctor_data"},
+            
+            {$lookup:{
+            
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        
+            }},
+            
+            {$unwind:"$patient_data"},
+
+            {$lookup:{
+            
+                from:"appointments",
+                localField:"appointment_id",
+                foreignField:"_id",
+                as:"appointment_data"
+            
+                }},
+                
+                {$unwind:"$appointment_data"},
+               
+            
+            
+            {$project:{
+                _id:1,
+                doctor_name:"$doctor_data.name",
+                patient_name:"$patient_data.name",
+                patient_token:"$patient_data.token",
+                doctor_token:"$doctor_data.token",
+                patient_id:"$patient_data._id",
+                doctor_id:"$doctor_data._id",
+                appointment_id:"$appointment_data._id",
+                patient_Gender: "$patient_data.gender",
+                patient_Age: "$patient_data.age",
+                doctor_phone: "$doctor_data.phone",
+                patient_phone:"$patient_data.phone",
+                sequence_id:1,
+                report_url:1,
+                status:1,
+                create_date:1,
+                extra_detail:1
+                      
+                }}
+        
+        ]).then((appointment_data)=>{
+
+            if(appointment_data){
+
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch All labs for Patient",
+                    record:appointment_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch labs for Patient"
+                })
+    
+            }
+
+
+        })
+        
+}
+
+exports.doctor_labs = function(req, res){
+    labs.aggregate([
+
+        {
+            $match: {
+                "patient_id": ObjectId(req.body.patient_id),
+                "doctor_id": ObjectId(req.body.doctor_id),
+                "appointment_id": ObjectId(req.body.appointment_id),
+            }
+        },
+
+        {$lookup:{
+            
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        
+            }},
+            
+            {$unwind:"$doctor_data"},
+            
+            {$lookup:{
+            
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        
+            }},
+            
+            {$unwind:"$patient_data"},
+
+            {$lookup:{
+            
+                from:"appointments",
+                localField:"appointment_id",
+                foreignField:"_id",
+                as:"appointment_data"
+            
+                }},
+                
+                {$unwind:"$appointment_data"},
+               
+            
+            
+            {$project:{
+                _id:1,
+                doctor_name:"$doctor_data.name",
+                patient_name:"$patient_data.name",
+                patient_token:"$patient_data.token",
+                doctor_token:"$doctor_data.token",
+                patient_id:"$patient_data._id",
+                doctor_id:"$doctor_data._id",
+                appointment_id:"$appointment_data._id",
+                patient_Gender: "$patient_data.gender",
+                patient_Age: "$patient_data.age",
+                doctor_phone: "$doctor_data.phone",
+                patient_phone:"$patient_data.phone",
+                sequence_id:1,
+                report_url:1,
+                status:1,
+                create_date:1,
+                extra_detail:1
+                      
+                }}
+        
+        ]).then((appointment_data)=>{
+
+            if(appointment_data){
+
+                res.send({
+                    success:true,
+                    message:"Successfully to fetch All labs for Patient",
+                    record:appointment_data
+                })
+            }else{
+                res.send({
+                    success:false,
+                    message:"Sorry! to fetch labs for Patient"
+                })
+    
+            }
+
+
+        })
+        
+}
