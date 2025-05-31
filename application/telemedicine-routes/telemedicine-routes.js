@@ -203,8 +203,8 @@ module.exports = function (app) {
   
   
   // labs 
-  app.route('/labs').get(adminController.labs_list);
-  app.route('/labs').post(adminController.labs_list);
+  app.route('/labs_list').get(adminController.labs_list);
+  app.route('/labs_list').post(adminController.labs_list);
   app.route('/delete_labs').post(adminController.delete_labs);
 
   
