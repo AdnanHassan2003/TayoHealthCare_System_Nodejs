@@ -5600,7 +5600,8 @@ exports.updateProfile = function (req, res) {
                     ).then((data) => {
                         res.send({
                             success: true,
-                            message: "Profile picture updated successfully"
+                            message: "Profile picture updated successfully",
+                            picture: "admin_profile/" + image_name
                         });
                     }).catch((err) => {
                         res.send({
