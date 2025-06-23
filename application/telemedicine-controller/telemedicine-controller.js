@@ -4273,6 +4273,7 @@ exports.getAll_Doctors = async function(req, res) {
                     picture: 1,
                     phone: 1,
                     email: 1,
+                    token:1,
                     hospital_name: "$data.name",
                     countries: 1,
                     speciality:"$speciality_data.name",
