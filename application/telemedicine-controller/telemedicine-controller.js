@@ -6616,3 +6616,83 @@ exports.doctor_labs = function(req, res){
         })
         
 }
+
+
+
+
+// Change password API
+exports.changesPassword = function(req, res) {
+    const { id, PassWord, newPassword, confirmPassword } = req.body;
+    
+    // Check if new password matches confirm password
+    if (newPassword !== confirmPassword) {
+        return res.status(400).send({
+            success: false,
+            message: "New password and confirm password do not match"
+        });
+    }
+    
+    // Find doctor with current email and password
+    Doctor.findOne({ _id: id, PassWord: PassWord }).then((doctor) => {
+        if (doctor) {
+            // Update doctor's password
+            Doctor.findOneAndUpdate(
+                { _id: id }, 
+                { $set: { PassWord: newPassword } }, 
+                { new: true }
+            ).then((data_doctor) => {
+                console.log("Doctor password updated:", data_doctor);
+                res.send({
+                    success: true,
+                    message: "Successfully changed Doctor password",
+                    record: data_doctor
+                });
+            }).catch((error) => {
+                res.status(500).send({
+                    success: false,
+                    message: "Error updating doctor password"
+                });
+            });
+        } else {
+            // If not doctor, try patient
+            Patient.findOne({ _id: id, PassWord: PassWord }).then((patient) => {
+                if (patient) {
+                    // Update patient's password
+                    Patient.findOneAndUpdate(
+                        { _id: id }, 
+                        { $set: { PassWord: newPassword } }, 
+                        { new: true }
+                    ).then((data_patient) => {
+                        console.log("Patient password updated:", data_patient);
+                        res.send({
+                            success: true,
+                            message: "Successfully changed Patient password",
+                            record: data_patient
+                        });
+                    }).catch((error) => {
+                        res.status(500).send({
+                            success: false,
+                            message: "Error updating patient password"
+                        });
+                    });
+                } else {
+                    res.send({
+                        success: false,
+                        message: "Invalid Email or Password"
+                    });
+                }
+            }).catch((error) => {
+                res.status(500).send({
+                    success: false,
+                    message: "Error finding patient"
+                });
+            });
+        }
+    }).catch((error) => {
+        res.status(500).send({
+            success: false,
+            message: "Error finding doctor"
+        });
+    });
+};
+

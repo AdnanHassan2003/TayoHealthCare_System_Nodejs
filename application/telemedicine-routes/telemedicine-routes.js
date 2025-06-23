@@ -249,4 +249,6 @@ module.exports = function (app) {
   app.route('/save_labs_record').post(adminController.save_labs_record);
   app.route('/patient_labs').post(adminController.patient_labs);
   app.route('/doctor_labs').post(adminController.doctor_labs);
+  app.route('/changesPassword').post(adminController.changesPassword)
+
 }
