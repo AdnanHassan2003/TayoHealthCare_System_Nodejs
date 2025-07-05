@@ -18,6 +18,7 @@ const Bcrypt = require('bcryptjs');
 var moment = require('moment-timezone');
 const Prescription = require('mongoose').model('Prescription')
 const labs = require('mongoose').model('labs')
+const labRequest =require ("mongoose").model("labRequest")
 var Excel = require('exceljs');
 var fs = require('fs');
 var node_gcm = require("node-gcm")
@@ -2047,8 +2048,9 @@ exports.save_user_data = function (req, res) {
 
 exports.save_doctor_data = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
+        console.log("yearrrrrrrrrrrrrrrrrrrrr")
+        console.log("phone", req.body.phone)
         if (response.success) {
-
             Doctor.findOne({ "phone": req.body.phone }).then((doctor) => {
                 console.log("user", doctor);
                 if (doctor) {
@@ -6368,76 +6370,88 @@ exports.doctor_prescriptions = function(req, res){
 
 // labs 
 
-
 exports.save_labs_record = function(req, res) {
     var report_file = req.files;
-    
-    // Check if file was uploaded
+
     if (!report_file || report_file == '' || report_file == 'undefined') {
         return res.send({
             success: false,
             message: "No lab report file uploaded"
         });
     } else {
-        // Generate unique filename
-        const sequenceId = Utils.get_unique_id();
-        const fileExtension = path.extname(report_file[0].originalname);
-        const fileName = `lab_report_${sequenceId}${fileExtension}`;
-        const url = "./uploads/lab_reports/" + fileName;
-
-        // Read the uploaded file
-        fs.readFile(report_file[0].path, function(err, data) {
-            if (err) {
-                console.error("Error reading file:", err);
-                return res.send({
-                    success: false,
-                    message: "Failed to read uploaded file"
-                });
-            }
-
-            // Save to permanent location
-            fs.writeFile(url, data, 'binary', function(err) {
-                if (err) {
-                    console.error("Error writing file:", err);
+        // first check if appointment already has lab
+        labs.findOne({ appointment_id: req.body.appointment_id })
+            .then(existingLab => {
+                if (existingLab) {
                     return res.send({
                         success: false,
-                        message: "Failed to save lab report"
+                        message: "A lab record already exists for this appointment"
                     });
                 }
 
-                // Delete temporary file
-                fs.unlink(report_file[0].path, function(err) {
-                    if (err) console.error("Error deleting temp file:", err);
-                });
+                // Generate unique filename
+                const sequenceId = Utils.get_unique_id();
+                const fileExtension = path.extname(report_file[0].originalname);
+                const fileName = `lab_report_${sequenceId}${fileExtension}`;
+                const url = "./uploads/lab_reports/" + fileName;
 
-                // Create lab record
-                const labRecord = new labs({
-                    sequence_id: sequenceId,
-                    patient_id: req.body.patient_id,
-                    doctor_id: req.body.doctor_id,
-                    appointment_id: req.body.appointment_id,
-                    report_url: "lab_reports/" + fileName
-                });
+                fs.readFile(report_file[0].path, function(err, data) {
+                    if (err) {
+                        console.error("Error reading file:", err);
+                        return res.send({
+                            success: false,
+                            message: "Failed to read uploaded file"
+                        });
+                    }
 
-                labRecord.save().then((savedLab) => {
-                    res.send({
-                        success: true,
-                        message: "Lab report saved successfully",
-                        record: savedLab
+                    fs.writeFile(url, data, 'binary', function(err) {
+                        if (err) {
+                            console.error("Error writing file:", err);
+                            return res.send({
+                                success: false,
+                                message: "Failed to save lab report"
+                            });
+                        }
+
+                        fs.unlink(report_file[0].path, function(err) {
+                            if (err) console.error("Error deleting temp file:", err);
+                        });
+
+                        const labRecord = new labs({
+                            sequence_id: sequenceId,
+                            patient_id: req.body.patient_id,
+                            doctor_id: req.body.doctor_id,
+                            appointment_id: req.body.appointment_id,
+                            report_url: "lab_reports/" + fileName
+                        });
+
+                        labRecord.save().then((savedLab) => {
+                            res.send({
+                                success: true,
+                                message: "Lab report saved successfully",
+                                record: savedLab
+                            });
+                        }).catch((err) => {
+                            console.error("Error saving lab record:", err);
+                            res.send({
+                                success: false,
+                                message: "Error saving lab record",
+                                error: err.message
+                            });
+                        });
                     });
-                }).catch((err) => {
-                    console.error("Error saving lab record:", err);
-                    res.send({
-                        success: false,
-                        message: "Error saving lab record",
-                        error: err.message
-                    });
+                });
+            })
+            .catch(err => {
+                console.error("Error checking existing lab:", err);
+                res.send({
+                    success: false,
+                    message: "Error checking existing lab record",
+                    error: err.message
                 });
             });
-        });
     }
 };
-
 
 
 exports.patient_labs = function(req, res){
@@ -6697,3 +6711,261 @@ exports.changesPassword = function(req, res) {
     });
 };
 
+// lab request 
+
+exports.save_LabRequest = function(req, res) {
+    try {
+        // Validate required fields
+        if (!req.body.requested_tests || !Array.isArray(req.body.requested_tests)) {
+            return res.status(400).send({
+                success: false,
+                message: "Requested tests array is required"
+            });
+        }
+
+        // Validate each test in the array
+        const testsValidation = req.body.requested_tests.every(test => {
+            return test.test_name && test.description && test.priority;
+        });
+
+        if (!testsValidation) {
+            return res.status(400).send({
+                success: false,
+                message: "Each test must have name, description and priority"
+            });
+        }
+        
+
+        // Create the lab request
+        const LabRequest = new labRequest({
+            requested_tests: req.body.requested_tests.map(test => ({
+                test_name: test.test_name,
+                description: test.description,
+                priority: test.priority
+            })),
+            sequence_id: Utils.get_unique_id(),
+            patient_id: req.body.patient_id,
+            doctor_id: req.body.doctor_id,
+            appointment_id: req.body.appointment_id,
+            notes: req.body.notes
+        });
+
+     
+
+        // First get patient and doctor details
+        Promise.all([
+            Patient.findById(req.body.patient_id),
+            Doctor.findById(req.body.doctor_id)
+        ])
+        .then(([patient, doctor]) => {
+            if (!patient) {
+                throw new Error('Patient not found');
+            }
+            if (!doctor) {
+                throw new Error('Doctor not found');
+            }
+
+            // Save prescription
+            return LabRequest.save().then(savedPrescription => {
+    
+                return res.status(201).send({
+                    success: true,
+                    message: "labRequest registered successfully",
+                    record: savedPrescription
+                });
+            });
+        })
+        .catch(err => {
+            console.error("Save error:", err);
+            res.status(500).send({
+                success: false,
+                message: "Failed to save labRequest",
+                error: err.message
+            });
+        });
+    } catch (err) {
+        console.error("Unexpected error:", err);
+        res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+};
+
+
+exports.patient_LabRequest = function(req, res){
+    labRequest.aggregate([
+
+        {
+           $match: {
+                "patient_id": ObjectId(req.body.patient_id),
+                "doctor_id": ObjectId(req.body.doctor_id),
+                "appointment_id": ObjectId(req.body.appointment_id),
+            }
+        },
+        {$lookup:{
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        }},
+        
+        {$unwind:"$doctor_data"},
+        
+        {$lookup:{
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        }},
+        
+        {$unwind:"$patient_data"},
+
+        {$lookup:{
+            from:"appointments",
+            localField:"appointment_id",
+            foreignField:"_id",
+            as:"appointment_data"
+        }},
+        
+        {$unwind:"$appointment_data"},
+
+        {$lookup:{
+            from:"shifts",
+            localField:"appointment_data.shifts_id",
+            foreignField:"_id",
+            as:"shifts_data"
+        }},
+        
+        {$unwind:"$shifts_data"},
+        
+        {$project:{
+            _id:1,
+            requested_tests: 1,
+            doctor_name:"$doctor_data.name",
+            patient_name:"$patient_data.name",
+            patient_token:"$patient_data.token",
+            doctor_token:"$doctor_data.token",
+            patient_id:"$patient_data._id",
+            doctor_id:"$doctor_data._id",
+            appointment_id:"$appointment_data._id",
+            patient_phone:"$patient_data.phone",
+            doctor_phone:"$doctor_data.phone",
+            patient_profile:"$patient_data.picture",
+            patient_Gender: "$patient_data.gender",
+            patient_Age: "$patient_data.age",
+             shift_time:"$shifts_data.time",
+             shift_day:"$shifts_data.day",
+            sequence_id:1,
+            priority:1,
+            description:1,
+            test_name:1,
+            create_date:1, 
+            notes:1         
+        }}
+        
+    ]).then((labRequest_data)=>{
+        console.log("dataaaa",labRequest_data)
+        if(labRequest_data){
+            res.send({
+                success:true,
+                message:"Successfully to fetch All Appointements for Doctor",
+                record:labRequest_data
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch Appointements for Doctor"
+            })
+        }
+    })
+}
+
+exports.doctor_LabRequest = function(req, res){
+    labRequest.aggregate([
+
+        {
+           $match: {
+                "patient_id": ObjectId(req.body.patient_id),
+                "doctor_id": ObjectId(req.body.doctor_id),
+                "appointment_id": ObjectId(req.body.appointment_id),
+            }
+        },
+        {$lookup:{
+            from:"doctors",
+            localField:"doctor_id",
+            foreignField:"_id",
+            as:"doctor_data"
+        }},
+        
+        {$unwind:"$doctor_data"},
+        
+        {$lookup:{
+            from:"patients",
+            localField:"patient_id",
+            foreignField:"_id",
+            as:"patient_data"
+        }},
+        
+        {$unwind:"$patient_data"},
+
+        {$lookup:{
+            from:"appointments",
+            localField:"appointment_id",
+            foreignField:"_id",
+            as:"appointment_data"
+        }},
+        
+        {$unwind:"$appointment_data"},
+
+        {$lookup:{
+            from:"shifts",
+            localField:"appointment_data.shifts_id",
+            foreignField:"_id",
+            as:"shifts_data"
+        }},
+        
+        {$unwind:"$shifts_data"},
+        
+        {$project:{
+            _id:1,
+            requested_tests: 1,
+            doctor_name:"$doctor_data.name",
+            patient_name:"$patient_data.name",
+            patient_token:"$patient_data.token",
+            doctor_token:"$doctor_data.token",
+            patient_id:"$patient_data._id",
+            doctor_id:"$doctor_data._id",
+            appointment_id:"$appointment_data._id",
+            patient_phone:"$patient_data.phone",
+            doctor_phone:"$doctor_data.phone",
+            patient_profile:"$patient_data.picture",
+            patient_Gender: "$patient_data.gender",
+            patient_Age: "$patient_data.age",
+             shift_time:"$shifts_data.time",
+             shift_day:"$shifts_data.day",
+            sequence_id:1,
+            priority:1,
+            description:1,
+            test_name:1,
+            create_date:1,
+            notes:1          
+        }}
+        
+    ]).then((labRequest_data)=>{
+        console.log("dataaaa",labRequest_data)
+        if(labRequest_data){
+            res.send({
+                success:true,
+                message:"Successfully to fetch All Appointements for Doctor",
+                record:labRequest_data
+            })
+        }else{
+            res.send({
+                success:false,
+                message:"Sorry! to fetch Appointements for Doctor"
+            })
+        }
+    })
+}

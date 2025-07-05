@@ -31,6 +31,7 @@ module.exports = function () {
     require("../application/model/speciality");
     require("../application/model/prescription")
     require("../application/model/labs")
+    require("../application/model/LabRequest");
 
     return db;
 };
