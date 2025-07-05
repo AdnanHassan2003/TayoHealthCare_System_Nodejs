@@ -3777,7 +3777,7 @@ exports.delete_labs = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
             labs.deleteOne({ _id: req.body.lab_id }).then((user) => {
-                res.redirect("labs")
+                res.redirect("/labs_list")
             });
         } else {
             Utils.redirect_login(req, res);
