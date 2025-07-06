@@ -1520,6 +1520,53 @@ exports.labs_list = function(req, res){
         }
     });
 }
+
+exports.labRequest_list = function (req, res) {
+  Utils.check_admin_token(req.session.admin, function (response) {
+    if (response.success) {
+      labs.aggregate([
+        {
+          $lookup: {
+            from: "doctors",
+            localField: "doctor_id",
+            foreignField: "_id",
+            as: "doctor_data"
+          }
+        },
+        { $unwind: { path: "$doctor_data", preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: "patients",
+            localField: "patient_id",
+            foreignField: "_id",
+            as: "patient_data"
+          }
+        },
+        { $unwind: { path: "$patient_data", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            sequence_id: 1,
+            create_date: 1,
+            status: 1,
+            requested_tests: 1,
+            doctor_name: "$doctor_data.name",
+            patient_name: "$patient_data.name"
+          }
+        }
+      ]).then((lab_data) => {
+        res.render("labRequest", {
+          url_data: req.session.menu_array,
+          detail: lab_data,
+          msg: req.session.error,
+          moment: moment,
+          admin_type: req.session.admin.usertype
+        });
+      });
+    } else {
+      Utils.redirect_login(req, res);
+    }
+  });
+};
 //---------------------------------------------------------------------------------------------------
 
 
@@ -6968,4 +7015,166 @@ exports.doctor_LabRequest = function(req, res){
             })
         }
     })
+}
+
+
+/// forget password 
+
+
+exports.forget_Password = async function (req, res) {
+    const email = req.body.email;
+    if (!email) {
+        return res.send({
+            success: false,
+            message: "Email is required."
+        });
+    }
+
+    // Try to find patient first
+    let user = await Patient.findOne({ email: email });
+    let userType = 'patient';
+
+    if (!user) {
+        // If not found as patient, check doctor
+        user = await Doctor.findOne({ email: email });
+        userType = 'doctor';
+    }
+
+    if (!user) {
+        return res.send({
+            success: false,
+            message: "No user found with this email."
+        });
+    }
+
+    // Generate OTP
+    // const otp = utils.get_otp_number(6);
+    const otp = Utils.get_otp_number(6)
+
+    // Save OTP to user (add a field if not present)
+    user.reset_otp = otp;
+    user.reset_otp_expiry = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+    await user.save();
+
+    // Send OTP via email
+    const msg = `Your password reset OTP is: ${otp}`;
+    Utils.send_email_otp(req, email, msg);
+
+    res.send({
+        success: true,
+        message: `Password reset OTP sent to ${userType} email.`
+    });
+};
+
+
+// verify Otp
+
+exports.VerifyOtp = async function (req, res) {
+    const { email, otp } = req.body;
+    console.log("email", email, "otp", otp);
+    if (!email || !otp) {
+        return res.send({
+            success: false,
+            message: "Email and OTP are required."
+        });
+    }
+
+    // Try to find patient first
+    let user = await Patient.findOne({ email: email });
+    let userType = 'patient';
+
+    if (!user) {
+        // If not found as patient, check doctor
+        user = await Doctor.findOne({ email: email });
+        userType = 'doctor';
+    }
+
+    if (!user) {
+        return res.send({
+            success: false,
+            message: "No user found with this email."
+        });
+    }
+    console.log("user", user);
+    // Make sure OTP is string for comparison
+    const userOtp = user.reset_otp ? user.reset_otp.toString() : "";
+    const inputOtp = otp.toString();
+
+    // Check OTP and expiry
+    if (
+        userOtp !== inputOtp ||
+        !user.reset_otp_expiry ||
+        user.reset_otp_expiry < Date.now()
+    ) {
+        return res.send({
+            success: false,
+            message: "Invalid or expired OTP."
+        });
+    }
+
+    // OTP is valid, clear it
+    user.reset_otp = undefined;
+    user.reset_otp_expiry = undefined;
+    await user.save();
+
+    res.send({
+        success: true,
+        message: "OTP verified successfully. You can now reset your password.",
+        userType: userType,
+        userId: user._id
+    });
+}
+
+ 
+// Reset password after OTP verification
+exports.resetPassword = async function (req, res) {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    if (!email || !newPassword || !confirmPassword) {
+        return res.send({
+            success: false,
+            message: "Email, new password, and confirm password are required."
+        });
+    }
+
+    if (newPassword !== confirmPassword) {
+        return res.send({
+            success: false,
+            message: "New password and confirm password do not match."
+        });
+    }
+
+    // Try to find patient first
+    let user = await Patient.findOne({ email: email });
+    let userType = 'patient';
+
+    if (!user) {
+        // If not found as patient, check doctor
+        user = await Doctor.findOne({ email: email });
+        userType = 'doctor';
+    }
+
+    if (!user) {
+        return res.send({
+            success: false,
+            message: "No user found with this email."
+        });
+    }
+
+    // Update password (both PassWord and hashed password)
+    user.PassWord = newPassword;
+    user.password = bcrypt.hashSync(newPassword, 10);
+
+    // Clear OTP fields if present
+    user.reset_otp = undefined;
+    user.reset_otp_expiry = undefined;
+
+    await user.save();
+
+    res.send({
+        success: true,
+        message: "Password reset successfully.",
+        userType: userType,
+        userId: user._id
+    });
 }

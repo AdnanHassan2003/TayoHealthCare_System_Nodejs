@@ -1,0 +1,87 @@
+<% include header.html %>
+
+<section class="content">
+  <div class="container-fluid">
+
+    <div class="row mb-3">
+      <div class="col-12 text-center">
+      
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="tbl_data">
+              <thead class="thead-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Doctor</th>
+                  <th>Patient</th>
+                  <th>Date</th>
+                  <th>Requested Tests</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if(detail && detail.length > 0) { %>
+                  <% detail.forEach(function(entry) { %>
+                    <tr>
+                      <td><%= entry.sequence_id %></td>
+                      <td><%= entry.doctor_name || 'N/A' %></td>
+                      <td><%= entry.patient_name || 'N/A' %></td>
+                      <td>
+                        <% if(entry.create_date) { %>
+                          <%= moment(entry.create_date).format('DD-MM-YYYY') %>
+                        <% } else { %>
+                          N/A
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if(entry.requested_tests && entry.requested_tests.length > 0) { %>
+                          <ul style="padding-left:16px;">
+                            <% entry.requested_tests.forEach(function(test) { %>
+                              <li><strong><%= test.test_name %></strong> (<%= test.priority %>)</li>
+                            <% }) %>
+                          </ul>
+                        <% } else { %>
+                          <span class="text-muted">None</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <span class="badge badge-<%= entry.status === 'pending' ? 'warning' : 'success' %>">
+                          <%= entry.status %>
+                        </span>
+                      </td>
+                      <td>
+                        <% if(admin_type === 0) { %>
+                          <form method="POST" action="/delete_labs" style="margin: 0;">
+                            <input type="hidden" name="lab_id" value="<%= entry._id %>" />
+                            <button type="submit" class="btn btn-danger btn-sm">
+                              <i class="fas fa-trash"></i> Delete
+                            </button>
+                          </form>
+                        <% } else { %>
+                          <span class="text-muted">-</span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="7" class="text-center text-muted">No lab requests found.</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<% include footer.html %>

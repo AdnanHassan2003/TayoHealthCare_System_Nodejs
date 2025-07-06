@@ -53,6 +53,12 @@ patientschema = new Schema({
         type: Number,
         default: 0
     },
+    reset_otp: {
+        type: Number,
+    },
+    reset_otp_expiry: {
+        type: Date,
+    },
     picture: String,
     create_date: {
         type: Date,

@@ -147,30 +147,59 @@ exports.send_infobip_sms_otp = function (to, msg) {
 }
 
 exports.send_email_otp = function (req, email, msg) {
-    Settings.findOne({}, { email: 1, password: 1 }).then((setting) => {
-        // create reusable transport method (opens pool of SMTP connections)
-        var transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: setting.email,
-                pass: setting.password
-            }
-        });
-        // setup e-mail data with unicode symbols
-        var mailOptions = {
-            from: setting.email,
-            to: email,
-            subject: 'Verification',
-            text: msg
-        };
-        // send mail with defined transport object
-        transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                //console.log(error);               
-            } else {
-                //console.log('Email sent: ' + info.response);               
-            }
-        });
+    // Use environment variables for email and password
+    const senderEmail = process.env.SMTP_EMAIL;
+    const senderPassword = process.env.SMTP_PASSWORD;
+
+    var nodemailer = require('nodemailer');
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: "abdullahidiriefarah@gmail.com",
+            pass: "qrxl ortk qgwy ixix"
+        }
+    });
+
+    // HTML email template
+  const htmlTemplate = `
+    <div style="max-width:520px;margin:40px auto;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,0.08);border:1px solid #e0e7ef;padding:36px 40px 32px 40px;background:#fff;font-family:'Segoe UI',sans-serif;">
+        <div style="text-align:center;">
+            <img src="https://img.icons8.com/color/96/000000/health-checkup.png" alt="Tayo HealthCare" style="width:64px;height:64px;margin-bottom:12px;">
+            <h2 style="color:#1a73e8;margin-bottom:8px;font-weight:600;">Tayo HealthCare</h2>
+            <div style="font-size:20px;color:#222;font-weight:500;margin-bottom:18px;">Password Reset Request</div>
+        </div>
+        <p style="font-size:16px;color:#444;margin-bottom:18px;">
+            Hello,<br>
+            We received a request to reset your password. Please use the OTP below to continue:
+        </p>
+        <div style="text-align:center;margin:32px 0;">
+            <span style="display:inline-block;font-size:36px;letter-spacing:10px;background:#f0f7ff;padding:18px 36px;border-radius:10px;color:#1a73e8;font-weight:bold;box-shadow:0 2px 8px rgba(26,115,232,0.08);">
+                ${msg.replace(/\D/g, '') || msg}
+            </span>
+        </div>
+        <p style="font-size:15px;color:#666;margin-bottom:0;">
+            <b>Note:</b> This OTP is valid for a limited time and can only be used once.<br>
+            If you did not request a password reset, please ignore this email or contact support.
+        </p>
+        <div style="margin-top:32px;text-align:center;">
+            <span style="font-size:15px;color:#888;">Thank you,<br><b>Tayo HealthCare Team</b></span>
+        </div>
+    </div>
+`;
+    var mailOptions = {
+        from: senderEmail,
+        to: email,
+        subject: 'Tayo HealthCare Password Reset OTP',
+        text: msg,
+        html: htmlTemplate
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            //console.log(error);               
+        } else {
+            //console.log('Email sent: ' + info.response);               
+        }
     });
 }
 

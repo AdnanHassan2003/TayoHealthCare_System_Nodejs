@@ -207,6 +207,9 @@ module.exports = function (app) {
   app.route('/labs_list').post(adminController.labs_list);
   app.route('/delete_labs').post(adminController.delete_labs);
 
+  //lab request 
+  app.route('/labRequest').get(adminController.labRequest_list);
+  app.route('/labRequest').post(adminController.labRequest_list);
   
 
   // All Apis That Use Our Telemedicine Application
@@ -253,6 +256,9 @@ module.exports = function (app) {
   app.route('/save_LabRequest').post(adminController.save_LabRequest)
   app.route('/doctor_LabRequest').post(adminController.doctor_LabRequest)
   app.route('/patient_LabRequest').post(adminController.patient_LabRequest)
+  app.route('/forget_Password').post(adminController.forget_Password)
+  app.route('/VerifyOtp').post(adminController.VerifyOtp)
+  app.route('/resetPassword').post(adminController.resetPassword)
 
 
 }
