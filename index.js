@@ -4,10 +4,9 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development";
 var port = process.env.PORT || 2003;
 //console.log("process.env.NODE_ENV",process.env.NODE_ENV)
 var mongoose = require("./config/mongoose");
-var {scheduleAppointmentReminders} = require("./application/Cron/AppointmentCron.js")
 express = require("./config/express"),
     db = mongoose(),
-    scheduleAppointmentReminders();
+ require("./application/Cron/AppointmentCron.js");
     app = express();
 
 app.get('*', function (req, res) {
