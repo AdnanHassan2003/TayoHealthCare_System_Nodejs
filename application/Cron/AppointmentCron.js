@@ -3,7 +3,7 @@ const Appointment = require("../model/appointment.js");
 const Patient = require("../model/patient.js");
 const Doctor = require("../model/doctor.js");
 const Shifts = require("../model/shifts.js");
-const { send_notification } = require("../controller/utils.js");
+const  send_notification  = require("../controller/utils.js");
 const moment = require("moment");
 
 function scheduleAppointmentReminders() {

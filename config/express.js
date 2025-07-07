@@ -6,7 +6,8 @@ var compression = require('compression');
 var app = express();
 var dotenv = require('dotenv');
 var multer = require('multer');
-const { scheduleAppointmentReminders } = require('../application/Cron/AppointmentCron.js');
+const { scheduleAppointmentReminders } = require('../application/Cron/AppointmentCron');
+
 
 module.exports = function () {
     if (process.env.NODE_ENV == 'development') {
