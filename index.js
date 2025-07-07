@@ -6,8 +6,8 @@ var port = process.env.PORT || 2003;
 var mongoose = require("./config/mongoose");
 express = require("./config/express"),
     db = mongoose(),
- require("./application/Cron/AppointmentCron.js");
     app = express();
+    require("./application/Cron/AppointmentCron.js");
 
 app.get('*', function (req, res) {
     res.render("404");
