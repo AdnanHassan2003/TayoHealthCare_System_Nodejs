@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -88,30 +89,33 @@
   <script src="plugins/summernote/summernote-bs4.min.js"></script>
   <!-- <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>  -->
   <!-- <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script> -->
-  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script type="text/javascript"
+    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 
 
-  
+
   <style>
     #google_translate_element {
-   height: 26px !important; overflow: hidden !important; 
-  }
-  body {
-top: 0px !important;
-}
-body > .skiptranslate {
-display: none !important;
-}
+      height: 26px !important;
+      overflow: hidden !important;
+    }
 
-</style>
+    body {
+      top: 0px !important;
+    }
 
-<script type="text/javascript">
+    body>.skiptranslate {
+      display: none !important;
+    }
+  </style>
+
+  <script type="text/javascript">
     function googleTranslateElementInit() {
       //code from step 4th    
       new google.translate.TranslateElement({
         pageLanguage: 'en',
-        
+
         includedLanguages: 'en,so,am,ar,sw'
       }, 'google_translate_element');
 
@@ -121,7 +125,7 @@ display: none !important;
     }
   </script>
 
-  <style type="text/css">  
+  <style type="text/css">
     .system-bottons {
       background: #008000;
       color: white;
@@ -131,8 +135,8 @@ display: none !important;
       color: white;
     }
 
-    
-  
+
+
 
     body {
       top: 0px !important;
@@ -142,7 +146,7 @@ display: none !important;
       width: 130px !important;
     }
 
-    
+
     .goog-tooltip:hover {
       display: none !important;
     }
@@ -152,8 +156,6 @@ display: none !important;
       border: none !important;
       box-shadow: none !important;
     }
-
-    
   </style>
 
   <script>
@@ -178,14 +180,14 @@ display: none !important;
               }
               if (res.admin.menu_array.indexOf("home") == -1) {
                 $("#home").hide()
-              }              
+              }
               if (res.admin.menu_array.indexOf("admin_list") == -1) {
                 $("#admin_list").hide()
-              }             
+              }
               //for the parent menu close if all sub are hiden
               if (res.admin.menu_array.indexOf("admin_list") == -1) {
                 $("#setting_menu").hide()
-              }              
+              }
             }
           }
         }
@@ -194,12 +196,14 @@ display: none !important;
   </script>
   <!-- Favicons -->
   <link href="Tayo.png" rel="icon">
-   
+
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-orang navbar-light navbar-orange" style="background-color: #008000;">
+    <nav class="main-header navbar navbar-expand navbar-orang navbar-light navbar-orange"
+      style="background-color: #008000;">
       <!-- Left navbar links -->
       <ul class="navbar-nav">
         <li class="nav-item">
@@ -216,7 +220,10 @@ display: none !important;
           <span style="float: left;"> <img style=" border-radius: 50%; width: 35px; height: 35px; margin-right: 10px;"
               id="admin_image" src="/default.png"><span id="admin_name"
               style="margin-right: 10px;text-transform: capitalize;">Admin Name
-            </span><a href="log_out" style="color: white"><span class="fa fa-power-off "></span></a></span>
+            </span><a href="#" style="color: white" data-toggle="modal" data-target="#logoutModal">
+              <span class="fa fa-power-off"></span>
+            </a>
+          </span>
         </li>
       </ul>
     </nav>
@@ -286,39 +293,39 @@ display: none !important;
                   </a>
                 </li>   
                 </li> -->
-                <li class="nav-item has-treeview" id="setting_menu">
-                <% if (typeof url_data !='undefined' && url_data.length> 0) {    %>
-                          
-                  <% url_data.forEach(function(entry) { %>
-                      <% if(entry.menu_details.length  > 0) { %>
-                      <li class="nav-item">
-                          <a href="#" class="nav-link">
-      <i class="<%= entry.icon %>"></i>
-      <p>
-          <%= entry.title %>
-          <i class="fas fa-angle-left right"></i>
-      </p>
-  </a>
-                          <% if (entry.menu_details) { %>
-                              <ul class="nav nav-treeview px-4">
-                                  <% entry.menu_details.forEach(function(s_element) { %>
-                                      <li class="nav-item">
-                                          <a href='<%= s_element.url %>' class="nav-link">
-                                            <i class="<%= s_element.icon %>"></i>
-                                              <p>
-                                                  <%= s_element.title %>
-                                              </p>
-                                          </a>
-                                      </li>
-                                      <% }) %>
-                              </ul>
-                              <% } %>
-                      </li>
-                         <% } %>
-                      <% }) %>
-                             
-                      <% } %>
-         
+            <li class="nav-item has-treeview" id="setting_menu">
+              <% if (typeof url_data !='undefined' && url_data.length> 0) { %>
+
+                <% url_data.forEach(function(entry) { %>
+                  <% if(entry.menu_details.length> 0) { %>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="<%= entry.icon %>"></i>
+                <p>
+                  <%= entry.title %>
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <% if (entry.menu_details) { %>
+                <ul class="nav nav-treeview px-4">
+                  <% entry.menu_details.forEach(function(s_element) { %>
+                    <li class="nav-item">
+                      <a href='<%= s_element.url %>' class="nav-link">
+                        <i class="<%= s_element.icon %>"></i>
+                        <p>
+                          <%= s_element.title %>
+                        </p>
+                      </a>
+                    </li>
+                    <% }) %>
+                </ul>
+                <% } %>
+            </li>
+            <% } %>
+              <% }) %>
+
+                <% } %>
+
           </ul>
         </nav>
         <!-- /.sidebar-menu -->
@@ -327,7 +334,26 @@ display: none !important;
     </aside>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Logout</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to log out?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <a href="/log_out" class="btn btn-danger">Yes, Logout</a>
+      </div>
     </div>
-    <!-- /.content-header -->
+  </div>
+</div>

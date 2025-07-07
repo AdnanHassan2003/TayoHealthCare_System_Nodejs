@@ -210,7 +210,8 @@ module.exports = function (app) {
   //lab request 
   app.route('/labRequest').get(adminController.labRequest_list);
   app.route('/labRequest').post(adminController.labRequest_list);
-  
+   app.route('/delete_labRequest').post(adminController.delete_labRequest);
+
 
   // All Apis That Use Our Telemedicine Application
   app.route('/login_DoctorAndPatient').post(adminController.login_DoctorAndPatient);

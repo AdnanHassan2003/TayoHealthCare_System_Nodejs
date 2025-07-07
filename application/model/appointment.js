@@ -39,6 +39,11 @@ appointmentschema = new Schema({
     create_date: {
         type: Date,
         default: Date.now
+    },
+    // Add this field to track if reminder was sent
+    reminderSent: {
+        type: Boolean,
+        default: false
     }
 });
 

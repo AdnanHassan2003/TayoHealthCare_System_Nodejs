@@ -30,12 +30,13 @@
     }
   </script>
 
-<link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
-<script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+  <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
+  <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
 
   <section class="content">
     <% if (typeof msg_success !='undefined' ) { %>
-      <div class="alert alert-success alert-dismissible fade show" style="text-align: center; background-color: #008000;" role="alert">
+      <div class="alert alert-success alert-dismissible fade show"
+        style="text-align: center; background-color: #008000;" role="alert">
         <strong>
           <%= msg_success %>
         </strong>
@@ -44,14 +45,14 @@
         </button>
       </div>
       <% } %>
-    <div class="container-fluid">
+        <div class="container-fluid">
           <div class="row" style="margin-bottom:10px;">
             <div class="col-md-4">
             </div>
             <div class="col-md-4" style="text-align: center;">
               <form class="form-horizontal" role="form" method="post" action="/add_doctor">
                 <button type="submit" class="btn system-bottons btn-block"><span class="fa fa-plus"></span>
-                Add Doctor
+                  Add Doctor
                 </button>
               </form>
             </div>
@@ -65,60 +66,60 @@
               <form style="background-color: #ffffff; padding: 10px; margin-bottom:10px;" class="form-data" role="form"
                 method="post" action="/doctor_list">
                 <div class="row">
-                    <div class="col-md-6">
-                      <div style="text-align: center;">
-                        <label>
-                          <%= process.env.search_filter %>
-                        </label>
-                      </div>
-                      <div class="row">
-                        <div class="col-6">
-                          <select class="form-control select2" style="width: 100%;" name="search_item" id="search_item">
-                            <% if(search_item=="email" ) { %>
-                              <option value="email" selected="selected">
+                  <div class="col-md-6">
+                    <div style="text-align: center;">
+                      <label>
+                        <%= process.env.search_filter %>
+                      </label>
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <select class="form-control select2" style="width: 100%;" name="search_item" id="search_item">
+                          <% if(search_item=="email" ) { %>
+                            <option value="email" selected="selected">
+                              <%= process.env.email %>
+                            </option>
+                            <option value="phone">
+                              <%= process.env.phone %>
+                            </option>
+                            <option value="sequence_id">
+                              <%= process.env.sequence_id %>
+                            </option>
+                            <%}else if(search_item=="phone" ) { %>
+                              <option value="email">
                                 <%= process.env.email %>
                               </option>
-                              <option value="phone">
+                              <option value="phone" selected="selected">
                                 <%= process.env.phone %>
                               </option>
                               <option value="sequence_id">
                                 <%= process.env.sequence_id %>
                               </option>
-                              <%}else if(search_item=="phone" ) { %>
+                              <% }else { %>
                                 <option value="email">
                                   <%= process.env.email %>
                                 </option>
-                                <option value="phone" selected="selected">
+                                <option value="phone">
                                   <%= process.env.phone %>
                                 </option>
-                                <option value="sequence_id">
+                                <option value="sequence_id" selected="selected">
                                   <%= process.env.sequence_id %>
                                 </option>
-                                <% }else { %>
-                                  <option value="email">
-                                    <%= process.env.email %>
-                                  </option>
-                                  <option value="phone">
-                                    <%= process.env.phone %>
-                                  </option>
-                                  <option value="sequence_id" selected="selected">
-                                    <%= process.env.sequence_id %>
-                                  </option>
-                                  <% }%>
-                          </select>
-                        </div>
-                        <div class="col-6">
-                          <input type="text" class="form-control" placeholder="<%= process.env.search_value %>"
-                            name="search_value" value="<%= search_value %>" id="search_value">
-                        </div>
+                                <% }%>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <input type="text" class="form-control" placeholder="<%= process.env.search_value %>"
+                          name="search_value" value="<%= search_value %>" id="search_value">
                       </div>
                     </div>
-                    <!-- /.col -->
-                    <div class="col-md-2">
-  
-                    </div>
-                    <div class="col-md-4">
-                      <!-- <div style="text-align: center;">
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-md-2">
+
+                  </div>
+                  <div class="col-md-4">
+                    <!-- <div style="text-align: center;">
                         <label>
                           <%= process.env.date_filter %>
                         </label>
@@ -133,22 +134,22 @@
                             value="<%= f_end_date %>" name="end_date" id="end_date">
                         </div>
                       </div> -->
-                    </div>
                   </div>
-                  <div class="row">
-                    <div class="col-md-10" style="margin-top: 10px;">
-                    </div>
-                    <div class="col-md-2" style="margin-top: 10px;">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <button type="submit" class="btn system-bottons float-right" style="width: 100%;"
-                            id="apply_filter"><i class="far fa-credit-card"></i>
-                            <%= process.env.submit %>
-                          </button>
-                        </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-10" style="margin-top: 10px;">
+                  </div>
+                  <div class="col-md-2" style="margin-top: 10px;">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <button type="submit" class="btn system-bottons float-right" style="width: 100%;"
+                          id="apply_filter"><i class="far fa-credit-card"></i>
+                          <%= process.env.submit %>
+                        </button>
                       </div>
                     </div>
                   </div>
+                </div>
               </form>
             </div>
           </div>
@@ -156,9 +157,9 @@
           <div id="tbl_parent_div">
             <div class="col-md-12">
               <div class="card">
-                <div >
+                <div>
                   <table class="table table-bordered table-hover" id="tbl_data">
-                   <thead>
+                    <thead>
                       <tr>
                         <th>
                           <%= process.env.sequence_id %>
@@ -185,10 +186,10 @@
                           Speciality
                         </th>
                         <th>
-                            Experience Years
+                          Experience Years
                         </th>
                         <th>
-                            Consultation Fee
+                          Consultation Fee
                         </th>
                         <th>
                           <%= process.env.title_status %>
@@ -202,101 +203,98 @@
                       </tr>
                     </thead>
                     <tbody>
-                        <% detail.forEach(function(entry) { %>
-                            <tr>
-                              <td>
-                                <%= entry.sequence_id %>
-                              </td>
-                              <td>
-                                <%= entry.name %>
-                              </td>
-                              <td><img class="img-responsive img-circle" style="width: 50px; height: 50px;"
-                                  src="<%= entry.picture != '' ? entry.picture : 'default.png' %>">
-                              </td>
-                              <td>
-                                <%= entry.phone %>
-                              </td>
-                              <td>
-                                <%= entry.email %>
-                              </td>
-                              <td>
-                                <%= entry.hospital_name %>
-                              </td>
-                              <td>
-                                <%= entry.countries %>
-                              </td>
-                              <td>
-                                <%= entry.speciality_name %>
-                              </td>
-                              <td>
-                                <%= entry.experience_years %>
-                              </td>
-                              <td>
-                                <%= entry.consultation_fee %>
-                              </td>
-                              <td>
-                                <% if(entry.status=="1" ) { %>
-                                  <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
-                                    <%= process.env.active %>
-                                  </span>
-                                  <%}else { %>
-                                    <span class="btn-danger" style="padding: 5px; border-radius: 4px;">
-                                      <%= process.env.inactive %>
-                                    </span>
-                                    <% }%>
-                              </td>
-                              <td style="width: 100px;">
-                                <%= moment(entry.create_date).format("hh:mm a") %></br>
-                                  <%= moment(entry.create_date).format("DD-MM-YYYY") %>
-                              </td>
-                              <td>
-                                <% if(admin_type==0 ) { %>
-                                  <div>
-                                    <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-                                      <%= process.env.action %>
-                                        <span class="caret"></span>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                      <li class="dropdown-submenu" style="margin: 2px;">
-                                        <form method="POST" action="/edit_doctor">
-                                          <input type="hidden" name="doctor_id" value="<%=entry._id%>" />
-                                          <button type="submit" class="btn btn-default" style="width: 100%;">
-                                            <i class="fas fa-pencil-alt">
-                                            </i>
-                                            <%= process.env.edit %>
-                                          </button>
-                                        </form>
-                                      </li>
-                                      <li class="dropdown-submenu" style="margin: 2px;">
-                                        <form>
-                                          <button type="button" class="btn btn-default" style="width: 100%;"
-                                            onclick="view_admin('<%= entry.sequence_id %>','<%= entry.name %>','<%= entry.phone %>','<%= entry.email %>','<%= entry.user_name %>',
+                      <% detail.forEach(function(entry) { %>
+                        <tr>
+                          <td>
+                            <%= entry.sequence_id %>
+                          </td>
+                          <td>
+                            <%= entry.name %>
+                          </td>
+                          <td><img class="img-responsive img-circle" style="width: 50px; height: 50px;"
+                              src="<%= entry.picture != '' ? entry.picture : 'default.png' %>">
+                          </td>
+                          <td>
+                            <%= entry.phone %>
+                          </td>
+                          <td>
+                            <%= entry.email %>
+                          </td>
+                          <td>
+                            <%= entry.hospital_name %>
+                          </td>
+                          <td>
+                            <%= entry.countries %>
+                          </td>
+                          <td>
+                            <%= entry.speciality_name %>
+                          </td>
+                          <td>
+                            <%= entry.experience_years %>
+                          </td>
+                          <td>
+                            <%= entry.consultation_fee %>
+                          </td>
+                          <td>
+                            <% if(entry.status=="1" ) { %>
+                              <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
+                                <%= process.env.active %>
+                              </span>
+                              <%}else { %>
+                                <span class="btn-danger" style="padding: 5px; border-radius: 4px;">
+                                  <%= process.env.inactive %>
+                                </span>
+                                <% }%>
+                          </td>
+                          <td style="width: 100px;">
+                            <%= moment(entry.create_date).format("hh:mm a") %></br>
+                              <%= moment(entry.create_date).format("DD-MM-YYYY") %>
+                          </td>
+                          <td>
+                            <% if(admin_type==0 ) { %>
+                              <div>
+                                <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                                  <%= process.env.action %>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                  <li class="dropdown-submenu" style="margin: 2px;">
+                                    <form method="POST" action="/edit_doctor">
+                                      <input type="hidden" name="doctor_id" value="<%=entry._id%>" />
+                                      <button type="submit" class="btn btn-default" style="width: 100%;">
+                                        <i class="fas fa-pencil-alt">
+                                        </i>
+                                        <%= process.env.edit %>
+                                      </button>
+                                    </form>
+                                  </li>
+                                  <li class="dropdown-submenu" style="margin: 2px;">
+                                    <form>
+                                      <button type="button" class="btn btn-default" style="width: 100%;"
+                                        onclick="view_admin('<%= entry.sequence_id %>','<%= entry.name %>','<%= entry.phone %>','<%= entry.email %>','<%= entry.user_name %>',
                                             '<%= entry.experience_years %>','<%= entry.consultation_fee %>',
                                             '<%= entry.picture %>', '<%= entry.address %>','<%= entry.extra_detail %>')">
-                                            <i class="fas fa-folder">
-                                            </i>
-                                            <%= process.env.view %>
-                                          </button>
-    
-                                        </form>
-                                      </li>
-                                      <li class="dropdown-submenu" style="margin: 2px;">
-                                        <form method="POST" action="/delete_doctor">
-                                          <input type="hidden" name="doctor_id" value="<%=entry._id%>" />
-                                          <button type="submit" class="btn btn-default" style="width: 100%;">
-                                            <i class="fas fa-trash">
-                                            </i>
-                                             delete
-                                          </button>
-                                        </form>
-                                      </li>
-                                     
-                                    </ul>
-                                  </div>
-                                  <% }%>
-                              </td>
-                            </tr>
-                            <% }) %>
+                                        <i class="fas fa-folder">
+                                        </i>
+                                        <%= process.env.view %>
+                                      </button>
+
+                                    </form>
+                                  </li>
+                                  <li class="dropdown-submenu" style="margin: 2px;">
+                                    <button type="button" class="btn btn-default" style="width: 100%;"
+                                      data-toggle="modal" data-target="#deleteDoctorModal" data-id="<%= entry._id %>">
+                                      <i class="fas fa-trash"></i> delete
+                                    </button>
+                                  </li>
+
+
+                                </ul>
+                              </div>
+                              <% }%>
+                          </td>
+                        </tr>
+                        <% }) %>
                     </tbody>
                   </table>
                 </div>
@@ -356,15 +354,15 @@
                           </li>
                           <li class="list-group-item">
                             <b>
-                                Experience Years
+                              Experience Years
                             </b> <a class="float-right" id="vDoctorexperience_years"></a>
                           </li>
                           <li class="list-group-item">
                             <b>
-                                Consultation Fee
+                              Consultation Fee
                             </b> <a class="float-right" id="vDoctorconsultation_fee"></a>
                           </li>
-                        
+
                         </ul>
                       </div>
                       <!-- /.card-body -->
@@ -382,7 +380,7 @@
                         <h3 class="card-title">More about..</h3>
                       </div>
                       <!-- /.card-header -->
-                      <div class="card-body">                                              
+                      <div class="card-body">
                         <strong><i class="far fa-file-alt mr-1"></i>
                           <%= process.env.extra_detail %>
                         </strong>
@@ -429,17 +427,38 @@
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default" onclick="change_admin_pass()" >
+                  <button type="button" class="btn btn-default" onclick="change_admin_pass()">
                     <%= process.env.change_password %>
                   </button>
                 </div>
               </form>
-
+              
             </div>
           </div>
         </div>
+      </div>
+    </section>
+    <!-- Delete Doctor Confirmation Modal -->
+  <div class="modal fade" id="deleteDoctorModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="POST" action="/delete_doctor">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Doctor Deletion</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this doctor?
+          <input type="hidden" name="doctor_id" id="modalDoctorId" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        </div>
+      </form>
     </div>
-  </section>
+  </div>
+  </div>
   <script>
     function genetare_admin_excel() {
       $.ajax({
@@ -452,6 +471,7 @@
         }
       });
     }
+
 
     function change_admin_pass() {
       var admin_id = $('#admin_id').val();
@@ -480,7 +500,7 @@
       }
     }
 
-    function view_admin(sequence_id, name, phone, email,user_name, experience_years, consultation_fee, picture,extra_detail) {
+    function view_admin(sequence_id, name, phone, email, user_name, experience_years, consultation_fee, picture, extra_detail) {
       $("#vAdminImage").attr('src', picture);
       $("#vDoctorId").text(sequence_id);
       $("#vDoctorName").text(name);
@@ -498,5 +518,14 @@
       $('#adminChangePassModal').modal('show');
     }
   </script>
+  <script>
+  $('#deleteDoctorModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var doctorId = button.data('id');
+    var modal = $(this);
+    modal.find('#modalDoctorId').val(doctorId);
+  });
+</script>
+
   <!-- /.content -->
   <% include footer.html %>

@@ -1,7 +1,7 @@
 //waxaa lagu qoraa functions ka intabasan solalabta kadibna lawacdo  si markasto looqorin
 var myUtils = require('./utils');
 var fs = require('fs');
-var Admin = require('mongoose').model('admin')
+const Admin = require("../model/admin.js");
 var { customAlphabet } = require("nanoid");
 var moment = require('moment');
 var momentzone = require('moment-timezone');
@@ -11,7 +11,10 @@ var nodemailer = require('nodemailer');
 var requestAPI = require('request');
 const cons = require('consolidate');
 //////crypto things end////////////////
-
+const { GoogleAuth } = require("google-auth-library");
+const axios = require("axios");
+const path = require("path");
+require("dotenv").config();
 //add hours to current timezone
 Date.prototype.addHours = function () {
     this.setTime(this.getTime() + (process.env.time_zone_hour * 60 * 60 * 1000));
@@ -347,31 +350,93 @@ exports.redirect_504 = function (req, res) {
 
 
 /// send notification
-exports.send_notification=function(data, response) {
-    console.log("data", data)
+// exports.send_notification=function(data, response) {
+//     console.log("data", data)
     
-    let firebase_key ="AAAAjib-3fA:APA91bGcXBe6HBl61YYdoVKqFsSin_X5d9A2V5rNi0jSLU-3rnpdTTf9OoeXxpSZ-tnh33kSEFq-0fgoMsCdorSromVh2xQBKiNYvE9FBM5uS5zrOZJdFxcvw67JIxc3bHXZqqa7ln6e"
+//     let firebase_key ="AAAAjib-3fA:APA91bGcXBe6HBl61YYdoVKqFsSin_X5d9A2V5rNi0jSLU-3rnpdTTf9OoeXxpSZ-tnh33kSEFq-0fgoMsCdorSromVh2xQBKiNYvE9FBM5uS5zrOZJdFxcvw67JIxc3bHXZqqa7ln6e"
 
-    console.log('api', firebase_key)
+//     console.log('api', firebase_key)
    
-    const  device_token=data.token
-    const title=data.title
-    const message=data.message
-    var message1 = new node_gcm.Message();
+//     const  device_token=data.token
+//     const title=data.title
+//     const message=data.message
+//     var message1 = new node_gcm.Message();
 
-    message1.addData('title', title);
-    message1.addData('message',message);
+//     message1.addData('title', title);
+//     message1.addData('message',message);
  
     
-    var sender = new node_gcm.Sender(firebase_key);
-    sender.sendNoRetry(message1, { registrationTokens: [device_token] }, function (err, response) {
-        if (err) console.log('err', err);
-        else console.log('res', response);
-})
-// response.send({
-//     success:true
+//     var sender = new node_gcm.Sender(firebase_key);
+//     sender.sendNoRetry(message1, { registrationTokens: [device_token] }, function (err, response) {
+//         if (err) console.log('err', err);
+//         else console.log('res', response);
 // })
-}
+// // response.send({
+// //     success:true
+// // })
+// }
+
+/**
+ * Send push notification to a device using FCM.
+ * @param {Object} data - { token, title, message, [dataPayload] }
+ * @param {Function} callback - function(err, response)
+ */
+
+
+const auth = new GoogleAuth({
+  keyFile: path.join(process.cwd(), "serviceAccountKey.json"),
+  scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
+});
+
+exports.send_notification = function (data, callback) {
+  auth
+    .getClient()
+    .then((client) => {
+      return client.getAccessToken().then((accessToken) => {
+        const projectId = process.env.FIREBASE_PROJECT_ID;
+        const url = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+
+        const fcmPayload = {
+          message: {
+            token: data.token,
+            notification: {
+              title: data.title || "Notification",
+              body: data.message || "",
+            },
+            android: {
+              priority: "high",
+              notification: {
+                click_action: "FLUTTER_NOTIFICATION_CLICK",
+                channel_id: "default_channel",
+              },
+            },
+            data: data.dataPayload || {},
+          },
+        };
+
+        return axios
+          .post(url, fcmPayload, {
+            headers: {
+              Authorization: `Bearer ${accessToken.token}`,
+              "Content-Type": "application/json",
+            },
+          })
+          .then((response) => {
+            console.log("✅ FCM Response", response.data);
+            if (callback) callback(null, response.data);
+          })
+          .catch((err) => {
+            console.error("❌ FCM send error", err.message);
+            if (callback) callback(err, null);
+          });
+      });
+    })
+    .catch((err) => {
+      console.error("❌ FCM auth error", err.message);
+      if (callback) callback(err, null);
+    });
+};
+
 
 exports = systen_urls = [
     "home",

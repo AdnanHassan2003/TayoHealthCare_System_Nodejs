@@ -1406,7 +1406,7 @@ exports.speciality_list = function(req, res){
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
             Speciality.find({}).then((speciality_data)=>{
-
+                console.log("dataaa :", speciality_data)
                 res.render('speciality_list', {
                     url_data: req.session.menu_array,
                     detail: speciality_data,
@@ -1459,6 +1459,7 @@ exports.prescription_list = function(req, res){
                     }
                 }
             ]).then((prescription_data) => {
+                  console.log("dataaa :", prescription_data)
                 res.render('prescriptions_list', {
                     url_data: req.session.menu_array,
                     detail: prescription_data,
@@ -1521,52 +1522,54 @@ exports.labs_list = function(req, res){
     });
 }
 
-exports.labRequest_list = function (req, res) {
-  Utils.check_admin_token(req.session.admin, function (response) {
-    if (response.success) {
-      labs.aggregate([
-        {
-          $lookup: {
-            from: "doctors",
-            localField: "doctor_id",
-            foreignField: "_id",
-            as: "doctor_data"
-          }
-        },
-        { $unwind: { path: "$doctor_data", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "patients",
-            localField: "patient_id",
-            foreignField: "_id",
-            as: "patient_data"
-          }
-        },
-        { $unwind: { path: "$patient_data", preserveNullAndEmptyArrays: true } },
-        {
-          $project: {
-            sequence_id: 1,
-            create_date: 1,
-            status: 1,
-            requested_tests: 1,
-            doctor_name: "$doctor_data.name",
-            patient_name: "$patient_data.name"
-          }
+exports.labRequest_list = function(req, res){
+    Utils.check_admin_token(req.session.admin, function (response) {
+          console.log("dataaa :", response)
+        if (response.success) {
+            labRequest.aggregate([
+                {
+                    $lookup: {
+                        from: "doctors",
+                        localField: "doctor_id",
+                        foreignField: "_id",
+                        as: "doctor_data"
+                    }
+                },
+                { $unwind: { path: "$doctor_data", preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: "patients",
+                        localField: "patient_id",
+                        foreignField: "_id",
+                        as: "patient_data"
+                    }
+                },
+                { $unwind: { path: "$patient_data", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        sequence_id: 1,
+                        requested_tests : 1,
+                        create_date: 1,
+                        doctor_name: "$doctor_data.name",
+                        patient_name: "$patient_data.name",
+                        notes:1
+                    }
+                }
+            ]).then((labRequest_data) => {
+                console.log("dataaa :", labRequest_data)
+                res.render('labRequest', {
+                    url_data: req.session.menu_array,
+                    detail: labRequest_data,
+                    msg: req.session.error,
+                    moment: moment,
+                    admin_type: req.session.admin.usertype
+                });
+            });
+        } else {
+            Utils.redirect_login(req, res);
         }
-      ]).then((lab_data) => {
-        res.render("labRequest", {
-          url_data: req.session.menu_array,
-          detail: lab_data,
-          msg: req.session.error,
-          moment: moment,
-          admin_type: req.session.admin.usertype
-        });
-      });
-    } else {
-      Utils.redirect_login(req, res);
-    }
-  });
-};
+    });
+}
 //---------------------------------------------------------------------------------------------------
 
 
@@ -3622,8 +3625,11 @@ exports.delete_admin = function (req, res) {
 exports.delete_menus = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Menu.deleteOne({ _id: req.body.menus_id }).then((user) => {
+            Menu.deleteOne({ _id: req.body.menu_id }).then(() => {
                 res.redirect("/menu_list")
+            }).catch((err) => {
+                console.error("Delete failed:", err);
+                res.status(500).send("Delete failed");
             });
         } else {
             Utils.redirect_login(req, res);
@@ -3825,6 +3831,17 @@ exports.delete_labs = function (req, res) {
         if (response.success) {
             labs.deleteOne({ _id: req.body.lab_id }).then((user) => {
                 res.redirect("/labs_list")
+            });
+        } else {
+            Utils.redirect_login(req, res);
+        }
+    });
+};
+exports.delete_labRequest = function (req, res) {
+    Utils.check_admin_token(req.session.admin, function (response) {
+        if (response.success) {
+            labRequest.deleteOne({ _id: req.body.labRequest_id }).then((user) => {
+                res.redirect("/labRequest")
             });
         } else {
             Utils.redirect_login(req, res);

@@ -6,6 +6,7 @@ var compression = require('compression');
 var app = express();
 var dotenv = require('dotenv');
 var multer = require('multer');
+const { scheduleAppointmentReminders } = require('../application/Cron/AppointmentCron');
 
 module.exports = function () {
     if (process.env.NODE_ENV == 'development') {
@@ -34,7 +35,7 @@ module.exports = function () {
 
     app.engine('html', require('ejs').renderFile, cons.swig);
     app.set('view engine', 'html');
-
+    scheduleAppointmentReminders();
 
     require('../application/telemedicine-routes/telemedicine-routes')(app);
     return app;
