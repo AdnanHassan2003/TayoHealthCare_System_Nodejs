@@ -6,8 +6,8 @@ var port = process.env.PORT || 2003;
 var mongoose = require("./config/mongoose");
 var {scheduleAppointmentReminders} = require("./application/Cron/AppointmentCron.js")
 express = require("./config/express"),
-scheduleAppointmentReminders();
     db = mongoose(),
+    scheduleAppointmentReminders();
     app = express();
 
 app.get('*', function (req, res) {
