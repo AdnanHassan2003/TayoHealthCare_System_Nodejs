@@ -1,10 +1,10 @@
-const cron = require("node-cron");
-const Appointment = require("../model/appointment.js");
-const Patient = require("../model/patient.js");
-const Doctor = require("../model/doctor.js");
-const Shifts = require("../model/shifts.js");
-const  send_notification  = require("../controller/utils.js");
-const moment = require("moment");
+var Appointment = require("../model/appointment.js");
+var Patient = require("../model/patient.js");
+var Doctor = require("../model/doctor.js");
+var Shifts = require("../model/shifts.js");
+var cron = require("node-cron");
+var send_notification = require("../controller/utils.js");
+var moment = require("moment");
 
 function scheduleAppointmentReminders() {
   cron.schedule("* * * * *", async () => {
@@ -14,7 +14,6 @@ function scheduleAppointmentReminders() {
       const now = moment();
       const fiveMinutesLater = moment().add(5, "minutes");
 
-      // find appointments scheduled for today and not yet reminded
       const appointments = await Appointment.find({
         reminderSent: { $ne: true },
         status: 1,
@@ -29,15 +28,10 @@ function scheduleAppointmentReminders() {
 
         if (!shift) continue;
 
-        // check if today matches shift day
         const today = moment().format("dddd");
         if (shift.day !== today) continue;
 
-        // check if shift time is within the next 5 minutes
-        const shiftTimeMoment = moment(
-          shift.time,
-          "hh:mm A"
-        ); // parse shift time like "03:15 PM"
+        const shiftTimeMoment = moment(shift.time, "hh:mm A");
 
         const shiftToday = moment().set({
           hour: shiftTimeMoment.get("hour"),
@@ -54,7 +48,6 @@ function scheduleAppointmentReminders() {
             `🔔 Sending reminder for appointment ${appt._id} at shift time ${shift.time}`
           );
 
-          // notify patient
           if (patient && patient.token) {
             send_notification(
               {
@@ -76,7 +69,6 @@ function scheduleAppointmentReminders() {
             );
           }
 
-          // notify doctor
           if (doctor && doctor.token) {
             send_notification(
               {
@@ -100,7 +92,6 @@ function scheduleAppointmentReminders() {
             );
           }
 
-          // mark appointment as notified
           appt.reminderSent = true;
           await appt.save();
         } else {
@@ -115,4 +106,6 @@ function scheduleAppointmentReminders() {
   });
 }
 
-module.exports = { scheduleAppointmentReminders };
+module.exports = {
+  scheduleAppointmentReminders
+};
