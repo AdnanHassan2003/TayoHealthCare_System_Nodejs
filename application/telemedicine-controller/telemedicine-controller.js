@@ -7219,14 +7219,31 @@ exports.allAppointments = function(req, res) {
         },
         { $unwind: "$patient_data" },
         {
+            $lookup: {
+                from: "shifts",
+                localField: "shifts_id",
+                foreignField: "_id",
+                as: "shifts_data"
+            }
+        },
+        { $unwind: "$shifts_data" },
+        {
             $project: {
                 _id: 1,
-                doctor_id: "$doctor_data._id",
                 doctor_name: "$doctor_data.name",
-                doctor_token: "$doctor_data.token",
-                 patient_id: "$patient_data._id",
+                doctor_profile: "$doctor_data.picture",
                 patient_name: "$patient_data.name",
                 patient_token: "$patient_data.token",
+                doctor_token: "$doctor_data.token",
+                patient_id: "$patient_data._id",
+                patient_phone: "$patient_data.phone",
+                doctor_phone: "$doctor_data.phone",
+                doctor_id: "$doctor_data._id",
+                shift_time: "$shifts_data.time",
+                shift_day: "$shifts_data.day",
+                patient_Gender: "$patient_data.gender",
+                patient_Age: "$patient_data.age",
+                sequence_id: 1,
                 appointment_date: 1,
                 status: 1,
                 create_date: 1
@@ -7254,4 +7271,4 @@ exports.allAppointments = function(req, res) {
             error: err.message
         });
     });
-}
+};
