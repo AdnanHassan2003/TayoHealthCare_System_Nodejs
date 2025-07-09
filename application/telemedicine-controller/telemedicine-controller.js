@@ -37,6 +37,7 @@ const { utils } = require('xlsx')
 const { group, Console } = require('console')
 const message = require('../model/message')
 const path = require('path')
+const cons = require('consolidate')
 // const sendCallNotification = require('../nofications/fcmSender')
 
 // const { utils } = require('xlsx/types')
@@ -7200,12 +7201,6 @@ exports.resetPassword = async function (req, res) {
 exports.allAppointments = function(req, res) {
     Appointment.aggregate([
         {
-            $match: {
-                "patient_id": ObjectId(req.body.patient_id),
-                "doctor_id": ObjectId(req.body.doctor_id)
-            }
-        },
-        {
             $lookup: {
                 from: "doctors",
                 localField: "doctor_id",
@@ -7236,6 +7231,7 @@ exports.allAppointments = function(req, res) {
             }
         }
     ]).then((appointments) => {
+        console.log("Appointments fetched:", appointments);
         if (appointments.length > 0) {
             res.send({
                 success: true,
