@@ -7195,3 +7195,65 @@ exports.resetPassword = async function (req, res) {
         userId: user._id
     });
 }
+
+
+exports.allAppointments = function(req, res) {
+    Appointment.aggregate([
+        {
+            $match: {
+                "patient_id": ObjectId(req.body.patient_id),
+                "doctor_id": ObjectId(req.body.doctor_id)
+            }
+        },
+        {
+            $lookup: {
+                from: "doctors",
+                localField: "doctor_id",
+                foreignField: "_id",
+                as: "doctor_data"
+            }
+        },
+        { $unwind: "$doctor_data" },
+        {
+            $lookup: {
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient_data"
+            }
+        },
+        { $unwind: "$patient_data" },
+        {
+            $project: {
+                _id: 1,
+                doctor_name: "$doctor_data.name",
+                patient_name: "$patient_data.name",
+                appointment_date: 1,
+                status: 1,
+                create_date: 1,
+                doctor_id: "$doctor_data._id",
+                patient_id: "$patient_data._id"
+            }
+        }
+    ]).then((appointments) => {
+        if (appointments.length > 0) {
+            res.send({
+                success: true,
+                message: "Successfully fetched all appointments.",
+                record: appointments
+            });
+        } else {
+            res.send({
+                success: false,
+                message: "No appointments found."
+            });
+        }
+    }).catch((err) => {
+        console.error("Error fetching appointments:", err);
+        res.status(500).send({
+            success: false,
+            message: "Error fetching appointments.",
+            error: err.message
+        });
+    });
+}
