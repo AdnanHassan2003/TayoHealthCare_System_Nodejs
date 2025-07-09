@@ -7221,15 +7221,15 @@ exports.allAppointments = function(req, res) {
         {
             $project: {
                 _id: 1,
+                doctor_id: "$doctor_data._id",
                 doctor_name: "$doctor_data.name",
                 doctor_token: "$doctor_data.token",
+                 patient_id: "$patient_data._id",
                 patient_name: "$patient_data.name",
                 patient_token: "$patient_data.token",
                 appointment_date: 1,
                 status: 1,
-                create_date: 1,
-                doctor_id: "$doctor_data._id",
-                patient_id: "$patient_data._id"
+                create_date: 1
             }
         }
     ]).then((appointments) => {
