@@ -1,5 +1,11 @@
-var moment = require("moment-timezone");
-
+var Appointment = require("../model/appointment.js");
+var Patient = require("../model/patient.js");
+var Doctor = require("../model/doctor.js");
+var Shifts = require("../model/shifts.js");
+var cron = require("node-cron");
+const { send_notification } = require("../controller/utils.js");
+var moment = require("moment");
+const cons = require("consolidate");
 function scheduleAppointmentReminders() {
   cron.schedule("* * * * *", async () => {
     console.log("🚀 appointment reminder cron triggered");
