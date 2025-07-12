@@ -7241,6 +7241,7 @@ exports.allAppointments = function(req, res) {
                 doctor_id: "$doctor_data._id",
                 shift_time: "$shifts_data.time",
                 shift_day: "$shifts_data.day",
+                shift_id: "$shifts_data._id",
                 patient_Gender: "$patient_data.gender",
                 patient_Age: "$patient_data.age",
                 sequence_id: 1,
