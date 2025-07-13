@@ -31,382 +31,409 @@
   </script>
   <section class="content">
     <div class="container-fluid">
-          <div class="row" style="margin-bottom:10px;">
-            <div class="col-md-4">
-            </div>
-            <div class="col-md-4" style="text-align: center;">
-              <form class="form-horizontal" role="form" method="post" action="/add_payment">
-                <button type="submit" class="btn system-bottons btn-block"><span class="fa fa-plus"></span>
-                Add Payment
-                </button>
-              </form>
-            </div>
-            <div class="col-md-4">
-            </div>
-          </div>
+      <div class="row" style="margin-bottom:10px;">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4" style="text-align: center;">
+          <form class="form-horizontal" role="form" method="post" action="/add_payment">
+            <button type="submit" class="btn system-bottons btn-block"><span class="fa fa-plus"></span>
+              Add Payment
+            </button>
+          </form>
+        </div>
+        <div class="col-md-4">
+        </div>
+      </div>
 
-          <div class="card card-default">
-            <!-- /.card-header -->
-            <div class="card-body">
-              <form style="background-color: #ffffff; padding: 10px; margin-bottom:10px;" class="form-data" role="form"
-                method="post" action="/payment_list">
-                <div class="row">
-                  <div class="col-md-3">
-                    <div class="form-group">
-                      <label for="status">
-                        Status
-                      </label>
-                      <select class="form-control custom-select" id="status" name="status">
-                        <%if(status == 0){%>
-                          <option value="ALL"  >All</option>
-                          <option value="0" selected> Pending</option>
-                          <option value="1"> Paid</option>
-                          <option value="2"> Failed</option>
-                         
-                          
-                        <%}else if(status == 1){%>
-                          <option value="ALL"  >All</option>
-                          <option value="0"> Pending</option>
-                          <option value="1" selected> Paid</option>
-                          <option value="2"> Failed</option>
-                         
-  
-                        <%}else if(status == 2){%>
+      <div class="card card-default">
+        <!-- /.card-header -->
+        <div class="card-body">
+          <form style="background-color: #ffffff; padding: 10px; margin-bottom:10px;" class="form-data" role="form"
+            method="post" action="/payment_list">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="status">
+                    Status
+                  </label>
+                  <select class="form-control custom-select" id="status" name="status">
+                    <%if(status==0){%>
+                      <option value="ALL">All</option>
+                      <option value="0" selected> Pending</option>
+                      <option value="1"> Paid</option>
+                      <option value="2"> Failed</option>
+
+
+                      <%}else if(status==1){%>
+                        <option value="ALL">All</option>
+                        <option value="0"> Pending</option>
+                        <option value="1" selected> Paid</option>
+                        <option value="2"> Failed</option>
+
+
+                        <%}else if(status==2){%>
                           <option value="ALL">All</option>
                           <option value="0"> Pending</option>
                           <option value="1"> Paid</option>
                           <option value="2" selected> Failed</option>
-                         
 
-                        <%}else if(status=='ALL' || status==undefined) {%>
-                          <option value="ALL">All</option>
-                          <option value="0"> Pending</option>
-                          <option value="1"> Paid</option>
-                          <option value="2"> Failed</option>
-                        
-                          
-                        <%}%> 
-            
-                      </select>
-                  </div>
-                </div>
-                <div class="col-md-3">
-  
-                </div>
-                <div class="col-md-2">
-  
-                </div>
-                <div class="col-md-4">
-                  <div style="text-align: center;">
-                    <label>
-                      <%= process.env.date_filter %>
-                    </label>
-                  </div>
-                  <div class="row">
-                    <div class="col-6">
-                      <input type="text" class="form-control datepicker" placeholder="<%= process.env.start_date %>"
-                        value="<%= f_start_date %>" name="start_date" id="start_date">
-                    </div>
-                    <div class="col-6">
-                      <input type="text" class="form-control datepicker" placeholder="<%= process.env.end_date %>"
-                        value="<%= f_end_date %>" name="end_date" id="end_date">
-                    </div>
-                  </div>
-                </div>
 
+                          <%}else if(status=='ALL' || status==undefined) {%>
+                            <option value="ALL">All</option>
+                            <option value="0"> Pending</option>
+                            <option value="1"> Paid</option>
+                            <option value="2"> Failed</option>
+
+
+                            <%}%>
+
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3">
+
+              </div>
+              <div class="col-md-2">
+
+              </div>
+              <div class="col-md-4">
+                <div style="text-align: center;">
+                  <label>
+                    <%= process.env.date_filter %>
+                  </label>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <input type="text" class="form-control datepicker" placeholder="<%= process.env.start_date %>"
+                      value="<%= f_start_date %>" name="start_date" id="start_date">
                   </div>
-                  <div class="row">
-                    <div class="col-md-10" style="margin-top: 10px;">
-                    </div>
-                    <div class="col-md-2" style="margin-top: 10px;">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <button type="submit" class="btn system-bottons float-right" style="width: 100%;"
-                            id="apply_filter"><i class="far fa-credit-card"></i>
-                            <%= process.env.submit %>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                  <div class="col-6">
+                    <input type="text" class="form-control datepicker" placeholder="<%= process.env.end_date %>"
+                      value="<%= f_end_date %>" name="end_date" id="end_date">
                   </div>
-              </form>
+                </div>
+              </div>
+
             </div>
-          </div>
+            <div class="row">
+              <div class="col-md-10" style="margin-top: 10px;">
+              </div>
+              <div class="col-md-2" style="margin-top: 10px;">
+                <div class="row">
+                  <div class="col-md-12">
+                    <button type="submit" class="btn system-bottons float-right" style="width: 100%;"
+                      id="apply_filter"><i class="far fa-credit-card"></i>
+                      <%= process.env.submit %>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
 
-          <div id="tbl_parent_div">
-            <div class="col-md-12">
-              <div class="card">
-                <div >
-                  <table class="table table-bordered table-hover" id="tbl_data">
-                   <thead>
-                      <tr>
-                        <th>
-                          <%= process.env.sequence_id %>
-                        </th>
-                        <th>
-                           Doctor
-                        </th>
-                        <th>
-                         Reciver Phone
-                       </th>
-                        <th>
-                          Patient
-                        </th>
-                        <th>
-                          Sender Phone
-                        </th>
-                        <th>
-                          Amount
-                        </th>
-                        <th>
-                           payment method
-                        </th>
-                        <th>
-                          <%= process.env.title_status %>
-                        </th>
-                        <th>
-                            <%= process.env.created_date %>
-                        </th>
-                        <th>
-                          <%= process.env.action %>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        <% detail.forEach(function(entry) { %>
-                            <tr>
-                              <td>
-                                <%= entry.sequence_id %>
-                              </td>
-                              <td>
-                                <%= entry.doctor_name %>
-                              </td>
-                              <td>
-                                <%= entry.reciver_phone %>
-                              </td>
-                              <td>
-                                <%= entry.patient_name %>
-                              </td>
-                              <td>
-                                <%= entry.sender_phone %>
-                              </td>
-                              <td>
-                                <%= entry.amount %>
-                              </td>
-                              <td>
-                                <%= entry.payment_method %>
-                              </td>
-                              <td>
-                                <% if (entry.status == "0") { %>
-                                  <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
-                                    Pending
-                                  </span>
-                                <% } else if (entry.status == "1") { %>
-                                  <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
-                                    Paid
-                                  </span>
-                                <% } else { %>
-                                  <span class="btn-danger" style="padding: 5px; border-radius: 4px;">
-                                    Failed
-                                  </span>
-                                <% } %>
-                              </td>
-                              
-                              <td style="width: 100px;">
-                                <%= moment(entry.create_date).format("hh:mm a") %></br>
-                                  <%= moment(entry.create_date).format("DD-MM-YYYY") %>
-                              </td>
-                              <td>
-                                <% if(admin_type==0 ) { %>
-                                  <div>
-                                    <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-                                      <%= process.env.action %>
-                                        <span class="caret"></span>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                      <li class="dropdown-submenu" style="margin: 2px;">
-                                        <form method="POST" action="/edit_payment">
-                                          <input type="hidden" name="payment_id" value="<%=entry._id%>" />
-                                          <button type="submit" class="btn btn-default" style="width: 100%;">
-                                            <i class="fas fa-pencil-alt">
-                                            </i>
-                                            <%= process.env.edit %>
-                                          </button>
-                                        </form>
-                                      </li>
-                                      <li class="dropdown-submenu" style="margin: 2px;">
-                                        <form>
-                                          <button type="button" class="btn btn-default" style="width: 100%;"
-                                            onclick="view_admin('<%= entry.sequence_id %>','<%= entry.name %>','<%= entry.phone %>','<%= entry.email %>','<%= entry.user_name %>',
+      <div id="tbl_parent_div">
+        <div class="col-md-12">
+          <div class="card">
+            <div>
+              <table class="table table-bordered table-hover" id="tbl_data">
+                <thead>
+                  <tr>
+                    <th>
+                      <%= process.env.sequence_id %>
+                    </th>
+                    <th>
+                      Doctor
+                    </th>
+                    <th>
+                      Reciver Phone
+                    </th>
+                    <th>
+                      Patient
+                    </th>
+                    <th>
+                      Sender Phone
+                    </th>
+                    <th>
+                      Amount
+                    </th>
+                    <th>
+                      payment method
+                    </th>
+                    <th>
+                      <%= process.env.title_status %>
+                    </th>
+                    <th>
+                      <%= process.env.created_date %>
+                    </th>
+                    <th>
+                      <%= process.env.action %>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% detail.forEach(function(entry) { %>
+                    <tr>
+                      <td>
+                        <%= entry.sequence_id %>
+                      </td>
+                      <td>
+                        <%= entry.doctor_name %>
+                      </td>
+                      <td>
+                        <%= entry.reciver_phone %>
+                      </td>
+                      <td>
+                        <%= entry.patient_name %>
+                      </td>
+                      <td>
+                        <%= entry.sender_phone %>
+                      </td>
+                      <td>
+                        <%= entry.amount %>
+                      </td>
+                      <td>
+                        <%= entry.payment_method %>
+                      </td>
+                      <td>
+                        <% if (entry.status=="0" ) { %>
+                          <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
+                            Pending
+                          </span>
+                          <% } else if (entry.status=="1" ) { %>
+                            <span class="system-bottons" style="padding: 5px; border-radius: 4px;">
+                              Paid
+                            </span>
+                            <% } else { %>
+                              <span class="btn-danger" style="padding: 5px; border-radius: 4px;">
+                                Failed
+                              </span>
+                              <% } %>
+                      </td>
+
+                      <td style="width: 100px;">
+                        <%= moment(entry.create_date).format("hh:mm a") %></br>
+                          <%= moment(entry.create_date).format("DD-MM-YYYY") %>
+                      </td>
+                      <td>
+                        <% if(admin_type==0 ) { %>
+                          <div>
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                              <%= process.env.action %>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                              <li class="dropdown-submenu" style="margin: 2px;">
+                                <form method="POST" action="/edit_payment">
+                                  <input type="hidden" name="payment_id" value="<%=entry._id%>" />
+                                  <button type="submit" class="btn btn-default" style="width: 100%;">
+                                    <i class="fas fa-pencil-alt">
+                                    </i>
+                                    <%= process.env.edit %>
+                                  </button>
+                                </form>
+                              </li>
+                              <li class="dropdown-submenu" style="margin: 2px;">
+                                <form>
+                                  <button type="button" class="btn btn-default" style="width: 100%;"
+                                    onclick="view_admin('<%= entry.sequence_id %>','<%= entry.name %>','<%= entry.phone %>','<%= entry.email %>','<%= entry.user_name %>',
                                             '<%= entry.experience_years %>','<%= entry.consultation_fee %>',
                                             '<%= entry.picture %>', '<%= entry.address %>','<%= entry.extra_detail %>')">
-                                            <i class="fas fa-folder">
-                                            </i>
-                                            <%= process.env.view %>
-                                          </button>
-    
-                                        </form>
-                                      </li>
-                                      <li class="dropdown-submenu" style="margin: 2px;">
-                                        <form method="POST" action="/delete_payment">
-                                          <input type="hidden" name="payment_id" value="<%=entry._id%>" />
-                                          <button type="submit" class="btn btn-default" style="width: 100%;">
-                                            <i class="fas fa-trash">
-                                            </i>
-                                             delete
-                                          </button>
-                                        </form>
-                                      </li>
-                                     
-                                    </ul>
-                                  </div>
-                                  <% }%>
-                              </td>
-                            </tr>
-                            <% }) %>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                                    <i class="fas fa-folder">
+                                    </i>
+                                    <%= process.env.view %>
+                                  </button>
+
+                                </form>
+                              </li>
+                              <li class="dropdown-submenu" style="margin: 2px;">
+                                <!-- <form method="POST" action="/delete_payment">
+                                          <input type="hidden" name="payment_id" value="<%=entry._id%>" /> -->
+                                <button type="button" class="btn btn-default" style="width: 100%;" data-toggle="modal"
+                                  data-target="#deletePaymentModal"
+                                 data-id="<%= entry._id %>">
+                                  <i class="fas fa-trash"></i> Delete
+                                </button>
+                                <!-- </form> -->
+                              </li>
+
+                            </ul>
+                          </div>
+                          <% }%>
+                      </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div class="modal" id="userViewModal">
-          <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-              <!-- Modal Header -->
-              <div class="modal-header">
-                <h4 class="modal-title">
-                  <%= process.env.extra_detail %>
-                </h4>
-                <button type="button" class="close" data-dismiss="modal">×</button>
-              </div>
-              <!-- Modal body -->
-              <div class="modal-body">
-                <div class="row">
-                  <div class="col-md-5">
+    <div class="modal" id="userViewModal">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">
+              <%= process.env.extra_detail %>
+            </h4>
+            <button type="button" class="close" data-dismiss="modal">×</button>
+          </div>
+          <!-- Modal body -->
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-5">
 
-                    <!-- Profile Image -->
-                    <div class="card card-primary card-outline">
-                      <div class="card-body box-profile">
-                        <div class="text-center">
-                          <img id="vAdminImage" class="profile-user-img img-fluid img-circle"
-                            src="../../dist/img/avatar5.png" alt="Profile picture">
-                        </div>
-
-                        <ul class="list-group list-group-unbordered mb-3">
-                          <li class="list-group-item">
-                            <b>
-                              <%= process.env.sequence_id %>
-                            </b> <a class="float-right" id="vDoctorId"></a>
-                          </li>
-                          <li class="list-group-item">
-                            <b>
-                              <%= process.env.title_name %>
-                            </b> <a class="float-right" id="vDoctorName"></a>
-                          </li>
-                          <li class="list-group-item">
-                            <b>
-                              <%= process.env.phone %>
-                            </b> <a class="float-right" id="vDoctorPhone"></a>
-                          </li>
-                          <li class="list-group-item">
-                            <b>
-                              <%= process.env.email %>
-                            </b> <a class="float-right" id="vDoctorEmail"></a>
-                          </li>
-                          <li class="list-group-item">
-                            <b>
-                              <%= process.env.user_name %>
-                            </b> <a class="float-right" id="vDoctorUsername"></a>
-                          </li>
-                          <li class="list-group-item">
-                            <b>
-                                Experience Years
-                            </b> <a class="float-right" id="vDoctorexperience_years"></a>
-                          </li>
-                          <li class="list-group-item">
-                            <b>
-                                Consultation Fee
-                            </b> <a class="float-right" id="vDoctorconsultation_fee"></a>
-                          </li>
-                        
-                        </ul>
-                      </div>
-                      <!-- /.card-body -->
+                <!-- Profile Image -->
+                <div class="card card-primary card-outline">
+                  <div class="card-body box-profile">
+                    <div class="text-center">
+                      <img id="vAdminImage" class="profile-user-img img-fluid img-circle"
+                        src="../../dist/img/avatar5.png" alt="Profile picture">
                     </div>
-                    <!-- /.card -->
+
+                    <ul class="list-group list-group-unbordered mb-3">
+                      <li class="list-group-item">
+                        <b>
+                          <%= process.env.sequence_id %>
+                        </b> <a class="float-right" id="vDoctorId"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>
+                          <%= process.env.title_name %>
+                        </b> <a class="float-right" id="vDoctorName"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>
+                          <%= process.env.phone %>
+                        </b> <a class="float-right" id="vDoctorPhone"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>
+                          <%= process.env.email %>
+                        </b> <a class="float-right" id="vDoctorEmail"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>
+                          <%= process.env.user_name %>
+                        </b> <a class="float-right" id="vDoctorUsername"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>
+                          Experience Years
+                        </b> <a class="float-right" id="vDoctorexperience_years"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>
+                          Consultation Fee
+                        </b> <a class="float-right" id="vDoctorconsultation_fee"></a>
+                      </li>
+
+                    </ul>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
 
 
-                    <!-- /.card -->
+                <!-- /.card -->
+              </div>
+              <!-- /.col -->
+              <div class="col-md-7">
+                <!-- About Me Box -->
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">More about..</h3>
                   </div>
-                  <!-- /.col -->
-                  <div class="col-md-7">
-                    <!-- About Me Box -->
-                    <div class="card card-primary">
-                      <div class="card-header">
-                        <h3 class="card-title">More about..</h3>
-                      </div>
-                      <!-- /.card-header -->
-                      <div class="card-body">                                              
-                        <strong><i class="far fa-file-alt mr-1"></i>
-                          <%= process.env.extra_detail %>
-                        </strong>
-                        <p class="text-muted" id="vAdminExtraDetail"></p>
-                      </div>
-                      <!-- /.card-body -->
-                    </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    <strong><i class="far fa-file-alt mr-1"></i>
+                      <%= process.env.extra_detail %>
+                    </strong>
+                    <p class="text-muted" id="vAdminExtraDetail"></p>
                   </div>
-                  <!-- /.col -->
+                  <!-- /.card-body -->
                 </div>
               </div>
-
-              <!-- Modal footer -->
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-              </div>
-
+              <!-- /.col -->
             </div>
           </div>
-        </div>
 
-        <div class="modal" id="adminChangePassModal">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <!-- Modal Header -->
-              <div class="modal-header">
-                <h4 class="modal-title">
-                  <%= process.env.change_password %>
-                </h4>
-                <button type="button" class="close" data-dismiss="modal">×</button>
-              </div>
-              <form class="form-data">
-                <input type="hidden" id="admin_id" name="admin_id" class="form-control" required>
-                <!-- Modal body -->
-                <div class="modal-body">
-                  <div class="form-group">
-                    <label for="password">
-                      <%= process.env.new_password %>
-                    </label>
-                    <input type="password" id="new_password" name="new_password" class="form-control" required>
-                  </div>
-                  <!-- /.col -->
-                </div>
-
-                <!-- Modal footer -->
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" onclick="change_admin_pass()" >
-                    <%= process.env.change_password %>
-                  </button>
-                </div>
-              </form>
-
-            </div>
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
           </div>
+
         </div>
+      </div>
+    </div>
+
+    <div class="modal" id="adminChangePassModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">
+              <%= process.env.change_password %>
+            </h4>
+            <button type="button" class="close" data-dismiss="modal">×</button>
+          </div>
+          <form class="form-data">
+            <input type="hidden" id="admin_id" name="admin_id" class="form-control" required>
+            <!-- Modal body -->
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="password">
+                  <%= process.env.new_password %>
+                </label>
+                <input type="password" id="new_password" name="new_password" class="form-control" required>
+              </div>
+              <!-- /.col -->
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" onclick="change_admin_pass()">
+                <%= process.env.change_password %>
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
     </div>
   </section>
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deletePaymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius: 12px; text-align: center; padding: 20px;">
+        <div class="modal-body">
+          <div style="font-size: 50px; color: red; margin-bottom: 15px;">
+            <i class="fas fa-trash"></i>
+          </div>
+          <h5 style="font-weight: 600; margin-bottom: 10px;">You are about to delete this payment</h5>
+          <p style="color: #666;">This will remove the payment record permanently.<br>Are you sure?</p>
+          <form method="POST" action="/delete_payment">
+            <input type="hidden" name="payment_id" id="modalPaymentId">
+
+            <div class="d-flex justify-content-center mt-4" style="gap: 10px;">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                style="border-radius: 6px; padding: 6px 20px;">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-danger" style="border-radius: 6px; padding: 6px 20px;">
+                Delete
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     function genetare_admin_excel() {
       $.ajax({
@@ -447,7 +474,7 @@
       }
     }
 
-    function view_admin(sequence_id, name, phone, email,user_name, experience_years, consultation_fee, picture,extra_detail) {
+    function view_admin(sequence_id, name, phone, email, user_name, experience_years, consultation_fee, picture, extra_detail) {
       $("#vAdminImage").attr('src', picture);
       $("#vDoctorId").text(sequence_id);
       $("#vDoctorName").text(name);
@@ -464,6 +491,14 @@
       $("#admin_id").val(admin_id);
       $('#adminChangePassModal').modal('show');
     }
+  </script>
+  <script>
+    $('#deletePaymentModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget);
+      var paymentId = button.data('id');
+      var modal = $(this);
+      modal.find('#modalPaymentId').val(paymentId);
+    });
   </script>
   <!-- /.content -->
   <% include footer.html %>
