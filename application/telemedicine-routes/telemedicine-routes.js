@@ -264,6 +264,7 @@ module.exports = function (app) {
   app.route('/doctor_notification').post(adminController.doctor_notification)
   app.route('/save_message').post(adminController.save_message)
 
+  app.route('/allAppointments').post(adminController.allAppointments)
 
 
 }

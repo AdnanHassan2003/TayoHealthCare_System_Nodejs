@@ -37,6 +37,7 @@ const { utils } = require('xlsx')
 const { group, Console } = require('console')
 const message = require('../model/message')
 const path = require('path')
+const cons = require('consolidate')
 // const sendCallNotification = require('../nofications/fcmSender')
 
 // const { utils } = require('xlsx/types')
@@ -7338,4 +7339,79 @@ exports.save_message = function (req, res) {
             .catch(error => {
                 console.error("Error saving message:", error);
             });
+        }
+exports.allAppointments = function(req, res) {
+    Appointment.aggregate([
+        {
+            $lookup: {
+                from: "doctors",
+                localField: "doctor_id",
+                foreignField: "_id",
+                as: "doctor_data"
+            }
+        },
+        { $unwind: "$doctor_data" },
+        {
+            $lookup: {
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient_data"
+            }
+        },
+        { $unwind: "$patient_data" },
+        {
+            $lookup: {
+                from: "shifts",
+                localField: "shifts_id",
+                foreignField: "_id",
+                as: "shifts_data"
+            }
+        },
+        { $unwind: "$shifts_data" },
+        {
+            $project: {
+                _id: 1,
+                doctor_name: "$doctor_data.name",
+                doctor_profile: "$doctor_data.picture",
+                patient_name: "$patient_data.name",
+                patient_token: "$patient_data.token",
+                doctor_token: "$doctor_data.token",
+                patient_id: "$patient_data._id",
+                patient_phone: "$patient_data.phone",
+                doctor_phone: "$doctor_data.phone",
+                doctor_id: "$doctor_data._id",
+                shift_time: "$shifts_data.time",
+                shift_day: "$shifts_data.day",
+                shift_id: "$shifts_data._id",
+                patient_Gender: "$patient_data.gender",
+                patient_Age: "$patient_data.age",
+                sequence_id: 1,
+                appointment_date: 1,
+                status: 1,
+                create_date: 1
+            }
+        }
+    ]).then((appointments) => {
+        console.log("Appointments fetched:", appointments);
+        if (appointments.length > 0) {
+            res.send({
+                success: true,
+                message: "Successfully fetched all appointments.",
+                record: appointments
+            });
+        } else {
+            res.send({
+                success: false,
+                message: "No appointments found."
+            });
+        }
+    }).catch((err) => {
+        console.error("Error fetching appointments:", err);
+        res.status(500).send({
+            success: false,
+            message: "Error fetching appointments.",
+            error: err.message
+        });
+    });
 };

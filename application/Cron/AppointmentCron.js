@@ -3,16 +3,16 @@ var Patient = require("../model/patient.js");
 var Doctor = require("../model/doctor.js");
 var Shifts = require("../model/shifts.js");
 var cron = require("node-cron");
-var send_notification = require("../controller/utils.js");
+const { send_notification } = require("../controller/utils.js");
 var moment = require("moment");
-
+const cons = require("consolidate");
 function scheduleAppointmentReminders() {
   cron.schedule("* * * * *", async () => {
     console.log("🚀 appointment reminder cron triggered");
 
     try {
-      const now = moment();
-      const fiveMinutesLater = moment().add(5, "minutes");
+      const now = moment().tz("Africa/Nairobi");  // Set to Africa/Nairobi time zone
+      const fiveMinutesLater = moment().add(5, "minutes").tz("Africa/Nairobi");
 
       const appointments = await Appointment.find({
         reminderSent: { $ne: true },
@@ -20,6 +20,7 @@ function scheduleAppointmentReminders() {
       });
 
       for (const appt of appointments) {
+        console.log(`🔍 Checking appointment ${appt._id} for reminders`);
         const patient = await Patient.findById(appt.patient_id);
         const doctor = await Doctor.findById(appt.doctor_id);
         const shift = appt.shifts_id
@@ -28,12 +29,15 @@ function scheduleAppointmentReminders() {
 
         if (!shift) continue;
 
-        const today = moment().format("dddd");
+        const today = moment().tz("Africa/Nairobi").format("dddd");  // Ensure today is in your local time zone
         if (shift.day !== today) continue;
 
-        const shiftTimeMoment = moment(shift.time, "hh:mm A");
+        const shiftTimeMoment = moment.tz(shift.time, "hh:mm A", "Africa/Nairobi");  // Set shift time to local time zone
+        console.log(
+          `🔍 Shift time for ${shift.day} is ${shift.time} (${shiftTimeMoment.format("HH:mm")})`
+        );
 
-        const shiftToday = moment().set({
+        const shiftToday = moment().tz("Africa/Nairobi").set({
           hour: shiftTimeMoment.get("hour"),
           minute: shiftTimeMoment.get("minute"),
           second: 0,

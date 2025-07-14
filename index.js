@@ -3,11 +3,12 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development";
 // Setup server port
 var port = process.env.PORT || 2003;
 //console.log("process.env.NODE_ENV",process.env.NODE_ENV)
+const {scheduleAppointmentReminders} = require("./application/Cron/AppointmentCron.js");
 var mongoose = require("./config/mongoose");
 express = require("./config/express"),
     db = mongoose(),
     app = express();
-    require("./application/Cron/AppointmentCron.js");
+   scheduleAppointmentReminders()
 
 app.get('*', function (req, res) {
     res.render("404");
