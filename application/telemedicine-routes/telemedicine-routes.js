@@ -260,6 +260,10 @@ module.exports = function (app) {
   app.route('/forget_Password').post(adminController.forget_Password)
   app.route('/VerifyOtp').post(adminController.VerifyOtp)
   app.route('/resetPassword').post(adminController.resetPassword)
+  app.route('/patient_notification').post(adminController.patient_notification)
+  app.route('/doctor_notification').post(adminController.doctor_notification)
+  app.route('/save_message').post(adminController.save_message)
+
 
 
 }

@@ -5,7 +5,6 @@ var Schema = mongoose.Schema;
 messageschema = new Schema({
     sequence_id: {
         type: String,
-        
         lovercase: true,
         trim: true,
         required: true
@@ -19,8 +18,17 @@ messageschema = new Schema({
     token: {
         type: String
     },
-   
-  
+    patient_id: {
+        type: Schema.Types.ObjectId,
+    },
+    doctor_id: {
+        type: Schema.Types.ObjectId,
+    },
+    status: {
+        type: String,
+        enum: ['sent', 'delivered', 'read'],
+        default: 'sent'
+    },
     create_date: {
         type: Date,
         default: Date.now

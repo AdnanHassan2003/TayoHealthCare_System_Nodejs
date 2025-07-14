@@ -7195,3 +7195,147 @@ exports.resetPassword = async function (req, res) {
         userId: user._id
     });
 }
+
+
+///patient_notification
+
+exports.patient_notification = function(req, res){
+        Message.aggregate([
+
+            {
+                $match: {
+                    "patient_id": ObjectId(req.body.patient_id)
+                }
+            },
+                
+                {$lookup:{
+                
+                from:"patients",
+                localField:"patient_id",
+                foreignField:"_id",
+                as:"patient_data"
+            
+                }},
+                
+                {$unwind:"$patient_data"},
+                
+                
+                {$project:{
+                    _id:1,
+                    patient_name:"$patient_data.name",
+                    patient_token:"$patient_data.token",
+                    patient_id:"$patient_data._id",
+                    patient_phone:"$patient_data.phone",
+                    patient_profile:"$patient_data.picture",
+                    patient_Gender: "$patient_data.gender",
+                    patient_Age: "$patient_data.age",
+                    sequence_id:1,
+                    title: 1,
+                    message :1,
+                    status:1,
+                    create_date:1
+                          
+                    }}
+            
+            ]).then((message_data)=>{
+
+                if(message_data){
+
+                    res.send({
+                        success:true,
+                        message:"Successfully to fetch All Appointements for Patient",
+                        record:message_data
+                    })
+                }else{
+                    res.send({
+                        success:false,
+                        message:"Sorry! to fetch Appointements for Patient"
+                    })
+        
+                }
+
+
+            })
+            
+}
+
+exports.doctor_notification = function(req, res){
+        Message.aggregate([
+
+            {
+                $match: {
+                    "doctor_id": ObjectId(req.body.doctor_id)
+                }
+            },
+
+            {$lookup:{
+                
+                from:"doctors",
+                localField:"doctor_id",
+                foreignField:"_id",
+                as:"doctor_data"
+            
+                }},
+                
+                {$unwind:"$doctor_data"},
+                
+                
+                
+                {$project:{
+                    _id:1,
+                    doctor_name:"$doctor_data.name",
+                    doctor_profile:"$doctor_data.picture",
+                    doctor_token:"$doctor_data.token",
+                    doctor_phone:"$doctor_data.phone",
+                    doctor_id:"$doctor_data._id",
+                    sequence_id:1,
+                    title: 1,
+                    message :1,
+                    status:1,
+                    create_date:1
+                          
+                    }}
+            
+            ]).then((message_data)=>{
+
+                if(message_data){
+
+                    res.send({
+                        success:true,
+                        message:"Successfully to fetch All Appointements for Patient",
+                        record:message_data
+                    })
+                }else{
+                    res.send({
+                        success:false,
+                        message:"Sorry! to fetch Appointements for Patient"
+                    })
+        
+                }
+
+
+            })
+            
+}
+
+
+exports.save_message = function (req, res) {
+        console.log("Request body:", req.body);
+        const message = new Message({
+            title: req.body.title,
+            message: req.body.message,
+            sequence_id: Utils.get_unique_id(),
+            patient_id: req.body.patient_id,  // Optional
+            doctor_id: req.body.doctor_id,   // Optional
+        });
+        message.save()
+            .then((messageData) => {
+                res.send({
+                    success: true,
+                     data: messageData,
+                })
+            })
+            .catch(error => {
+                console.error("Error saving message:", error);
+            });
+};
