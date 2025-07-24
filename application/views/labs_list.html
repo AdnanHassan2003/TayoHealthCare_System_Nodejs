@@ -19,7 +19,7 @@
                   <th>Doctor</th>
                   <th>Patient</th>
                   <th>Date</th>
-                  <th>Extra Detail</th>
+                  <!-- <th>Extra Detail</th> -->
                   <th>Action</th>
                 </tr>
               </thead>
@@ -37,7 +37,7 @@
                     <td><%= entry.doctor_name %></td>
                     <td><%= entry.patient_name %></td>
                     <td><%= moment(entry.create_date).format('DD-MM-YYYY') %></td>
-                    <td><%= entry.extra_detail %></td>
+                    <!-- <td><%= entry.extra_detail %></td> -->
                     <td>
                       <% if(admin_type==0 ) { %>
                         <div>

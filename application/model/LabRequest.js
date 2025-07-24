@@ -32,7 +32,6 @@ const labRequestSchema = new Schema({
             description: String,
             priority: {
                 type: String,
-                enum: ['routine', 'urgent'],
                 default: 'routine'
             }
         }

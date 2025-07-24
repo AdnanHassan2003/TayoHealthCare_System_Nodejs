@@ -6219,26 +6219,7 @@ exports.save_prescription = function(req, res) {
         });
     }
 };
-//   exports.update_prescription = function(req,res){
-//     var duration = req.body.duration
-//     var medicine_name=req.body.medicine_name
-//     var dosage = req.body.dosage
-//     Prescription.findOneAndUpdate({_id:req.body._id}, { $set: { duration:duration,medicine_name:medicine_name,dosage:dosage } }).then((update_prescription)=>{
-//         if(update_prescription){
-//             res.send({
-//                 success:true,
-//                 message:"Successfully to update  prescription",
-//                 record:update_prescription
-//             })
-//         }else{
-//             res.send({
-//                 success:false,
-//                 message:"Sorry! not update prescription"
-//             })
-//         }
 
-//     })
-// }
 
 //Api get all prescriptions patient
 exports.patient_prescription = function(req, res){
@@ -6248,6 +6229,7 @@ exports.patient_prescription = function(req, res){
             $match: {
                 "patient_id": ObjectId(req.body.patient_id),
                  "doctor_id": ObjectId(req.body.doctor_id),
+                 "appointment_id": ObjectId(req.body.appointment_id),
             }
         },
 
@@ -6350,7 +6332,9 @@ exports.doctor_prescriptions = function(req, res){
 
         {
             $match: {
-                "doctor_id": ObjectId(req.body.doctor_id)
+                  "patient_id": ObjectId(req.body.patient_id),
+                 "doctor_id": ObjectId(req.body.doctor_id),
+                 "appointment_id": ObjectId(req.body.appointment_id),
             }
         },
         {$lookup:{
@@ -6787,7 +6771,6 @@ exports.save_LabRequest = function(req, res) {
                 message: "Requested tests array is required"
             });
         }
-
         // Validate each test in the array
         const testsValidation = req.body.requested_tests.every(test => {
             return test.test_name && test.description && test.priority;
