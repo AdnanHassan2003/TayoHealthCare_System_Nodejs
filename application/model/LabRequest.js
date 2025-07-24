@@ -38,8 +38,6 @@ const labRequestSchema = new Schema({
     ],
     status: {
         type: String,
-        enum: ['pending', 'completed', 'cancelled'],
-        default: 'pending'
     },
     notes: {
         type: String
