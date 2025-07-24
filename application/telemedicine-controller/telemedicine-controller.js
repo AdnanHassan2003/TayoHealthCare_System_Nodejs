@@ -5911,7 +5911,7 @@ exports.re_appointment = function (req, res) {
         else if(req.body.status==4){
             Appointment.findOneAndUpdate(
               { _id: req.body._id },
-              { $set: { status: req.body.status, appointment_date: req.body.appointment_date, shifts_id:req.body.shifts_id } },
+              { $set: { status: req.body.status,appointment_date: req.body.appointment_date, shifts_id:req.body.shifts_id,reminderSent:false} },
               { new: true }
             ).then((data_re_appointment) => {
       

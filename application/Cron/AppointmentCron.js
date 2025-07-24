@@ -16,7 +16,7 @@ function scheduleAppointmentReminders() {
 
       const appointments = await Appointment.find({
         reminderSent: { $ne: true },
-        status: 1,
+        status: { $in: [1, 4] }
       });
 
       for (const appt of appointments) {
