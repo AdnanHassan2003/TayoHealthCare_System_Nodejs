@@ -200,7 +200,7 @@
                         </label>
                         <select class="form-control custom-select2" id="doctor_id" name="doctor_id" required>
                             <% if(doctor_data.length > 0){  %>
-                              <option>Select Hospital</option>
+                              <option value="">Select Hospital</option>
                               <% doctor_data.forEach(function(data){%>
                                
                           <option value="<%=data._id%>"  ><%=data.name%></option>

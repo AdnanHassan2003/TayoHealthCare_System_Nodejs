@@ -247,7 +247,7 @@
                         </label>
                         <select class="form-control custom-select2" id="hospital_id" name="hospital_id" required>
                             <% if(hospital_data.length > 0){  %>
-                              <option>Select Hospital</option>
+                              <option value="">Select Hospital</option>
                               <% hospital_data.forEach(function(data){%>
                                
                           <option value="<%=data._id%>"  ><%=data.name%></option>
@@ -267,9 +267,8 @@
                         </label>
                         <select class="form-control custom-select2" id="speciality_id" name="speciality_id" required>
                             <% if(speciality_data.length > 0){  %>
-                              <option>Select Speciality</option>
+                               <option value="" >Select Speciality</option>
                               <% speciality_data.forEach(function(data){%>
-                               
                           <option value="<%=data._id%>"  ><%=data.name%></option>
                           <%})%>
                           <%}%>
