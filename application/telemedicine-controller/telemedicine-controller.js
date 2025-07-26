@@ -4509,14 +4509,13 @@ exports.patient_appointements = function(req, res){
                     shift_time:"$shifts_data.time",
                     shift_day:"$shifts_data.day",
                     patient_Gender: "$patient_data.gender",
-                patient_Age: "$patient_data.age",
+                    patient_Age: "$patient_data.age",
                     sequence_id:1,
                     appointment_date:1,
                     status:1,
+                    is_reviewed:1,
                     create_date:1
-                          
-                    }}
-            
+                }}
             ]).then((appointment_data)=>{
 
                 if(appointment_data){
@@ -7442,6 +7441,7 @@ exports.allAppointments = function(req, res) {
                 patient_Age: "$patient_data.age",
                 sequence_id: 1,
                 appointment_date: 1,
+                is_reviewed: 1,
                 status: 1,
                 create_date: 1
             }
