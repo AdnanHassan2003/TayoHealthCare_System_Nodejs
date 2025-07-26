@@ -66,7 +66,36 @@
                 method="post" action="/speciality_list">
                 <div class="row">
                     <div class="col-md-6">
-               
+                        <div style="text-align: center;">
+                  <label>
+                    <%= process.env.search_filter %>
+                  </label>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <select class="form-control select2" style="width: 100%;" name="search_item" id="search_item">
+                      <% if(search_item=="name" ) { %>
+                        <option value="email" selected="selected">
+                          name
+                        </option>
+                        <option value="sequence_id">
+                          <%= process.env.sequence_id %>
+                        </option>
+                      <% } else { %>
+                            <option value="name">
+                              name
+                            </option>
+                            <option value="sequence_id" selected="selected">
+                              <%= process.env.sequence_id %>
+                            </option>
+                            <% }%>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <input type="text" class="form-control" placeholder="<%= process.env.search_value %>"
+                      name="search_value" value="<%= search_value %>" id="search_value">
+                  </div>
+                </div>
                     </div>
                     <!-- /.col -->
                     <div class="col-md-2">

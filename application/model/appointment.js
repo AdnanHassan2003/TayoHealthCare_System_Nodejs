@@ -22,6 +22,10 @@ appointmentschema = new Schema({
     shifts_id: {
         type: Schema.Types.ObjectId,
     },  
+    is_reviewed: {
+        type: Boolean,
+        default: false
+    },
     status: {
         type: Number,
         default: 1,

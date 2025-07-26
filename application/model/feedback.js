@@ -15,7 +15,9 @@ feedbackschema = new Schema({
     patient_id: {
         type: Schema.Types.ObjectId,
     },
-    
+    appointment_id: {
+        type: Schema.Types.ObjectId,
+    },
     rating: {
         type: Number,
         required: true,

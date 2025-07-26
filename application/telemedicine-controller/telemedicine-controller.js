@@ -1406,8 +1406,70 @@ exports.selfmanagment_list = function(req, res){
 exports.speciality_list = function(req, res){
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Speciality.find({}).then((speciality_data)=>{
-                console.log("dataaa :", speciality_data)
+              if (req.body.search_item == undefined) {
+                search_item = "sequence_id";
+                search_value = req.body.search_value;
+                start_date = "";
+                end_date = "";
+            } else {
+                search_item = req.body.search_item;
+                search_value = req.body.search_value;
+                start_date = req.body.start_date;
+                end_date = req.body.end_date;
+            }
+            if (req.body.start_date == undefined && req.body.end_date == undefined) {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else if (req.body.start_date == "" || req.body.end_date == "") {
+                var now = new Date(Date.now());
+                var date = now.addHours();
+                start_date = date.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                end_date = date.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            } else {
+                var sdate = new Date(req.body.start_date);
+                start_date = sdate.setHours(0, 0, 0, 0);   // Set hours, minutes and seconds
+                start_date = new Date(start_date)
+
+                var edate = new Date(req.body.end_date);
+                end_date = edate.setHours(23, 59, 59, 59);   // Set hours, minutes and seconds
+                end_date = new Date(end_date)
+            }
+
+            //var date_filter = { "$match": { "create_date": { $gte: start_date, $lte: end_date } } };
+
+            f_start_date = moment(start_date).format("YYYY-MM-DD");
+            f_end_date = moment(end_date).format("YYYY-MM-DD");
+
+            //order by sequecy number
+            var sort = { "$sort": {} };
+            sort["$sort"]["_id"] = parseInt(-1);
+
+            //query search
+            var query_search = { "$match": {} };
+
+            if (search_item == 'name') {
+                if (search_value != undefined && search_value != '') {
+                    search_value = search_value.replace(/^\s+|\s+$/g, '');
+                    search_value = search_value.replace(/ +(?= )/g, '');
+                    query_search["$match"][search_item] = { $regex: new RegExp(search_value, 'i') };
+                }
+            } else {
+                if (search_value != undefined && search_value != '') {
+                    query_search["$match"][search_item] = search_value;
+                }
+            }
+            Speciality.aggregate([
+                query_search,
+                sort
+            ]).then((speciality_data)=>{
                 res.render('speciality_list', {
                     url_data: req.session.menu_array,
                     detail: speciality_data,
@@ -5943,16 +6005,25 @@ exports.re_appointment = function (req, res) {
                             sequence_id: Utils.get_unique_id(),
                             doctor_id:req.body.doctor_id,
                             patient_id:req.body.patient_id,
+                            appointment_id:req.body.appointment_id,
                             rating:req.body.rating,
                         });
-                
                         feedback.save().then((feedback) => {
                             if(feedback){
                                 res.send({
                                     success:true,
                                     message:"Successfully to review this doctor",
                                     record:feedback
-                                })
+                                });
+                                Appointment.findOneAndUpdate(
+                                    { _id: feedback.appointment_id },
+                                    { $set: { is_reviewed: true } },
+                                    { new: true }
+                                ).then((updated_appointment) => {
+                                    if (updated_appointment) {
+                                        console.log("Appointment updated successfully");
+                                    }
+                                });
                             }
                             else{
                                 res.send({
