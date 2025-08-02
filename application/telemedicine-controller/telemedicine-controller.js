@@ -2161,11 +2161,8 @@ exports.save_user_data = function (req, res) {
 
 exports.save_doctor_data = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
-        console.log("yearrrrrrrrrrrrrrrrrrrrr")
-        console.log("phone", req.body.phone)
         if (response.success) {
             Doctor.findOne({ "phone": req.body.phone }).then((doctor) => {
-                console.log("user", doctor);
                 if (doctor) {
                     req.session.error = "Sorry, There is an admin with this phone, please check the phone";
                     Utils.redirect_login(req, res);
@@ -2756,7 +2753,7 @@ exports.edit_user = function (req, res) {
 exports.edit_doctor = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            Doctor.findOne({ _id: req.body.doctor_id }, { password: 0 }).then((doctor) => {
+            Doctor.findOne({ _id: req.body.doctor_id }).then((doctor) => {
                 Hospital.find({}).then((hospital)=>{
                     Speciality.find({}).then((speciality)=>{
 
@@ -2768,6 +2765,7 @@ exports.edit_doctor = function (req, res) {
                             systen_urls: systen_urls,
                             Hospital:hospital,
                             Speciality:speciality,
+                            url_data: req.session.menu_array,
                             hospital_id:doctor.hospital_id.toString(),
                             speciality_id:doctor.speciality_id.toString()
                     
