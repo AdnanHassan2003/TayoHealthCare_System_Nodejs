@@ -4174,16 +4174,16 @@ exports.appointmentReport = function(req, res){
                       _id: "$doctor_id",
                       doctor_name: { $first: "$appointmentReport.name" },
                       total_appointments: { $sum: 1 },
-                      total_Pending: {$sum: {$cond: [{ $eq: ["$status", 0] }, 1,0,] }},
                       total_confirm: {$sum: {$cond: [{ $eq: ["$status", 1] }, 1,0,] }},
-                      total_compelete: {$sum: {$cond: [{ $eq: ["$status", 2] }, 1,0,] }}
+                      total_compelete: {$sum: {$cond: [{ $eq: ["$status", 2] }, 1,0,] }},
+                      total_ReAppointment: {$sum: {$cond: [{ $eq: ["$status", 4] }, 1,0,] }}
                       }},
                       
                       {$project:{
                           _id:1,
                           doctor_name:1,
                           total_appointments:1,
-                          total_Pending:1,
+                          total_ReAppointment:1,
                           total_confirm:1,
                           total_compelete:1
                           }}
