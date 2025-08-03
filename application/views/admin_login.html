@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>
-    Tayo Health Care
+    Tayo Health Care - Admin Login
   </title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,27 +20,457 @@
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  
+  <!-- Clean Professional Login Styles -->
   <style type="text/css">
+    /* Clean Professional Login Page Styles */
+    body {
+      background: linear-gradient(135deg, #0e1635 0%, #008000 100%) !important;
+      min-height: 100vh;
+      font-family: 'Source Sans Pro', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Simple Background Elements */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 128, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(14, 22, 53, 0.1) 0%, transparent 50%);
+      z-index: -1;
+    }
+    
+    /* Floating Elements */
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .floating-circle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+    
+    .floating-circle:nth-child(1) {
+      width: 60px;
+      height: 60px;
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .floating-circle:nth-child(2) {
+      width: 40px;
+      height: 40px;
+      top: 70%;
+      right: 15%;
+      animation-delay: 3s;
+    }
+    
+    .floating-circle:nth-child(3) {
+      width: 80px;
+      height: 80px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 6s;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+        opacity: 0.3;
+      }
+      50% {
+        transform: translateY(-15px);
+        opacity: 0.6;
+      }
+    }
+    
+    /* Clean Login Box */
+    .login-box {
+      position: relative;
+      z-index: 2;
+      margin: 0 auto;
+      padding-top: 8vh;
+      max-width: 500px;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .login-logo {
+      text-align: center;
+      margin-bottom: 30px;
+    } 
+    
+    .login-logo img {
+      width: 150px !important;
+      height: 150px !important;
+      border-radius: 50% !important;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      transition: all 0.4s ease;
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes logoPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 12px 35px rgba(0, 128, 0, 0.3);
+      }
+    }
+    
+    .login-logo:hover img {
+      transform: scale(1.1);
+      box-shadow: 0 15px 40px rgba(0, 128, 0, 0.4);
+    }
+    
+    /* Clean Card Design */
+    .card {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: none !important;
+      border-radius: 15px !important;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+      overflow: hidden;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: slideInUp 0.8s ease 0.3s forwards;
+      transition: all 0.3s ease;
+    }
+    
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .login-card-body {
+      padding: 50px !important;
+    }
+    
+    /* Clean Form Styling */
+    .form-control {
+      background: #f8f9fa !important;
+      border: 2px solid #e9ecef !important;
+      border-radius: 10px !important;
+      color: #495057 !important;
+      padding: 12px 15px !important;
+      font-size: 14px !important;
+      transition: all 0.3s ease !important;
+      transform: translateX(0);
+    }
+    
+    .form-control::placeholder {
+      color: #6c757d !important;
+    }
+    
+    .form-control:focus {
+      background: white !important;
+      border-color: #008000 !important;
+      box-shadow: 0 0 0 3px rgba(0, 128, 0, 0.1) !important;
+      transform: translateY(-2px) translateX(5px);
+    }
+    
+    /* Input Group Styling */
+    .input-group-text {
+      background: #f8f9fa !important;
+      border: 2px solid #e9ecef !important;
+      border-radius: 10px !important;
+      color: #008000 !important;
+      transition: all 0.3s ease;
+    }
+    
+    .input-group:hover .input-group-text {
+      background: #008000 !important;
+      color: white !important;
+      transform: scale(1.05);
+    }
+    
+    .input-group .form-control {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    .input-group .input-group-text {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+    
+    /* Clean Button Styling */
     .system-bottons {
-      background: #008000;
-      color: white; 
+      background: linear-gradient(135deg, #008000 0%, #0e1635 100%) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 10px !important;
+      padding: 12px 25px !important;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      box-shadow: 0 4px 15px rgba(0, 128, 0, 0.3) !important;
+      transition: all 0.3s ease !important;
+      position: relative;
+      overflow: hidden;
     }
+    
+    .system-bottons::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
     .system-bottons:hover {
-      color: white;
+      transform: translateY(-3px) scale(1.02) !important;
+      box-shadow: 0 8px 25px rgba(0, 128, 0, 0.4) !important;
+      color: white !important;
     }
-   
+    
+    .system-bottons:hover::before {
+      left: 100%;
+    }
+    
+    .system-bottons:active {
+      transform: translateY(-1px) scale(0.98) !important;
+    }
+    
+    /* Clean Alert Styling */
+    .alert {
+      background: linear-gradient(135deg, #008000, #0e1635) !important;
+      border: none !important;
+      border-radius: 10px !important;
+      color: white !important;
+      box-shadow: 0 4px 15px rgba(0, 128, 0, 0.3) !important;
+      animation: slideInDown 0.5s ease;
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Loading Animation */
+    .loading {
+      position: relative;
+      color: transparent !important;
+    }
+    
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .login-box {
+        padding-top: 5vh;
+        margin: 0 20px;
+        max-width: 100%;
+      }
+      
+      .login-card-body {
+        padding: 40px 30px !important;
+      }
+      
+      .login-logo img {
+        width: 120px !important;
+        height: 120px !important;
+      }
+      
+      .floating-elements {
+        display: none;
+      }
+    }
+    
+    /* Form Group Spacing */
+    .form-group {
+      margin-bottom: 20px;
+      animation: fadeIn 0.6s ease;
+    }
+    
+    .form-group:nth-child(1) { animation-delay: 0.4s; }
+    .form-group:nth-child(2) { animation-delay: 0.6s; }
+    .form-group:nth-child(3) { animation-delay: 0.8s; }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    /* Remember Me Checkbox */
+    .icheck-primary {
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .icheck-primary:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Forgot Password Link */
+    .forgot-password {
+      text-align: center;
+      margin-top: 20px;
+      animation: fadeIn 0.6s ease 1s both;
+    }
+    
+    .forgot-password a {
+      color: #008000;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .forgot-password a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #008000;
+      transition: width 0.3s ease;
+    }
+    
+    .forgot-password a:hover {
+      color: #0e1635;
+    }
+    
+    .forgot-password a:hover::after {
+      width: 100%;
+    }
+    
+    /* Card Title */
+    .card-title {
+      color: #0e1635;
+      font-weight: 600;
+      margin-bottom: 25px;
+      animation: fadeIn 0.6s ease 0.2s both;
+      text-align: center !important;
+      width: 100% !important;
+      display: block !important;
+    }
+    
+    /* Logo Title */
+    .logo-title {
+      color: white;
+      font-weight: 700;
+      margin-top: 15px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      animation: fadeIn 0.6s ease 0.1s both;
+    }
+    
+    .logo-subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      margin-top: 5px;
+      animation: fadeIn 0.6s ease 0.2s both;
+    }
+    
+    /* Icon Animations */
+    .fas {
+      transition: all 0.3s ease;
+    }
+    
+    .input-group:hover .fas {
+      transform: scale(1.2) rotate(5deg);
+    }
+    
+    /* Button Icon Animation */
+    .system-bottons .fas {
+      transition: all 0.3s ease;
+    }
+    
+    .system-bottons:hover .fas {
+      transform: translateX(3px);
+    }
   </style>
   
-   <link href="Telemedicine .png" rel="icon">
-   
+  <link href="Telemedicine .png" rel="icon">
 </head>
 
-<body class="hold-transition login-page" style="background-color: white !important;" >
-
+<body class="hold-transition login-page">
+  <!-- Floating Elements -->
+  <div class="floating-elements">
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+  </div>
 
   <div class="login-box">
     <% if (typeof msg !='undefined' ) { %> 
-      <div class="alert alert-success alert-dismissible fade show" style="text-align: center; background-color: #008000;" role="alert">
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
         <strong>
           <%= msg %>
         </strong>
@@ -48,46 +478,71 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <% } %>
-        <div class="login-logo">
-          <img src="telemedicine.png" class="center img-circle elevation-2" style="display: block;
-      margin-left: auto;
-      margin-right: auto;
-      width: 55%; height: 185px;" alt="User Image">
-        </div>
-        <!-- /.login-logo -->
-        <div class="card">
-          <div class="card-body login-card-body">
-            <form class="form-horizontal" action="/admin" method="post">
-              <div class="input-group mb-3">
-                <input type="text" id="email" name="email" class="form-control" placeholder="Email or Phone" required>
-                <div class="input-group-append">
-                  <div class="input-group-text">
-                    <span class="fas fa-envelope"></span>
-                  </div>
+    <% } %>
+    
+    <div class="login-logo">
+      <img src="telemedicine.png" alt="Tayo Health Care Logo">
+      <h2 class="logo-title">Tayo Health Care</h2>
+      <p class="logo-subtitle">Healthcare Management System</p>
+    </div>
+    
+    <!-- Clean Login Card -->
+    <div class="card">
+      <div class="card-body login-card-body">
+        <h3 class="card-title text-center" style="text-align: center !important; margin: 0 auto 30px auto !important;">
+          <i class="fas fa-user-shield me-2" style="color: #008000;"></i>&nbsp; Admin Login
+        </h3>
+        
+        <form class="form-horizontal" action="/admin" method="post" id="loginForm">
+          <div class="form-group">
+            <div class="input-group">
+              <input type="text" id="email" name="email" class="form-control" placeholder="Email or Phone" required>
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-envelope"></span>
                 </div>
               </div>
-              <div class="input-group mb-3">
-                <input type="password" id="password" name="password" class="form-control" placeholder="Password"
-                  required>
-                <div class="input-group-append">
-                  <div class="input-group-text">
-                    <span class="fas fa-lock"></span>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-6">
-                </div>
-                <div class="col-6">
-                  <button type="submit" class="btn system-bottons btn-block">
-                    <%= process.env.sign_in %>
-                  </button>
-                </div>
-              </div>
-            </form>
+            </div>
           </div>
+          
+          <div class="form-group">
+            <div class="input-group">
+              <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <div class="row">
+              <div class="col-6">
+                <div class="icheck-primary">
+                  <input type="checkbox" id="remember" name="remember">
+                  <label for="remember" style="color: #6c757d; font-weight: 500; font-size: 14px;">
+                    Remember me
+                  </label>
+                </div>
+              </div>
+              <div class="col-6">
+                <button type="submit" class="btn system-bottons btn-block" id="loginBtn">
+                  <i class="fas fa-sign-in-alt me-2"></i>
+                  <%= process.env.sign_in %>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+        
+        <div class="forgot-password">
+          <a href="#" onclick="showForgotPassword()">
+            <i class="fas fa-key me-1"></i>Forgot Password?
+          </a>
         </div>
+      </div>
+    </div>
   </div>
 
   <!-- jQuery -->
@@ -96,7 +551,217 @@
   <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
   <script src="dist/js/adminlte.min.js"></script>
-
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  
+  <!-- Enhanced Login JavaScript with Animations -->
+  <script>
+    $(document).ready(function() {
+      // Form submission with loading animation
+      $('#loginForm').on('submit', function(e) {
+        const email = $('#email').val();
+        const password = $('#password').val();
+        
+        if (!email || !password) {
+          e.preventDefault();
+          Swal.fire({
+            title: 'Error!',
+            text: 'Please fill in all fields.',
+            icon: 'error',
+            confirmButtonColor: '#dc3545'
+          });
+          return;
+        }
+        
+        // Add loading animation
+        $('#loginBtn').addClass('loading');
+        $('#loginBtn').html('<i class="fas fa-spinner fa-spin me-2"></i>Signing In...');
+        
+        // Simulate loading time (remove in production)
+        setTimeout(() => {
+          $('#loginBtn').removeClass('loading');
+          $('#loginBtn').html('<i class="fas fa-sign-in-alt me-2"></i><%= process.env.sign_in %>');
+        }, 2000);
+      });
+      
+      // Input focus animations
+      $('.form-control').on('focus', function() {
+        $(this).parent().addClass('focused');
+        $(this).siblings('.input-group-text').addClass('focused');
+      });
+      
+      $('.form-control').on('blur', function() {
+        if (!$(this).val()) {
+          $(this).parent().removeClass('focused');
+          $(this).siblings('.input-group-text').removeClass('focused');
+        }
+      });
+      
+      // Enhanced card hover effect
+      $('.card').hover(
+        function() {
+          $(this).css('transform', 'translateY(-5px)');
+        },
+        function() {
+          $(this).css('transform', 'translateY(0)');
+        }
+      );
+      
+      // Logo click animation
+      $('.login-logo img').on('click', function() {
+        $(this).css('animation', 'none');
+        setTimeout(() => {
+          $(this).css('animation', 'logoPulse 3s ease-in-out infinite');
+        }, 10);
+      });
+      
+      // Input group hover effects
+      $('.input-group').hover(
+        function() {
+          $(this).find('.fas').addClass('animated');
+        },
+        function() {
+          $(this).find('.fas').removeClass('animated');
+        }
+      );
+      
+      // Remember me checkbox animation
+      $('#remember').on('change', function() {
+        if ($(this).is(':checked')) {
+          $(this).parent().addClass('checked');
+        } else {
+          $(this).parent().removeClass('checked');
+        }
+      });
+      
+      // Button click animation
+      $('#loginBtn').on('click', function() {
+        $(this).addClass('clicked');
+        setTimeout(() => {
+          $(this).removeClass('clicked');
+        }, 200);
+      });
+      
+      // Page load animations
+      setTimeout(() => {
+        $('.login-logo').addClass('loaded');
+      }, 500);
+      
+      setTimeout(() => {
+        $('.card').addClass('loaded');
+      }, 800);
+      
+      // Floating elements interaction
+      $('.floating-circle').on('mouseenter', function() {
+        $(this).css('animation-play-state', 'paused');
+      }).on('mouseleave', function() {
+        $(this).css('animation-play-state', 'running');
+      });
+    });
+    
+    // Forgot password function with animation
+    function showForgotPassword() {
+      // Button click animation
+      event.target.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        event.target.style.transform = 'scale(1)';
+      }, 150);
+      
+      Swal.fire({
+        title: 'Forgot Password?',
+        html: `
+          <div style="text-align: left; margin: 20px 0;">
+            <p>Please contact your system administrator to reset your password.</p>
+            <p><strong>Email:</strong> admin@tayohealth.com</p>
+            <p><strong>Phone:</strong> +252 61 123 4567</p>
+          </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#008000',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
+    }
+    
+    // Add CSS for additional animations
+    const additionalCSS = `
+      <style>
+        .focused {
+          transform: scale(1.02) !important;
+        }
+        
+        .animated {
+          animation: iconBounce 0.6s ease !important;
+        }
+        
+        @keyframes iconBounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-5px);
+          }
+          60% {
+            transform: translateY(-3px);
+          }
+        }
+        
+        .checked {
+          transform: scale(1.1) !important;
+          color: #008000 !important;
+        }
+        
+        .clicked {
+          transform: scale(0.95) !important;
+        }
+        
+        .loaded {
+          animation: loaded 0.5s ease forwards !important;
+        }
+        
+        @keyframes loaded {
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .login-logo {
+          opacity: 0;
+          transform: scale(0.8);
+          animation: logoLoad 0.8s ease 0.2s forwards;
+        }
+        
+        @keyframes logoLoad {
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .card {
+          opacity: 0;
+          transform: scale(0.9) translateY(20px);
+          animation: cardLoad 0.8s ease 0.5s forwards;
+        }
+        
+        @keyframes cardLoad {
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      </style>
+    `;
+    
+    // Inject additional CSS
+    $('head').append(additionalCSS);
+  </script>
 </body>
 
 </html>
