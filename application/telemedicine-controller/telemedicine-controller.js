@@ -1635,7 +1635,7 @@ exports.prescription_list = function(req, res){
 exports.labs_list = function(req, res){
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            labs.aggregate([
+            Labs.aggregate([
                 {
                     $lookup: {
                         from: "doctors",
