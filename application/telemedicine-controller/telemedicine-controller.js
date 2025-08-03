@@ -17,7 +17,7 @@ var Menu = require('mongoose').model('menu')
 const Bcrypt = require('bcryptjs');
 var moment = require('moment-timezone');
 const Prescription = require('mongoose').model('Prescription')
-const labs = require('mongoose').model('labs')
+const Labs = require('mongoose').model('labs')
 const labRequest =require ("mongoose").model("labRequest")
 var Excel = require('exceljs');
 var fs = require('fs');
@@ -3984,7 +3984,7 @@ exports.delete_prescription = function (req, res) {
 exports.delete_labs = function (req, res) {
     Utils.check_admin_token(req.session.admin, function (response) {
         if (response.success) {
-            labs.deleteOne({ _id: req.body.lab_id }).then((user) => {
+            Labs.deleteOne({ _id: req.body.labs_id }).then((user) => {
                 res.redirect("/labs_list")
             });
         } else {
