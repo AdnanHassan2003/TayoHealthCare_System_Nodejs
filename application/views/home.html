@@ -1,198 +1,872 @@
 <% include header.html %>
 
-
-<script>
-    function timeSince(date) {
-      date = new Date(date);
-      var seconds = Math.floor((new Date() - date) / 1000);
-
-      var interval = seconds / 31536000;
-
-      if (interval > 1) {
-        return Math.floor(interval) + " year(s) ago";
-      }
-      interval = seconds / 2592000;
-      if (interval > 1) {
-        return Math.floor(interval) + " month(s) ago";
-      }
-      interval = seconds / 86400;
-      if (interval > 1) {
-        return Math.floor(interval) + " day(s) ago";
-      }
-      interval = seconds / 3600;
-      if (interval > 1) {
-        return Math.floor(interval) + " hour(s) ago";
-      }
-      interval = seconds / 60;
-      if (interval > 1) {
-        return Math.floor(interval) + " minute(s) ago";
-      }
-      return Math.floor(seconds) + " second(s) ago";
-    }
-  </script>
-
 <!DOCTYPE html>
 <html lang="en">
-<head > 
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Tayo Health Care - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="colors.css">
     
-     <link rel="stylesheet" href="colors.css">
-
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #008000 0%, #0e1635 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin: 0 auto;
+            max-width: 1400px;
+        }
+        
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #008000, #0e1635);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #008000, #0e1635);
+        }
+        
+        .stats-card-body {
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .stats-icon.admin { background: linear-gradient(135deg, #008000, #0e1635); }
+        .stats-icon.doctor { background: linear-gradient(135deg, #008000, #6374e3); }
+        .stats-icon.patient { background: linear-gradient(135deg, #008000, #949ab0); }
+        .stats-icon.hospital { background: linear-gradient(135deg, #008000, #65d6ac); }
+        
+        .stats-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stats-change {
+            font-size: 0.8rem;
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .chart-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .chart-header {
+            background: linear-gradient(135deg, #008000, #0e1635);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .chart-body {
+            padding: 25px;
+        }
+        
+        .quick-stats {
+            background: linear-gradient(135deg, #008000, #0e1635);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-stats h3 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .quick-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .quick-stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recent-activities {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #008000, #0e1635);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+        }
+        
+        .activity-content h6 {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .activity-content p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .notification-badge {
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .dashboard-title {
+                font-size: 2rem;
+            }
+            
+            .stats-number {
+                font-size: 2rem;
+            }
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body data-bs-spy="scroll" data-bs-target=".navbar" data-bs-offset="70">
-  <form style="background-color: #ffffff; padding: 10px; margin-bottom:10px;" class="form-data" role="form"
-  method="post" action="/admin">
 
-    <div class="container">
+<body>
+    <div class="dashboard-container fade-in">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">
+                <i class="fas fa-hospital-alt me-3"></i>
+                Tayo Health Care Dashboard
+            </h1>
+            <p class="dashboard-subtitle">Welcome to your healthcare management system</p>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="quick-stats">
+            <h3><i class="fas fa-chart-line me-2"></i>Quick Overview</h3>
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-stat-item">
+                        <span>Today's Appointments</span>
+                        <span class="fw-bold">24</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-stat-item">
+                        <span>Pending Reviews</span>
+                        <span class="fw-bold">8</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-stat-item">
+                        <span>Revenue Today</span>
+                        <span class="fw-bold">$2,450</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-stat-item">
+                        <span>Active Sessions</span>
+                        <span class="fw-bold">12</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Stats Cards -->
         <div class="row">
-          <% if(TotalAdmin.length > 0) {%>
-            
-            
-            <div class="card " style="width: 280px; height: 160px; margin-left: 30px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-                <div class="card-body">   
-                    <img class="card-img-top " style="width: 50px; margin-left: 55px;" src="user.png" class="rounded-circle" alt="Card image">
-                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Admin</strong></h1>
-                    <br>
-                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;"><%= TotalAdmin[0].Total_Admin %></strong>    
-                </div>
-            </div>
-            <%} else {%>
-              <div class="card " style="width: 280px; height: 160px; margin-left: 30px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-                <div class="card-body">   
-                    <img class="card-img-top " style="width: 50px; margin-left: 55px;" src="user.png" class="rounded-circle" alt="Card image">
-                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Admin</strong></h1>
-                    <br>
-                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>    
-                </div>
-            </div>
-              <%}%>
-
-            <% if(TotalDoctor.length > 0) {%>
-            <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-                <div class="card-body">
-                    <img class="card-img-top" style="width: 50px; margin-left: 22%;" src="doctors1.png" class="rounded-circle" alt="Card image">
-                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Doctor</strong></h1>
-                    <br>
-                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;"><%= TotalDoctor[0].Total_Doctor %></strong>   
+            <!-- Total Admin Card -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-card-body">
+                        <div class="stats-icon admin">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="stats-title">Total Administrators</div>
+                        <div class="stats-number">
+                            <% if(TotalAdmin.length > 0) { %>
+                                <%= TotalAdmin[0].Total_Admin %>
+                            <% } else { %>
+                                0
+                            <% } %>
+                        </div>
+                        <div class="stats-change">
+                            <i class="fas fa-arrow-up"></i> +12% this month
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <%}else {%>
-              <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-                <div class="card-body">
-                    <img class="card-img-top" style="width: 50px; margin-left: 22%;" src="doctors1.png" class="rounded-circle" alt="Card image">
-                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Doctor</strong></h1>
-                    <br>
-                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>   
+            <!-- Total Doctor Card -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-card-body">
+                        <div class="stats-icon doctor">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="stats-title">Total Doctors</div>
+                        <div class="stats-number">
+                            <% if(TotalDoctor.length > 0) { %>
+                                <%= TotalDoctor[0].Total_Doctor %>
+                            <% } else { %>
+                                0
+                            <% } %>
+                        </div>
+                        <div class="stats-change">
+                            <i class="fas fa-arrow-up"></i> +8% this month
+                        </div>
+                    </div>
                 </div>
             </div>
-              <%}%>
 
-           <% if(TotalPatient.length >0) {%>
-            
-            <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-              <div class="card-body">
-                  <img class="card-img-top" style="width: 50px; margin-left: 20%;" src="patient.png" class="rounded-circle" alt="Card image">
-                  <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Patient</strong></h1>
-                  <br>
-                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;"><%= TotalPatient[0].Total_Patient %></strong>
-              </div>
-          </div>
-          <%}else {%>
-            <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-              <div class="card-body">
-                  <img class="card-img-top" style="width: 50px; margin-left: 20%;" src="patient.png" class="rounded-circle" alt="Card image">
-                  <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Patient</strong></h1>
-                  <br>
-                      <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>
-              </div>
-          </div>
-            <%}%>
-
-
-          <% if(TotalHospital.length >0) {%>
-               <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-                <div class="card-body">
-                    <img class="card-img-top" style="width: 50px; margin-left: 15%;" src="classs.png" class="rounded-circle" alt="Card image">
-                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Hospital</strong></h1>
-                    <br>
-                        <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;"><%= TotalHospital[0].Total_Hospital %></strong>
+            <!-- Total Patient Card -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-card-body">
+                        <div class="stats-icon patient">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-title">Total Patients</div>
+                        <div class="stats-number">
+                            <% if(TotalPatient.length > 0) { %>
+                                <%= TotalPatient[0].Total_Patient %>
+                            <% } else { %>
+                                0
+                            <% } %>
+                        </div>
+                        <div class="stats-change">
+                            <i class="fas fa-arrow-up"></i> +15% this month
+                        </div>
+                    </div>
                 </div>
             </div>
-            <%}else {%>
-              <div class="card ml-5" style="width: 280px; height: 160px; box-shadow: 0 0 20px 0px rgba(0,0,0,0.2);">
-                <div class="card-body">
-                    <img class="card-img-top" style="width: 50px; margin-left: 15%;" src="classs.png" class="rounded-circle" alt="Card image">
-                    <h1 class="card-title mt-3" style="font-size: 20px;"><strong>Total Hospital</strong></h1>
-                    <br>
-                        <strong class="card-text mt-5" style="margin-top: 100px; margin-left: 90px; text-align: left; font-size: 25px;">0</strong>
+
+            <!-- Total Hospital Card -->
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-card-body">
+                        <div class="stats-icon hospital">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="stats-title">Total Hospitals</div>
+                        <div class="stats-number">
+                            <% if(TotalHospital.length > 0) { %>
+                                <%= TotalHospital[0].Total_Hospital %>
+                            <% } else { %>
+                                0
+                            <% } %>
+                        </div>
+                        <div class="stats-change">
+                            <i class="fas fa-arrow-up"></i> +5% this month
+                        </div>
+                    </div>
                 </div>
             </div>
-              <%}%>
-          
         </div>
 
-
-        <div class="container" style="margin-top: 70px;">
-          <div class="row">
-            <div class="card col-md-5" style="margin-left: 70px;">
-              <div class="card-header" style="font-size: 20px;">
-                Appointments by Status
-              </div>
-              <div class="card-body">
-                <canvas id="barChart" style="width:100%;max-width:600px"></canvas>
-              </div>
+        <!-- Charts Row -->
+        <div class="row">
+            <!-- Appointments by Status Chart -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Appointments by Status
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="barChart" height="300"></canvas>
+                    </div>
+                </div>
             </div>
 
-            <div class="card col-md-5" style="margin-left: 70px;">
-              <div class="card-header" style="font-size: 20px;">
-                Doctors by Speciality
-              </div>
-              <div class="card-body">
-                <canvas id="pieChart" style="width:100%;max-width:600px"></canvas>
-              </div>
+            <!-- Doctors by Speciality Chart -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Doctors by Speciality
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="pieChart" height="300"></canvas>
+                    </div>
+                </div>
             </div>
-            
-          </div>
         </div>
 
-        <div class="container" style="margin-top: 30px;">
-          <div class="row">
-            <div class="card col-md-5" style="margin-left: 70px;">
-              <div class="card-header" style="font-size: 20px;">
-                Monthly Appointments
-              </div>
-              <div class="card-body">
-                <canvas id="lineChart" style="width:100%;max-width:600px"></canvas>
-              </div>
+        <!-- Second Charts Row -->
+        <div class="row">
+            <!-- Monthly Appointments Chart -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Monthly Appointments Trend
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="lineChart" height="300"></canvas>
+                    </div>
+                </div>
             </div>
 
-            <div class="card col-md-5" style="margin-left: 70px;">
-              <div class="card-header" style="font-size: 20px;">
-                Monthly Revenue
-              </div>
-              <div class="card-body">
-                <canvas id="revenueChart" style="width:100%;max-width:600px"></canvas>
-              </div>
+            <!-- Monthly Revenue Chart -->
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="fas fa-dollar-sign me-2"></i>
+                        Monthly Revenue
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="revenueChart" height="300"></canvas>
+                    </div>
+                </div>
             </div>
-            
-          </div>
+        </div>
+
+        <!-- Recent Activities and Notifications -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="recent-activities">
+                    <h4 class="mb-4">
+                        <i class="fas fa-clock me-2"></i>
+                        Recent Activities
+                    </h4>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6>New Patient Registration</h6>
+                            <p>Dr. Ahmed registered a new patient - 2 minutes ago</p>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6>Appointment Confirmed</h6>
+                            <p>Appointment #1234 confirmed for tomorrow - 15 minutes ago</p>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6>Lab Report Uploaded</h6>
+                            <p>Blood test results uploaded for Patient #567 - 1 hour ago</p>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h6>New Doctor Added</h6>
+                            <p>Dr. Sarah Johnson joined Cardiology department - 2 hours ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="fas fa-bell me-2"></i>
+                        Notifications
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="chart-body">
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <h6>System Update</h6>
+                                <p>New features available in dashboard</p>
+                                <small class="text-muted">5 minutes ago</small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <h6>Backup Complete</h6>
+                                <p>Daily backup completed successfully</p>
+                                <small class="text-muted">1 hour ago</small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-content">
+                                <h6>Maintenance Alert</h6>
+                                <p>Scheduled maintenance in 2 hours</p>
+                                <small class="text-muted">2 hours ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    </form>
-
-<script src="./js/bootstrap.bundle.main.js"></script>
-<script src="./js/jqeury-3.5.1.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.2/dist/chart.main.js"></script>
-<script src="./js/jqeury.dataTables.main.js"></script>
-<script src="./js/dataTables.bootstrap5.main.js"></script>
-<script src="./js/script.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
+    <script>
+        // Helper function to get status name
+        function getStatusName(status) {
+            const statusMap = {
+                0: 'Pending',
+                1: 'Confirmed', 
+                2: 'Completed',
+                3: 'Cancelled',
+                4: 'Re-appointment'
+            };
+            return statusMap[status] || 'Unknown';
+        }
+
+        // Helper function to get month name
+        function getMonthName(month) {
+            const months = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+            return months[month - 1] || 'Unknown';
+        }
+
+        // Enhanced Chart Configuration
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.color = '#666';
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+        // Bar Chart - Appointments by Status
+        var appointmentStatusData = JSON.parse('<%- JSON.stringify(appointmentStatus || []) %>');
+        var statusLabels = appointmentStatusData.length > 0 ? appointmentStatusData.map(item => getStatusName(item._id)) : ['No Data'];
+        var statusCounts = appointmentStatusData.length > 0 ? appointmentStatusData.map(item => item.count) : [0];
+        
+        new Chart("barChart", {
+            type: "bar",
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    backgroundColor: [
+                        'rgba(0, 128, 0, 0.8)',
+                        'rgba(14, 22, 53, 0.8)',
+                        'rgba(99, 116, 227, 0.8)',
+                        'rgba(148, 154, 176, 0.8)',
+                        'rgba(101, 214, 172, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 128, 0, 1)',
+                        'rgba(14, 22, 53, 1)',
+                        'rgba(99, 116, 227, 1)',
+                        'rgba(148, 154, 176, 1)',
+                        'rgba(101, 214, 172, 1)'
+                    ],
+                    borderWidth: 2,
+                    data: statusCounts,
+                    label: 'Appointments',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#008000',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // Pie Chart - Doctors by Speciality
+        var doctorSpecialityData = JSON.parse('<%- JSON.stringify(doctorSpeciality || []) %>');
+        var specialityLabels = doctorSpecialityData.length > 0 ? doctorSpecialityData.map(item => item._id || 'Unknown') : ['No Data'];
+        var specialityCounts = doctorSpecialityData.length > 0 ? doctorSpecialityData.map(item => item.count) : [0];
+
+        new Chart("pieChart", {
+            type: "doughnut",
+            data: {
+                labels: specialityLabels,
+                datasets: [{
+                    backgroundColor: [
+                        '#008000',
+                        '#0e1635',
+                        '#6374e3',
+                        '#949ab0',
+                        '#65d6ac',
+                        '#f1879f',
+                        '#f0f6f8',
+                        '#008000'
+                    ],
+                    data: specialityCounts,
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#008000',
+                        borderWidth: 1,
+                        cornerRadius: 8
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 2000
+                }
+            }
+        });
+
+        // Line Chart - Monthly Appointments
+        var monthlyAppointmentsData = JSON.parse('<%- JSON.stringify(monthlyAppointments || []) %>');
+        var monthLabels = monthlyAppointmentsData.length > 0 ? monthlyAppointmentsData.map(item => 
+            getMonthName(item._id.month) + ' ' + item._id.year
+        ) : ['No Data'];
+        var appointmentCounts = monthlyAppointmentsData.length > 0 ? monthlyAppointmentsData.map(item => item.count) : [0];
+
+        new Chart("lineChart", {
+            type: "line",
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Appointments',
+                    data: appointmentCounts,
+                    borderColor: "#008000",
+                    backgroundColor: "rgba(0, 128, 0, 0.1)",
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: "#008000",
+                    pointBorderColor: "#fff",
+                    pointBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#008000',
+                        borderWidth: 1,
+                        cornerRadius: 8
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // Revenue Chart - Monthly Payments
+        var monthlyPaymentsData = JSON.parse('<%- JSON.stringify(monthlyPayments || []) %>');
+        var revenueMonthLabels = monthlyPaymentsData.length > 0 ? monthlyPaymentsData.map(item => 
+            getMonthName(item._id.month) + ' ' + item._id.year
+        ) : ['No Data'];
+        var revenueAmounts = monthlyPaymentsData.length > 0 ? monthlyPaymentsData.map(item => item.total || 0) : [0];
+
+        new Chart("revenueChart", {
+            type: "bar",
+            data: {
+                labels: revenueMonthLabels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: revenueAmounts,
+                    backgroundColor: 'rgba(67, 233, 123, 0.8)',
+                    borderColor: 'rgba(67, 233, 123, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#65d6ac',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return 'Revenue: $' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            },
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // Add loading animation
+        $(document).ready(function() {
+            $('.stats-card').each(function(index) {
+                $(this).css('animation-delay', (index * 0.1) + 's');
+            });
+            
+            // Add hover effects
+            $('.stats-card').hover(
+                function() {
+                    $(this).addClass('loading');
+                },
+                function() {
+                    $(this).removeClass('loading');
+                }
+            );
+        });
+    </script>
 </body>
 </html>
 
@@ -228,11 +902,11 @@ var appointmentStatusData = JSON.parse('<%- JSON.stringify(appointmentStatus || 
 var statusLabels = appointmentStatusData.length > 0 ? appointmentStatusData.map(item => getStatusName(item._id)) : ['No Data'];
 var statusCounts = appointmentStatusData.length > 0 ? appointmentStatusData.map(item => item.count) : [0];
 var barColors = [
-  "#b91d47",
-  "#00aba9", 
-  "#2b5797",
-  "#e8c3b9",
-  "#1e7145"
+  "#008000",
+  "#0e1635", 
+  "#6374e3",
+  "#949ab0",
+  "#65d6ac"
 ];
 
 new Chart("barChart", {
@@ -267,12 +941,12 @@ var doctorSpecialityData = JSON.parse('<%- JSON.stringify(doctorSpeciality || []
 var specialityLabels = doctorSpecialityData.length > 0 ? doctorSpecialityData.map(item => item._id || 'Unknown') : ['No Data'];
 var specialityCounts = doctorSpecialityData.length > 0 ? doctorSpecialityData.map(item => item.count) : [0];
 var pieColors = [
-  "#FF6384",
-  "#36A2EB",
-  "#FFCE56", 
-  "#4BC0C0",
-  "#9966FF",
-  "#FF9F40"
+  "#008000",
+  "#0e1635",
+  "#6374e3", 
+  "#949ab0",
+  "#65d6ac",
+  "#f1879f"
 ];
 
 new Chart("pieChart", {
