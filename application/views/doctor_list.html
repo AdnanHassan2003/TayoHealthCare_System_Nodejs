@@ -32,8 +32,42 @@
 
   <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css">
   <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+  
+  <style>
+    .content {
+      overflow-x: auto !important;
+      white-space: nowrap;
+    }
+    
+    .container-fluid {
+      min-width: 1400px !important;
+      overflow-x: auto !important;
+    }
+    
+    #tbl_parent_div {
+      overflow-x: auto !important;
+      width: 100% !important;
+    }
+    
+    #tbl_data {
+      min-width: 1200px !important;
+      table-layout: fixed !important;
+    }
+    
+    .table-responsive {
+      overflow-x: auto !important;
+    }
+    
+    /* Ensure table cells don't wrap */
+    #tbl_data th,
+    #tbl_data td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
 
-  <section class="content">
+  <section class="content" style="overflow-x: auto; width: 100%;">
     <% if (typeof msg_success !='undefined' ) { %>
       <div class="alert alert-success alert-dismissible fade show"
         style="text-align: center; background-color: #008000;" role="alert">
@@ -45,7 +79,7 @@
         </button>
       </div>
       <% } %>
-        <div class="container-fluid">
+        <div class="container-fluid" style="min-width: 1400px; overflow-x: auto;">
           <div class="row" style="margin-bottom:10px;">
             <div class="col-md-4">
             </div>
@@ -154,11 +188,11 @@
             </div>
           </div>
 
-          <div id="tbl_parent_div">
+          <div id="tbl_parent_div" style="overflow-x: auto; width: 100%;">
             <div class="col-md-12">
               <div class="card">
-                <div>
-                  <table class="table table-bordered table-hover" id="tbl_data">
+                <div style="min-width: 1200px; overflow-x: auto;">
+                  <table class="table table-bordered table-hover" id="tbl_data" style="min-width: 1200px; table-layout: fixed;">
                     <thead>
                       <tr>
                         <th>
