@@ -231,18 +231,112 @@ exports.dashboard = function (req, res) {
         
                             
                                 ]).then((totalhospital) => {
-                            res.render('home', {
-                                TotalAdmin: totaladmin,
-                                TotalDoctor: totaldoctor,
-                                TotalPatient:totalpatient,
-                                TotalHospital:totalhospital,
-                                url_data: req.session.menu_array
-                                
+                                    // Get chart data
+                                    Promise.all([
+                                        // Appointments by status
+                                        Appointment.aggregate([
+                                            {
+                                                $group: {
+                                                    _id: "$status",
+                                                    count: { $sum: 1 }
+                                                }
+                                            }
+                                        ]),
+                                        // Doctors by speciality
+                                        Doctor.aggregate([
+                                            {
+                                                $lookup: {
+                                                    from: "specialities",
+                                                    localField: "speciality_id",
+                                                    foreignField: "_id",
+                                                    as: "speciality"
+                                                }
+                                            },
+                                            {
+                                                $unwind: {
+                                                    path: "$speciality",
+                                                    preserveNullAndEmptyArrays: true
+                                                }
+                                            },
+                                            {
+                                                $group: {
+                                                    _id: "$speciality.name",
+                                                    count: { $sum: 1 }
+                                                }
+                                            },
+                                            {
+                                                $sort: { count: -1 }
+                                            },
+                                            {
+                                                $limit: 5
+                                            }
+                                        ]),
+                                        // Monthly appointments
+                                        Appointment.aggregate([
+                                            {
+                                                $group: {
+                                                    _id: {
+                                                        year: { $year: "$create_date" },
+                                                        month: { $month: "$create_date" }
+                                                    },
+                                                    count: { $sum: 1 }
+                                                }
+                                            },
+                                            {
+                                                $sort: { "_id.year": 1, "_id.month": 1 }
+                                            },
+                                            {
+                                                $limit: 6
+                                            }
+                                        ]),
+                                        // Payments by month
+                                        Payment.aggregate([
+                                            {
+                                                $group: {
+                                                    _id: {
+                                                        year: { $year: "$create_date" },
+                                                        month: { $month: "$create_date" }
+                                                    },
+                                                    total: { $sum: "$amount" }
+                                                }
+                                            },
+                                            {
+                                                $sort: { "_id.year": 1, "_id.month": 1 }
+                                            },
+                                            {
+                                                $limit: 6
+                                            }
+                                        ])
+                                    ]).then(([appointmentStatus, doctorSpeciality, monthlyAppointments, monthlyPayments]) => {
+                                        res.render('home', {
+                                            TotalAdmin: totaladmin,
+                                            TotalDoctor: totaldoctor,
+                                            TotalPatient: totalpatient,
+                                            TotalHospital: totalhospital,
+                                            appointmentStatus: appointmentStatus,
+                                            doctorSpeciality: doctorSpeciality,
+                                            monthlyAppointments: monthlyAppointments,
+                                            monthlyPayments: monthlyPayments,
+                                            url_data: req.session.menu_array
+                                        })
+                                    }).catch(err => {
+                                        console.error('Error fetching chart data:', err);
+                                        res.render('home', {
+                                            TotalAdmin: totaladmin,
+                                            TotalDoctor: totaldoctor,
+                                            TotalPatient: totalpatient,
+                                            TotalHospital: totalhospital,
+                                            appointmentStatus: [],
+                                            doctorSpeciality: [],
+                                            monthlyAppointments: [],
+                                            monthlyPayments: [],
+                                            url_data: req.session.menu_array
+                                        })
+                                    })
+                                })
                             })
                         })
                     })
-                })
-            })
 
         } else {
             Utils.redirect_login(req, res);
