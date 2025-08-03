@@ -126,17 +126,108 @@
   </script>
 
   <style type="text/css">
-    .system-bottons {
-      background: #008000;
-      color: white;
+    /* Professional Header Styles */
+    .main-header {
+      transition: all 0.3s ease;
     }
-
-    .system-bottons:hover {
-      color: white;
+    
+    .main-header .navbar-nav .nav-link {
+      transition: all 0.3s ease;
     }
-
-
-
+    
+    .main-header .navbar-nav .nav-link:hover {
+      transform: translateY(-2px);
+    }
+    
+    .brand-logo {
+      transition: all 0.3s ease;
+    }
+    
+    .brand-logo:hover {
+      transform: scale(1.05);
+    }
+    
+    .search-container .form-control {
+      transition: all 0.3s ease;
+    }
+    
+    .search-container .form-control:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 128, 0, 0.25);
+      border-color: #008000;
+    }
+    
+    .notification-icon {
+      transition: all 0.3s ease;
+    }
+    
+    .dropdown-item:hover .notification-icon {
+      transform: scale(1.1);
+    }
+    
+    .user-profile {
+      transition: all 0.3s ease;
+    }
+    
+    .user-profile:hover {
+      background: rgba(255,255,255,0.2) !important;
+      transform: translateY(-2px);
+    }
+    
+    .dropdown-menu {
+      animation: fadeInUp 0.3s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .badge {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .search-container {
+        display: none !important;
+      }
+      
+      .brand-logo span {
+        display: none !important;
+      }
+      
+      .user-profile span {
+        display: none !important;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .main-header .navbar-nav .nav-link {
+        padding: 10px 8px !important;
+      }
+      
+      .user-profile {
+        padding: 5px 10px !important;
+      }
+    }
 
     body {
       top: 0px !important;
@@ -146,7 +237,6 @@
       width: 130px !important;
     }
 
-
     .goog-tooltip:hover {
       display: none !important;
     }
@@ -155,6 +245,315 @@
       background-color: transparent !important;
       border: none !important;
       box-shadow: none !important;
+    }
+    
+    /* Enhanced Google Translate */
+    #google_translate_element {
+      background: rgba(255,255,255,0.1);
+      padding: 5px 10px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+    
+    #google_translate_element select {
+      background: transparent;
+      border: none;
+      color: white;
+      font-weight: 500;
+    }
+    
+    #google_translate_element select option {
+      background: white;
+      color: #333;
+    }
+    
+    /* Professional Sidebar Styles */
+    .main-sidebar {
+      transition: all 0.3s ease;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.3) transparent;
+    }
+    
+    .main-sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .main-sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .main-sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+    }
+    
+    .main-sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    
+    .main-sidebar .nav-link {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .main-sidebar .nav-link:hover {
+      background: rgba(255,255,255,0.1) !important;
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .main-sidebar .nav-link.active {
+      background: linear-gradient(135deg, #008000, #0e1635) !important;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    .main-sidebar .nav-link::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(135deg, #008000, #0e1635);
+      transition: width 0.3s ease;
+      z-index: -1;
+    }
+    
+    .main-sidebar .nav-link:hover::before {
+      width: 100%;
+    }
+    
+    .main-sidebar .nav-treeview {
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .user-panel {
+      transition: all 0.3s ease;
+    }
+    
+    .user-panel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    
+    .status-indicator {
+      animation: pulse 2s infinite;
+    }
+    
+    .quick-stats-sidebar {
+      transition: all 0.3s ease;
+    }
+    
+    .quick-stats-sidebar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    
+    .stat-item {
+      transition: all 0.3s ease;
+    }
+    
+    .stat-item:hover {
+      transform: scale(1.05);
+      background: rgba(255,255,255,0.15) !important;
+    }
+    
+    .sidebar-footer {
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-footer a:hover {
+      color: #65d6ac !important;
+      transform: scale(1.2);
+    }
+    
+    .brand-logo-container {
+      transition: all 0.3s ease;
+    }
+    
+    .brand-logo-container:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Responsive Sidebar */
+    @media (max-width: 768px) {
+      .main-sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .main-sidebar.sidebar-open {
+        transform: translateX(0);
+      }
+      
+      .quick-stats-sidebar {
+        display: none;
+      }
+      
+      .sidebar-footer {
+        position: relative;
+        margin-top: 20px;
+      }
+    }
+    
+    /* Sidebar Animation */
+    .main-sidebar {
+      animation: slideInLeft 0.5s ease;
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Professional Button Styles */
+    .system-bottons {
+      background: linear-gradient(135deg, #008000 0%, #0e1635 100%) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 8px !important;
+      padding: 10px 20px !important;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      box-shadow: 0 4px 15px rgba(0, 128, 0, 0.3) !important;
+      transition: all 0.3s ease !important;
+      position: relative !important;
+      overflow: hidden !important;
+    }
+    
+    .system-bottons::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .system-bottons:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 25px rgba(0, 128, 0, 0.4) !important;
+      color: white !important;
+      text-decoration: none !important;
+    }
+    
+    .system-bottons:hover::before {
+      left: 100%;
+    }
+    
+    .system-bottons:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 4px 15px rgba(0, 128, 0, 0.3) !important;
+    }
+    
+    .system-bottons:focus {
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(0, 128, 0, 0.3) !important;
+    }
+    
+    /* Button Variants */
+    .btn-primary.system-bottons {
+      background: linear-gradient(135deg, #008000 0%, #0e1635 100%) !important;
+    }
+    
+    .btn-success.system-bottons {
+      background: linear-gradient(135deg, #65d6ac 0%, #008000 100%) !important;
+    }
+    
+    .btn-info.system-bottons {
+      background: linear-gradient(135deg, #6374e3 0%, #0e1635 100%) !important;
+    }
+    
+    .btn-warning.system-bottons {
+      background: linear-gradient(135deg, #ffce56 0%, #ff9f40 100%) !important;
+      color: #333 !important;
+    }
+    
+    .btn-danger.system-bottons {
+      background: linear-gradient(135deg, #f1879f 0%, #dc3545 100%) !important;
+    }
+    
+    /* Button Sizes */
+    .btn-sm.system-bottons {
+      padding: 6px 12px !important;
+      font-size: 12px !important;
+    }
+    
+    .btn-lg.system-bottons {
+      padding: 12px 30px !important;
+      font-size: 16px !important;
+    }
+    
+    .btn-block.system-bottons {
+      width: 100% !important;
+      display: block !important;
+    }
+    
+    /* Disabled State */
+    .system-bottons:disabled {
+      opacity: 0.6 !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+    }
+    
+    /* Loading State */
+    .system-bottons.loading {
+      position: relative !important;
+      color: transparent !important;
+    }
+    
+    .system-bottons.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive Buttons */
+    @media (max-width: 768px) {
+      .system-bottons {
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+      }
+      
+      .btn-lg.system-bottons {
+        padding: 10px 24px !important;
+        font-size: 15px !important;
+      }
     }
   </style>
 
@@ -169,9 +568,17 @@
         dataType: "json",
         success: function (res) {
           if (res.success) {
+            // Update all admin name elements
             $('#admin_name').text(res.admin.name);
-            if (res.admin.picture && res.admin.picture != "")
+            $('#admin_name_dropdown').text(res.admin.name);
+            $('#sidebar_admin_name').text(res.admin.name);
+            
+            // Update all admin image elements
+            if (res.admin.picture && res.admin.picture != "") {
               $('#admin_image').attr('src', res.admin.picture);
+              $('#admin_image_dropdown').attr('src', res.admin.picture);
+            }
+            
             if (res.admin.usertype != 0) {
               var elementPos = res.admin.menu_array.map(function (x) { return x }).indexOf(value[1]);
 
@@ -192,6 +599,51 @@
           }
         }
       });
+      
+      // Add smooth scrolling and enhanced interactions
+      $('.dropdown-toggle').on('click', function() {
+        $(this).find('.fa-chevron-down').toggleClass('fa-chevron-up');
+      });
+      
+      // Search functionality
+      $('.search-container .form-control').on('keypress', function(e) {
+        if (e.which === 13) {
+          // Handle search
+          console.log('Searching for:', $(this).val());
+        }
+      });
+      
+      // Notification click handler
+      $('.dropdown-item').on('click', function() {
+        if ($(this).find('.notification-icon').length > 0) {
+          // Handle notification click
+          console.log('Notification clicked');
+        }
+      });
+      
+      // Add loading animation to header
+      $('.main-header').addClass('animate__animated animate__fadeInDown');
+      
+      // Sidebar interactions
+      $('.main-sidebar .nav-link').on('click', function() {
+        $('.main-sidebar .nav-link').removeClass('active');
+        $(this).addClass('active');
+      });
+      
+      // Update last update time
+      function updateLastUpdate() {
+        const now = new Date();
+        const minutes = Math.floor((now - new Date(now.getTime() - 2 * 60 * 1000)) / (1000 * 60));
+        $('#last-update').text(minutes + ' min ago');
+      }
+      
+      updateLastUpdate();
+      setInterval(updateLastUpdate, 60000); // Update every minute
+      
+      // Sidebar toggle for mobile
+      $('[data-widget="pushmenu"]').on('click', function() {
+        $('.main-sidebar').toggleClass('sidebar-open');
+      });
     });
   </script>
   <!-- Favicons -->
@@ -202,133 +654,279 @@
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
     <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-orang navbar-light navbar-orange"
-      style="background-color: #008000;">
+    <nav class="main-header navbar navbar-expand navbar-light" style="background: linear-gradient(135deg, #008000 0%, #0e1635 100%); box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
       <!-- Left navbar links -->
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link system-bottons" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+          <a class="nav-link" data-widget="pushmenu" href="#" style="color: white; font-size: 18px; padding: 15px;">
+            <i class="fas fa-bars"></i>
+          </a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+          <div class="brand-logo" style="margin-left: 20px;">
+            <img src="telemedicine.png" alt="Logo" style="height: 40px; width: auto; margin-right: 10px;">
+            <span style="color: white; font-weight: 600; font-size: 18px;">Tayo Health Care</span>
+          </div>
         </li>
       </ul>
+      
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
-        <li class="xn-icon-button pull-right last" style="margin-right: 10px;color: white; width: auto;">
-          <span>
-            <div id="google_translate_element" style="margin-right: 40px;float: left; height: 26px;">
+        <!-- Search Bar -->
+        <li class="nav-item d-none d-sm-inline-block">
+          <div class="search-container" style="margin-right: 20px;">
+            <div class="input-group" style="width: 300px;">
+              <input type="text" class="form-control" placeholder="Search..." style="border-radius: 25px 0 0 25px; border: none; background: rgba(255,255,255,0.9);">
+              <div class="input-group-append">
+                <button class="btn btn-light" type="button" style="border-radius: 0 25px 25px 0; border: none; background: rgba(255,255,255,0.9);">
+                  <i class="fas fa-search" style="color: #008000;"></i>
+                </button>
+              </div>
             </div>
-          </span>
-          <span style="float: left;"> <img style=" border-radius: 50%; width: 35px; height: 35px; margin-right: 10px;"
-              id="admin_image" src="/default.png"><span id="admin_name"
-              style="margin-right: 10px;text-transform: capitalize;">Admin Name
-            </span><a href="#" style="color: white" data-toggle="modal" data-target="#logoutModal">
-              <span class="fa fa-power-off"></span>
+          </div>
+        </li>
+        
+        <!-- Notifications -->
+        <li class="nav-item dropdown">
+          <a class="nav-link" href="#" role="button" data-toggle="dropdown" style="color: white; position: relative;">
+            <i class="fas fa-bell" style="font-size: 18px;"></i>
+            <span class="badge badge-danger" style="position: absolute; top: 0; right: 0; background: #ff4757;">3</span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" style="width: 300px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="dropdown-header" style="background: linear-gradient(135deg, #008000, #0e1635); color: white; padding: 15px;">
+              <h6 class="mb-0"><i class="fas fa-bell me-2"></i>Notifications</h6>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" style="padding: 12px 15px; border-bottom: 1px solid #f0f0f0;">
+              <div class="d-flex align-items-center">
+                <div class="notification-icon" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #008000, #0e1635); display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                  <i class="fas fa-user-plus" style="color: white; font-size: 14px;"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 600; color: #333;">New Patient Registration</div>
+                  <div style="font-size: 12px; color: #666;">2 minutes ago</div>
+                </div>
+              </div>
             </a>
-          </span>
+            <a class="dropdown-item" href="#" style="padding: 12px 15px; border-bottom: 1px solid #f0f0f0;">
+              <div class="d-flex align-items-center">
+                <div class="notification-icon" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #008000, #0e1635); display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                  <i class="fas fa-calendar-check" style="color: white; font-size: 14px;"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 600; color: #333;">Appointment Confirmed</div>
+                  <div style="font-size: 12px; color: #666;">15 minutes ago</div>
+                </div>
+              </div>
+            </a>
+            <a class="dropdown-item" href="#" style="padding: 12px 15px;">
+              <div class="d-flex align-items-center">
+                <div class="notification-icon" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #008000, #0e1635); display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                  <i class="fas fa-file-medical" style="color: white; font-size: 14px;"></i>
+                </div>
+                <div>
+                  <div style="font-weight: 600; color: #333;">Lab Report Uploaded</div>
+                  <div style="font-size: 12px; color: #666;">1 hour ago</div>
+                </div>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-center" href="#" style="color: #008000; font-weight: 600;">
+              View All Notifications
+            </a>
+          </div>
+        </li>
+        
+        <!-- Language Selector -->
+        <li class="nav-item d-none d-sm-inline-block">
+          <div id="google_translate_element" style="margin-right: 20px; margin-top: 5px;"></div>
+        </li>
+        
+        <!-- User Profile -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" style="color: white; display: flex; align-items: center; padding: 10px 15px;">
+            <div class="user-profile" style="display: flex; align-items: center; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 25px; backdrop-filter: blur(10px);">
+              <img id="admin_image" src="/default.png" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); margin-right: 10px;">
+              <span id="admin_name" style="color: white; font-weight: 500; margin-right: 10px; text-transform: capitalize;">Admin Name</span>
+              <i class="fas fa-chevron-down" style="color: white; font-size: 12px;"></i>
+            </div>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" style="width: 250px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="dropdown-header" style="background: linear-gradient(135deg, #008000, #0e1635); color: white; padding: 15px; text-align: center;">
+              <img id="admin_image_dropdown" src="/default.png" style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px;">
+              <div id="admin_name_dropdown" style="font-weight: 600; font-size: 16px;">Admin Name</div>
+              <div style="font-size: 12px; opacity: 0.8;">Administrator</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" style="padding: 12px 15px;">
+              <i class="fas fa-user me-2" style="color: #008000;"></i> My Profile
+            </a>
+            <a class="dropdown-item" href="#" style="padding: 12px 15px;">
+              <i class="fas fa-cog me-2" style="color: #008000;"></i> Settings
+            </a>
+            <a class="dropdown-item" href="#" style="padding: 12px 15px;">
+              <i class="fas fa-question-circle me-2" style="color: #008000;"></i> Help
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" style="padding: 12px 15px; color: #dc3545;">
+              <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
+          </div>
         </li>
       </ul>
     </nav>
     <!-- /.navbar -->
     <!-- Main Sidebar Container -->
-    <!-- for dark -->
-    <aside class="main-sidebar elevation-4 sidebar-dark-primary " style="background-color: #1a2334;">
-      <!-- for white -->
-      <!-- <aside class="main-sidebar elevation-4 sidebar-light-maroon"> -->
+    <aside class="main-sidebar elevation-4" style="background: linear-gradient(180deg, #0e1635 0%, #1a2334 50%, #008000 100%); box-shadow: 4px 0 20px rgba(0,0,0,0.1);">
       <!-- Brand Logo -->
-      <a href="#" class="brand-link" style="text-align: center;">
-        <span class="brand-text font-weight-light">
-          Tayo Health Care
-        </span>
-      </a>
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <!-- Sidebar user (optional) -->
-        <div class="center user-panel ">
-          <div class="image center">
-            <img src="telemedicine.png" class="center img-circle elevation-2" style="display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 80%; height: 160px;" alt="User Image">
+      <div class="brand-link" style="text-align: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="brand-logo-container" style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+          <div class="brand-text-container">
+            <span class="brand-text" style="color: white; font-weight: 700; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+              Tayo Health Care
+            </span>
+            <div style="color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 400;">
+              Healthcare Management System
+            </div>
           </div>
         </div>
+      </div>
+      
+      <!-- Sidebar -->
+      <div class="sidebar" style="padding: 20px 0;">
+        <!-- Sidebar user (optional) -->
+        <div class="user-panel" style="text-align: center; padding: 20px; margin-bottom: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; margin: 0 15px 20px 15px; backdrop-filter: blur(10px);">
+          <div class="user-image-container" style="position: relative; margin-bottom: 15px;">
+            <img src="telemedicine.png" class="img-circle elevation-3" style="width: 80px; height: 80px; border: 3px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.2);" alt="User Image">
+            <div class="status-indicator" style="position: absolute; bottom: 5px; right: 5px; width: 15px; height: 15px; background: #65d6ac; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+          </div>
+          <div class="user-info">
+            <div id="sidebar_admin_name" style="color: white; font-weight: 600; font-size: 16px; margin-bottom: 5px;">Admin Name</div>
+            <div style="color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 400;">Administrator</div>
+          </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats-sidebar" style="margin: 0 15px 20px 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; backdrop-filter: blur(10px);">
+          <h6 style="color: white; font-weight: 600; margin-bottom: 15px; text-align: center;">
+            <i class="fas fa-chart-line me-2"></i>Quick Stats
+          </h6>
+          <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="stat-item" style="text-align: center; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+              <div style="color: #65d6ac; font-weight: 700; font-size: 18px;">24</div>
+              <div style="color: rgba(255,255,255,0.7); font-size: 10px;">Today's Appointments</div>
+            </div>
+            <div class="stat-item" style="text-align: center; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+              <div style="color: #6374e3; font-weight: 700; font-size: 18px;">8</div>
+              <div style="color: rgba(255,255,255,0.7); font-size: 10px;">Pending Reviews</div>
+            </div>
+          </div>
+        </div>
+        
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-
-            <!-- <li class="nav-item has-treeview" id="dashboard_menu">
-              <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-copy"></i>
-                <p>
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" style="padding: 0 15px;">
+            
+            <!-- Dashboard Menu -->
+            <li class="nav-item" id="home">
+              <a href="/" class="nav-link" style="margin-bottom: 5px; border-radius: 12px; transition: all 0.3s ease;">
+                <i class="nav-icon fas fa-tachometer-alt" style="color: #65d6ac; font-size: 16px;"></i>
+                <p style="color: white; font-weight: 500; margin: 0;">
                   Dashboard
-                  <i class="fas fa-angle-left right"></i>
-                  <span class="badge badge-info right"></span>
                 </p>
               </a>
-              <ul class="nav nav-treeview px-4">
-                <li class="nav-item" id="home">
-                  <a href="/" class="nav-link">
-                    <p>Home</p>
-                  </a>
-                </li>
-              </ul>
-            </li>      -->
-
-            <!--setting-->
-            <!-- <li class="nav-item has-treeview" id="setting_menu">
-              <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-cogs"></i>
-                <p>
-                  Settings
-                  <i class="fas fa-angle-left right"></i>
-                </p>
-              </a>
-              <ul class="nav nav-treeview px-4">               
-                <li class="nav-item" id="admin_list">
-                  <a href="/admin_list" class="nav-link">
-                    <p>Admin List</p>
-                  </a>
-                </li>  
-                <li class="nav-item" id="admin_list">
-                  <a href="/menu_list" class="nav-link">
-                    <p>menu list </p>
-                  </a>
-                </li>   
-                </li> -->
-            <li class="nav-item has-treeview" id="setting_menu">
-              <% if (typeof url_data !='undefined' && url_data.length> 0) { %>
-
-                <% url_data.forEach(function(entry) { %>
-                  <% if(entry.menu_details.length> 0) { %>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="<%= entry.icon %>"></i>
-                <p>
-                  <%= entry.title %>
-                    <i class="fas fa-angle-left right"></i>
-                </p>
-              </a>
-              <% if (entry.menu_details) { %>
-                <ul class="nav nav-treeview px-4">
-                  <% entry.menu_details.forEach(function(s_element) { %>
-                    <li class="nav-item">
-                      <a href='<%= s_element.url %>' class="nav-link">
-                        <i class="<%= s_element.icon %>"></i>
-                        <p>
-                          <%= s_element.title %>
-                        </p>
-                      </a>
-                    </li>
-                    <% }) %>
-                </ul>
-                <% } %>
             </li>
-            <% } %>
-              <% }) %>
-
+            
+            <!-- Dynamic Menu Items -->
+            <% if (typeof url_data !='undefined' && url_data.length> 0) { %>
+              <% url_data.forEach(function(entry) { %>
+                <% if(entry.menu_details.length> 0) { %>
+                  <li class="nav-item has-treeview" style="margin-bottom: 5px;">
+                    <a href="#" class="nav-link" style="border-radius: 12px; transition: all 0.3s ease;">
+                      <i class="<%= entry.icon %>" style="color: #6374e3; font-size: 16px;"></i>
+                      <p style="color: white; font-weight: 500; margin: 0;">
+                        <%= entry.title %>
+                        <i class="fas fa-angle-left right" style="color: rgba(255,255,255,0.7);"></i>
+                      </p>
+                    </a>
+                    <% if (entry.menu_details) { %>
+                      <ul class="nav nav-treeview" style="padding-left: 20px; margin-top: 5px;">
+                        <% entry.menu_details.forEach(function(s_element) { %>
+                          <li class="nav-item" style="margin-bottom: 3px;">
+                            <a href='<%= s_element.url %>' class="nav-link" style="border-radius: 8px; transition: all 0.3s ease; padding: 8px 15px;">
+                              <i class="<%= s_element.icon %>" style="color: #949ab0; font-size: 14px; margin-right: 8px;"></i>
+                              <p style="color: rgba(255,255,255,0.8); font-weight: 400; margin: 0; font-size: 14px;">
+                                <%= s_element.title %>
+                              </p>
+                            </a>
+                          </li>
+                        <% }) %>
+                      </ul>
+                    <% } %>
+                  </li>
                 <% } %>
-
+              <% }) %>
+            <% } %>
+            
+            <!-- Additional Menu Items -->
+            <li class="nav-item" style="margin-bottom: 5px;">
+              <a href="#" class="nav-link" style="border-radius: 12px; transition: all 0.3s ease;">
+                <i class="nav-icon fas fa-users" style="color: #f1879f; font-size: 16px;"></i>
+                <p style="color: white; font-weight: 500; margin: 0;">
+                  Patients
+                </p>
+              </a>
+            </li>
+            
+            <li class="nav-item" style="margin-bottom: 5px;">
+              <a href="#" class="nav-link" style="border-radius: 12px; transition: all 0.3s ease;">
+                <i class="nav-icon fas fa-user-md" style="color: #4facfe; font-size: 16px;"></i>
+                <p style="color: white; font-weight: 500; margin: 0;">
+                  Doctors
+                </p>
+              </a>
+            </li>
+            
+            <li class="nav-item" style="margin-bottom: 5px;">
+              <a href="#" class="nav-link" style="border-radius: 12px; transition: all 0.3s ease;">
+                <i class="nav-icon fas fa-calendar-alt" style="color: #ffce56; font-size: 16px;"></i>
+                <p style="color: white; font-weight: 500; margin: 0;">
+                  Appointments
+                </p>
+              </a>
+            </li>
+            
+            <li class="nav-item" style="margin-bottom: 5px;">
+              <a href="#" class="nav-link" style="border-radius: 12px; transition: all 0.3s ease;">
+                <i class="nav-icon fas fa-hospital" style="color: #9966ff; font-size: 16px;"></i>
+                <p style="color: white; font-weight: 500; margin: 0;">
+                  Hospitals
+                </p>
+              </a>
+            </li>
+            
+            <li class="nav-item" style="margin-bottom: 5px;">
+              <a href="#" class="nav-link" style="border-radius: 12px; transition: all 0.3s ease;">
+                <i class="nav-icon fas fa-chart-bar" style="color: #ff9f40; font-size: 16px;"></i>
+                <p style="color: white; font-weight: 500; margin: 0;">
+                  Reports
+                </p>
+              </a>
+            </li>
+            
+            <li class="nav-item" style="margin-bottom: 5px;">
+              <a href="#" class="nav-link" style="border-radius: 12px; transition: all 0.3s ease;">
+                <i class="nav-icon fas fa-cog" style="color: #4bc0c0; font-size: 16px;"></i>
+                <p style="color: white; font-weight: 500; margin: 0;">
+                  Settings
+                </p>
+              </a>
+            </li>
           </ul>
         </nav>
-        <!-- /.sidebar-menu -->
+        
+        <!-- Sidebar Footer -->
+
       </div>
       <!-- /.sidebar -->
     </aside>

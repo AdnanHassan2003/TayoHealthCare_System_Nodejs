@@ -1,0 +1,441 @@
+</div>
+<!-- /.content-wrapper -->
+<script>
+  var url = window.location;
+  // for sidebar menu entirely but not cover treeview
+  $('ul.nav-sidebar a').filter(function () {
+    return this.href == url;
+  }).addClass('active');
+
+  // for treeview
+  $('ul.nav-treeview a').filter(function () {
+    return this.href == url;
+  }).parentsUntil(".nav-sidebar > .nav-treeview").addClass('menu-open').prev('a');
+
+  $(function () {
+    $("#tbl_data").DataTable({
+      "searching": false,
+      "lengthChange": false,
+      "ordering": false,
+      "buttons": ["copy", "excel", "pdf", "print"]
+    }).buttons().container().appendTo('#tbl_parent_div .col-md-6:eq(0)');
+
+    $('.textarea').summernote()
+  });
+  
+  $(document).ready(function () {
+    $(".datepicker").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      todayHighlight: true
+    })
+  });
+
+</script>
+
+<!-- Professional Enhanced Footer -->
+<footer class="main-footer" style="background: linear-gradient(135deg, #0e1635 0%, #008000 100%); color: white; padding: 40px 0 30px 0; margin-top: 60px; position: relative; overflow: hidden; box-shadow: 0 -10px 30px rgba(0,0,0,0.1);">
+  
+  <!-- Animated Background Elements -->
+  <div class="footer-bg-elements" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;">
+    <div class="floating-shape" style="position: absolute; width: 120px; height: 120px; background: rgba(255,255,255,0.03); border-radius: 50%; top: 15%; left: 8%; animation: float 8s ease-in-out infinite;"></div>
+    <div class="floating-shape" style="position: absolute; width: 90px; height: 90px; background: rgba(255,255,255,0.04); border-radius: 50%; top: 70%; right: 12%; animation: float 10s ease-in-out infinite reverse;"></div>
+    <div class="floating-shape" style="position: absolute; width: 70px; height: 70px; background: rgba(255,255,255,0.02); border-radius: 50%; bottom: 25%; left: 15%; animation: float 9s ease-in-out infinite;"></div>
+    <div class="floating-shape" style="position: absolute; width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 50%; top: 40%; right: 25%; animation: float 7s ease-in-out infinite reverse;"></div>
+  </div>
+  
+  <!-- Main Footer Content -->
+  <div class="container-fluid" style="position: relative; z-index: 2;">
+    <div class="row">
+      <!-- Company Info & Branding -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="footer-section" style="text-align: center; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);">
+          <div class="footer-logo" style="margin-bottom: 25px;">
+            <div class="logo-container" style="position: relative; display: inline-block;">
+              <img src="telemedicine.png" alt="Tayo Health Care" style="height: 80px; width: auto; margin-bottom: 20px; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4)); transition: all 0.3s ease;">
+              <div class="logo-glow" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; background: radial-gradient(circle, rgba(0,128,0,0.3) 0%, transparent 70%); border-radius: 50%; animation: glow 3s ease-in-out infinite alternate;"></div>
+            </div>
+            <h3 style="color: white; font-weight: 800; margin-bottom: 15px; text-shadow: 0 3px 6px rgba(0,0,0,0.4); font-size: 24px;">
+              Tayo Health Care
+            </h3>
+            <p style="color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.8; margin-bottom: 0; font-weight: 400;">
+              Leading Healthcare Management System<br>
+              <span style="color: #65d6ac; font-weight: 600;">Providing Quality Medical Services</span>
+            </p>
+          </div>
+          
+          <!-- Enhanced Social Media Links -->
+          <div class="social-links" style="margin-top: 25px;">
+            <a href="#" class="social-link" style="display: inline-block; width: 50px; height: 50px; background: linear-gradient(135deg, #008000, #0e1635); border-radius: 50%; text-align: center; line-height: 50px; margin: 0 10px; color: white; text-decoration: none; transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden;">
+              <i class="fab fa-facebook-f" style="font-size: 18px; position: relative; z-index: 2;"></i>
+              <div class="social-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, #1877f2, #0e1635); transition: left 0.4s ease;"></div>
+            </a>
+            <a href="#" class="social-link" style="display: inline-block; width: 50px; height: 50px; background: linear-gradient(135deg, #008000, #0e1635); border-radius: 50%; text-align: center; line-height: 50px; margin: 0 10px; color: white; text-decoration: none; transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden;">
+              <i class="fab fa-twitter" style="font-size: 18px; position: relative; z-index: 2;"></i>
+              <div class="social-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, #1da1f2, #0e1635); transition: left 0.4s ease;"></div>
+            </a>
+            <a href="#" class="social-link" style="display: inline-block; width: 50px; height: 50px; background: linear-gradient(135deg, #008000, #0e1635); border-radius: 50%; text-align: center; line-height: 50px; margin: 0 10px; color: white; text-decoration: none; transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden;">
+              <i class="fab fa-linkedin-in" style="font-size: 18px; position: relative; z-index: 2;"></i>
+              <div class="social-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, #0077b5, #0e1635); transition: left 0.4s ease;"></div>
+            </a>
+            <a href="#" class="social-link" style="display: inline-block; width: 50px; height: 50px; background: linear-gradient(135deg, #008000, #0e1635); border-radius: 50%; text-align: center; line-height: 50px; margin: 0 10px; color: white; text-decoration: none; transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden;">
+              <i class="fab fa-instagram" style="font-size: 18px; position: relative; z-index: 2;"></i>
+              <div class="social-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, #e4405f, #0e1635); transition: left 0.4s ease;"></div>
+            </a>
+          </div>
+          
+          <!-- Newsletter Subscription -->
+          <div class="newsletter-section" style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.08); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+            <h6 style="color: white; font-weight: 600; margin-bottom: 15px; font-size: 16px;">
+              <i class="fas fa-envelope me-2" style="color: #65d6ac;"></i>Subscribe to Newsletter
+            </h6>
+            <div class="input-group" style="position: relative;">
+              <input type="email" class="form-control" placeholder="Enter your email" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 25px 0 0 25px; padding: 12px 20px; font-size: 14px;">
+              <div class="input-group-append">
+                <button class="btn" type="button" style="background: linear-gradient(135deg, #008000, #0e1635); border: none; color: white; border-radius: 0 25px 25px 0; padding: 12px 20px; font-weight: 600; transition: all 0.3s ease;">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Links -->
+      <div class="col-lg-2 col-md-6 mb-4">
+        <div class="footer-section" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); height: 100%;">
+          <h5 style="color: white; font-weight: 700; margin-bottom: 25px; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 18px;">
+            <i class="fas fa-link me-2" style="color: #65d6ac;"></i>Quick Links
+          </h5>
+          <ul class="footer-links" style="list-style: none; padding: 0; margin: 0; text-align: center;">
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #65d6ac; font-size: 12px;"></i>Dashboard
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,128,0,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #65d6ac; font-size: 12px;"></i>Patients
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,128,0,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #65d6ac; font-size: 12px;"></i>Doctors
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,128,0,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #65d6ac; font-size: 12px;"></i>Appointments
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,128,0,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #65d6ac; font-size: 12px;"></i>Reports
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,128,0,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Services -->
+      <div class="col-lg-2 col-md-6 mb-4">
+        <div class="footer-section" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); height: 100%;">
+          <h5 style="color: white; font-weight: 700; margin-bottom: 25px; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 18px;">
+            <i class="fas fa-stethoscope me-2" style="color: #6374e3;"></i>Services
+          </h5>
+          <ul class="footer-links" style="list-style: none; padding: 0; margin: 0; text-align: center;">
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #6374e3; font-size: 12px;"></i>Telemedicine
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(99,116,227,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #6374e3; font-size: 12px;"></i>Lab Reports
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(99,116,227,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #6374e3; font-size: 12px;"></i>Consultations
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(99,116,227,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #6374e3; font-size: 12px;"></i>Emergency Care
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(99,116,227,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.3s ease; font-size: 15px; font-weight: 500; display: block; padding: 8px 15px; border-radius: 10px; position: relative; overflow: hidden;">
+                <i class="fas fa-chevron-right me-2" style="color: #6374e3; font-size: 12px;"></i>Pharmacy
+                <div class="link-hover" style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(99,116,227,0.2), rgba(14,22,53,0.2)); transition: left 0.3s ease; z-index: -1;"></div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Contact Info -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="footer-section" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); height: 100%;">
+          <h5 style="color: white; font-weight: 700; margin-bottom: 25px; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 18px;">
+            <i class="fas fa-phone me-2" style="color: #f1879f;"></i>Contact Info
+          </h5>
+          <div class="contact-info" style="text-align: center;">
+            <div class="contact-item" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; background: rgba(255,255,255,0.08); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+              <div class="contact-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #65d6ac, #008000); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; box-shadow: 0 4px 15px rgba(101, 214, 172, 0.3); position: relative; overflow: hidden;">
+                <i class="fas fa-map-marker-alt" style="color: white; font-size: 18px; position: relative; z-index: 2;"></i>
+                <div class="icon-pulse" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%); border-radius: 50%; animation: iconPulse 2s ease-in-out infinite;"></div>
+              </div>
+              <div>
+                <div style="color: white; font-weight: 700; font-size: 16px; margin-bottom: 5px;">Address</div>
+                <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 400;">Mogadishu, Somalia</div>
+              </div>
+            </div>
+            
+            <div class="contact-item" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; background: rgba(255,255,255,0.08); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+              <div class="contact-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #6374e3, #0e1635); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; box-shadow: 0 4px 15px rgba(99, 116, 227, 0.3); position: relative; overflow: hidden;">
+                <i class="fas fa-phone" style="color: white; font-size: 18px; position: relative; z-index: 2;"></i>
+                <div class="icon-pulse" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%); border-radius: 50%; animation: iconPulse 2s ease-in-out infinite;"></div>
+              </div>
+              <div>
+                <div style="color: white; font-weight: 700; font-size: 16px; margin-bottom: 5px;">Phone</div>
+                <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 400;">+252 61 123 4567</div>
+              </div>
+            </div>
+            
+            <div class="contact-item" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; background: rgba(255,255,255,0.08); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+              <div class="contact-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #f1879f, #dc3545); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; box-shadow: 0 4px 15px rgba(241, 135, 159, 0.3); position: relative; overflow: hidden;">
+                <i class="fas fa-envelope" style="color: white; font-size: 18px; position: relative; z-index: 2;"></i>
+                <div class="icon-pulse" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%); border-radius: 50%; animation: iconPulse 2s ease-in-out infinite;"></div>
+              </div>
+              <div>
+                <div style="color: white; font-weight: 700; font-size: 16px; margin-bottom: 5px;">Email</div>
+                <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 400;">info@tayohealth.com</div>
+              </div>
+            </div>
+            
+            <!-- Working Hours -->
+            <div class="contact-item" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; padding: 15px; background: rgba(255,255,255,0.08); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease;">
+              <div class="contact-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #ffce56, #ff9f40); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; box-shadow: 0 4px 15px rgba(255, 206, 86, 0.3); position: relative; overflow: hidden;">
+                <i class="fas fa-clock" style="color: white; font-size: 18px; position: relative; z-index: 2;"></i>
+                <div class="icon-pulse" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%); border-radius: 50%; animation: iconPulse 2s ease-in-out infinite;"></div>
+              </div>
+              <div>
+                <div style="color: white; font-weight: 700; font-size: 16px; margin-bottom: 5px;">Working Hours</div>
+                <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 400;">24/7 Emergency Care</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer Bottom -->
+    <div class="footer-bottom" style="border-top: 2px solid rgba(255,255,255,0.1); margin-top: 40px; padding-top: 30px; text-align: center; background: rgba(255,255,255,0.03); border-radius: 15px; padding: 20px;">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="copyright" style="color: rgba(255,255,255,0.9); font-size: 15px; font-weight: 500;">
+            <strong style="color: white; font-weight: 700;">Copyright &copy; <script>document.write(new Date().getFullYear());</script></strong>
+            <a href="#" style="color: #65d6ac; text-decoration: none; font-weight: 700; margin: 0 5px;">
+              <%= process.env.app_name %>
+            </a>. All rights reserved.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="footer-info" style="color: rgba(255,255,255,0.9); font-size: 15px; font-weight: 500;">
+            <span style="color: #65d6ac; font-weight: 700;">Developed by</span>
+            <strong style="color: white; font-weight: 700; margin: 0 5px;">Tayo Health Care</strong>
+            <span style="background: linear-gradient(135deg, #008000, #0e1635); padding: 6px 15px; border-radius: 25px; font-size: 13px; margin-left: 15px; color: white; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+              Version 1.0.0
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Enhanced Footer CSS Animations -->
+  <style>
+    /* Floating Animation */
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.2;
+      }
+      50% {
+        transform: translateY(-25px) rotate(180deg);
+        opacity: 0.5;
+      }
+    }
+    
+    /* Glow Animation */
+    @keyframes glow {
+      0% {
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+    }
+    
+    /* Icon Pulse Animation */
+    @keyframes iconPulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.3);
+        opacity: 0.2;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+    }
+    
+    /* Enhanced Hover Effects */
+    .social-link:hover {
+      transform: translateY(-5px) scale(1.1) !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+    }
+    
+    .social-link:hover .social-hover {
+      left: 0 !important;
+    }
+    
+    .footer-links a:hover {
+      color: #65d6ac !important;
+      transform: translateX(8px) !important;
+      text-shadow: 0 0 15px rgba(101, 214, 172, 0.6) !important;
+    }
+    
+    .footer-links a:hover .link-hover {
+      left: 0 !important;
+    }
+    
+    .contact-item:hover {
+      transform: translateY(-3px) !important;
+      background: rgba(255,255,255,0.15) !important;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+    }
+    
+    .contact-item:hover .contact-icon {
+      transform: scale(1.1) !important;
+    }
+    
+    .footer-section:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2) !important;
+    }
+    
+    .logo-container:hover img {
+      transform: scale(1.05) !important;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5)) !important;
+    }
+    
+    /* Newsletter Input Focus */
+    .newsletter-section input:focus {
+      background: rgba(255,255,255,0.2) !important;
+      border-color: #65d6ac !important;
+      box-shadow: 0 0 0 3px rgba(101, 214, 172, 0.3) !important;
+    }
+    
+    .newsletter-section button:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3) !important;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .footer-section {
+        text-align: center !important;
+        margin-bottom: 30px !important;
+        padding: 20px !important;
+      }
+      
+      .contact-item {
+        justify-content: center !important;
+        margin-bottom: 25px !important;
+        padding: 12px !important;
+      }
+      
+      .social-links {
+        margin-top: 30px !important;
+      }
+      
+      .newsletter-section {
+        margin-top: 30px !important;
+      }
+      
+      .footer-bottom .row {
+        text-align: center !important;
+      }
+      
+      .footer-bottom .col-md-6 {
+        margin-bottom: 20px !important;
+      }
+      
+      .floating-shape {
+        display: none !important;
+      }
+    }
+    
+    /* Smooth Transitions */
+    .footer-section,
+    .social-link,
+    .footer-links a,
+    .contact-item,
+    .contact-icon,
+    .logo-container img,
+    .newsletter-section button {
+      transition: all 0.4s ease !important;
+    }
+    
+    /* Enhanced Glass Morphism */
+    .footer-section {
+      backdrop-filter: blur(20px) !important;
+      background: rgba(255,255,255,0.03) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    
+    /* Loading Animation for Newsletter */
+    .newsletter-section button.loading {
+      position: relative !important;
+      color: transparent !important;
+    }
+    
+    .newsletter-section button.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</footer>
+</body>
+
+</html>
