@@ -6591,7 +6591,7 @@ exports.save_labs_record = function(req, res) {
         });
     } else {
         // first check if appointment already has lab
-        labs.findOne({ appointment_id: req.body.appointment_id })
+        Labs.findOne({ appointment_id: req.body.appointment_id })
             .then(existingLab => {
                 if (existingLab) {
                     return res.send({
