@@ -6584,13 +6584,40 @@ exports.doctor_prescriptions = function(req, res){
 exports.save_labs_record = function(req, res) {
     var report_file = req.files;
 
-    if (!report_file || report_file == '' || report_file == 'undefined') {
+    // Validate file upload
+    if (!report_file || report_file == '' || report_file == 'undefined' || !report_file[0]) {
         return res.send({
             success: false,
             message: "No lab report file uploaded"
         });
-    } else {
-        // first check if appointment already has lab
+    }
+
+    // Validate file type
+    const allowedTypes = ['.jpg', '.jpeg', '.png'];
+    const fileExtension = path.extname(report_file[0].originalname).toLowerCase();
+    if (!allowedTypes.includes(fileExtension)) {
+        return res.send({
+            success: false,
+            message: "Invalid file type. Allowed types: JPG, PNG"
+        });
+    }
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (report_file[0].size > maxSize) {
+        return res.send({
+            success: false,
+            message: "File size too large. Maximum size is 5MB"
+        });
+    }
+
+    // Ensure upload directory exists
+    const uploadDir = "./uploads/lab_reports/";
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    // first check if appointment already has lab
         Labs.findOne({ appointment_id: req.body.appointment_id })
             .then(existingLab => {
                 if (existingLab) {
@@ -6602,7 +6629,6 @@ exports.save_labs_record = function(req, res) {
 
                 // Generate unique filename
                 const sequenceId = Utils.get_unique_id();
-                const fileExtension = path.extname(report_file[0].originalname);
                 const fileName = `lab_report_${sequenceId}${fileExtension}`;
                 const url = "./uploads/lab_reports/" + fileName;
 
@@ -6628,7 +6654,7 @@ exports.save_labs_record = function(req, res) {
                             if (err) console.error("Error deleting temp file:", err);
                         });
 
-                        const labRecord = new labs({
+                        const labRecord = new Labs({
                             sequence_id: sequenceId,
                             patient_id: req.body.patient_id,
                             doctor_id: req.body.doctor_id,
@@ -6662,11 +6688,11 @@ exports.save_labs_record = function(req, res) {
                 });
             });
     }
-};
+
 
 
 exports.patient_labs = function(req, res){
-    labs.aggregate([
+    Labs.aggregate([
 
         {
             $match: {
@@ -6755,7 +6781,7 @@ exports.patient_labs = function(req, res){
 }
 
 exports.doctor_labs = function(req, res){
-    labs.aggregate([
+    Labs.aggregate([
 
         {
             $match: {
