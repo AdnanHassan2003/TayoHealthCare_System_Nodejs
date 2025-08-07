@@ -2810,7 +2810,7 @@ exports.edit_admin = function (req, res) {
             Admin.findOne({ _id: req.body.admin_id }, { password: 0 }).then((admin) => {
                 if (admin) {
                     // console.log(admin)
-                    res.render("add_admin", { admin_data: admin, systen_urls: systen_urls })
+                    res.render("add_admin", { admin_data: admin, systen_urls: systen_urls,  url_data: req.session.menu_array })
                 } else {
                     res.redirect("/admin_list")
                 }
@@ -2887,7 +2887,7 @@ exports.edit_patient = function (req, res) {
             Patient.findOne({ _id: req.body.patient_id }, { password: 0 }).then((patient) => {
                 if (patient) {
                     // console.log(admin)
-                    res.render("add_patient", { patient_data: patient, systen_urls: systen_urls })
+                    res.render("add_patient", { patient_data: patient, systen_urls: systen_urls, url_data: req.session.menu_array })
                 } else {
                     res.redirect("/patient_list")
                 }
@@ -2918,6 +2918,7 @@ exports.edit_appointment = function (req, res) {
                                   doctor_id: appointment.doctor_id.toString(),
                                   patient_id:appointment.patient_id.toString(),
                                   systen_urls: systen_urls,
+                                  url_data: req.session.menu_array,
                                   moment: moment 
                                 
                                 })
@@ -2944,7 +2945,7 @@ exports.edit_hospital = function (req, res) {
             Hospital.findOne({ _id: req.body.hospital_id }, { password: 0 }).then((hospital) => {
                 if (hospital) {
                     // console.log(admin)
-                    res.render("add_hospital", { hospital_data: hospital, systen_urls: systen_urls })
+                    res.render("add_hospital", { hospital_data: hospital, systen_urls: systen_urls, url_data: req.session.menu_array })
                 } else {
                     res.redirect("/hospital_list")
                 }
@@ -2976,6 +2977,7 @@ exports.edit_payment = function (req, res) {
                                   doctor_id: payment.doctor_id.toString(),
                                   patient_id:payment.patient_id.toString(),
                                   systen_urls: systen_urls,
+                                  url_data: req.session.menu_array,
                                   moment: moment 
                                 
                                 })
@@ -3014,6 +3016,7 @@ exports.edit_feedback = function (req, res) {
                                   doctor_id: feedback.doctor_id.toString(),
                                   patient_id:feedback.patient_id.toString(),
                                   systen_urls: systen_urls,
+                                  url_data: req.session.menu_array,
                                   moment: moment 
                                 
                                 })
@@ -3042,7 +3045,7 @@ exports.edit_adds = function (req, res) {
             Adds.findOne({ _id: req.body.adds_id }, { password: 0 }).then((adds) => {
                 if (adds) {
                     // console.log(admin)
-                    res.render("add_adds", { adds_data: adds, systen_urls: systen_urls })
+                    res.render("add_adds", { adds_data: adds, systen_urls: systen_urls, url_data: req.session.menu_array })
                 } else {
                     res.redirect("/adds_list")
                 }
@@ -3063,7 +3066,7 @@ exports.edit_selfmanagment = function (req, res) {
             SelfManagment.findOne({ _id: req.body.selfmanagment_id }, { password: 0 }).then((selfmanagment) => {
                 if (selfmanagment) {
                     // console.log(admin)
-                    res.render("add_selfmanagment", { selfmanagment_data: selfmanagment, systen_urls: systen_urls })
+                    res.render("add_selfmanagment", { selfmanagment_data: selfmanagment, systen_urls: systen_urls, url_data: req.session.menu_array })
                 } else {
                     res.redirect("/selfmanagment_list")
                 }
@@ -3083,7 +3086,7 @@ exports.edit_speciality = function (req, res) {
             Speciality.findOne({ _id: req.body.speciality_id }, { password: 0 }).then((speciality) => {
                 if (speciality) {
                     // console.log(admin)
-                    res.render("add_speciality", { speciality_data: speciality, systen_urls: systen_urls })
+                    res.render("add_speciality", { speciality_data: speciality, systen_urls: systen_urls, url_data: req.session.menu_array })
                 } else {
                     res.redirect("/speciality_list")
                 }
