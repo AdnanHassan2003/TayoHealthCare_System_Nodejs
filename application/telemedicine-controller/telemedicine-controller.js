@@ -4503,6 +4503,7 @@ exports.getAll_Doctors = async function(req, res) {
                     speciality:"$speciality_data.name",
                     experience_years: 1,
                     consultation_fee: 1,
+                    rating:1,
                     status: 1,
                     create_date: 1
                 }
