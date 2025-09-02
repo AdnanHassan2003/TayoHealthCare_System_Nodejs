@@ -216,6 +216,7 @@ module.exports = function (app) {
   // All Apis That Use Our Telemedicine Application
   app.route('/login_DoctorAndPatient').post(adminController.login_DoctorAndPatient);
   app.route('/register_Patient').post(adminController.register_Patient)
+  app.route('/register_Doctor').post(adminController.register_Doctor)
   app.route('/getAll_Doctors').post(adminController.getAll_Doctors);
   app.route('/patient_appointements').post(adminController.patient_appointements); // waa all appointments uu patients uu qabsaday
   app.route('/doctor_appointements').post(adminController.doctor_appointements); // waa all appointments uu doctor uu laga qabsaday

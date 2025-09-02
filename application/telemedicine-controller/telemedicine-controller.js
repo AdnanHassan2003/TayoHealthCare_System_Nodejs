@@ -4428,7 +4428,6 @@ exports.register_Patient = function (req, res) {
                             address:req.body.address,
                             gender:req.body.gender,
                             age:req.body.age,
-                            license_number:Utils.get_unique_id(),
                             phone: req.body.phone,
                             status: 1,
                             type:1,
@@ -4464,6 +4463,70 @@ exports.register_Patient = function (req, res) {
             })
 
 };
+
+
+
+exports.register_Doctor = function(req, res){
+    console.log("body", req.body)
+
+    Doctor.findOne({ "phone": req.body.phone }).then((doctor) => {
+        console.log("user", doctor)
+        if (doctor) {
+            res.send({
+                success:false,
+                message:"Sorry, There is an doctor with this phone, please check the phone",
+            })
+        }
+
+        else {
+            var profile_file = req.files;
+            var name = req.body.name
+            var doctor = new Doctor({
+                name: name,
+                sequence_id: Utils.get_unique_id(),
+                email: req.body.email,
+                license_number:Utils.get_unique_id(),
+                phone: req.body.phone,
+                status: 0,
+                type:0,
+                consultation_fee: req.body.consultation_fee,
+                experience_years: req.body.experience_years,
+                speciality_id: req.body.speciality_id,
+                countries: req.body.countries,
+                hospital_id: req.body.hospital_id,
+                extra_detail: req.body.extra_detail,
+                picture: "",
+                user_name: req.body.user_name,
+                PassWord: req.body.PassWord,
+                password: Bcrypt.hashSync(req.body.PassWord, 10)
+            });
+            if (profile_file != undefined && profile_file.length > 0) {
+                image_name = Utils.tokenGenerator(29) + '.jpg';
+                url = "./uploads/admin_profile/" + image_name;
+                liner = "admin_profile/" + image_name;
+
+                fs.readFile(req.files[0].path, function (err, data) {
+                    fs.writeFile(url, data, 'binary', function (err) { });
+                    fs.unlink(req.files[0].path, function (err, file) {
+
+                    });
+                });
+
+                patient.picture = liner;
+            }
+            patient.save().then((patient) => {
+
+                res.send({
+                    success:true,
+                    message:"patient was created successfully",
+                    record:patient
+                })
+            });
+    }
+
+    })
+    
+}
 
 
 
@@ -5820,7 +5883,7 @@ exports.updateProfile = function (req, res) {
                     // Update only picture field
                     Patient.findByIdAndUpdate(
                         req.body.patient_id,
-                        { picture: "admin_profile/" + image_name },
+                        { picture: "admin_profile/" + image_name, name: req.body.name, email: req.body.email, phone: req.body.phone, address: req.body.address, gender: req.body.gender, age: req.body.age, extra_detail: req.body.extra_detail, user_name: req.body.user_name, PassWord: req.body.PassWord, password: Bcrypt.hashSync(req.body.PassWord, 10) },
                         { useFindAndModify: false }
                     ).then((data) => {
                         res.send({

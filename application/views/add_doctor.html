@@ -151,17 +151,17 @@
                       <select class="form-control custom-select" id="status" name="status" required>
                         <% if(doctor_data.status=="1" ) { %>
                           <option value="1" selected="selected">
-                            <%= process.env.active %>
+                            Approved
                           </option>
                           <option value="0">
-                            <%= process.env.inactive %>
+                            Pending
                           </option>
                           <% } else{ %>
                             <option value="1">
-                              <%= process.env.active %>
+                              Approved
                             </option>
                             <option value="0" selected="selected">
-                              <%= process.env.inactive %>
+                              Pending
                             </option>
                             <% } %>
                       </select>
