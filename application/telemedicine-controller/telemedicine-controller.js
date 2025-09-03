@@ -38,6 +38,7 @@ const { group, Console } = require('console')
 const message = require('../model/message')
 const path = require('path')
 const cons = require('consolidate')
+const bcrypt = require("bcryptjs");  // safer for Node.js
 // const sendCallNotification = require('../nofications/fcmSender')
 
 // const { utils } = require('xlsx/types')
