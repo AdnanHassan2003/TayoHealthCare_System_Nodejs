@@ -4513,14 +4513,14 @@ exports.register_Doctor = function(req, res){
                     });
                 });
 
-                patient.picture = liner;
+                doctor.picture = liner;
             }
-            patient.save().then((patient) => {
+            doctor.save().then((doctor) => {
 
                 res.send({
                     success:true,
-                    message:"patient was created successfully",
-                    record:patient
+                    message:"doctor was created successfully",
+                    record:doctor
                 })
             });
     }
