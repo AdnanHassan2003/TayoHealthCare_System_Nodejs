@@ -1,4 +1,15 @@
-node_modules
-serviceAccountKey.json
+# Node modules
+node_modules/
+
+# Environment files
 .env
-//waxaa lagaliyaa files ka aadan rabin in lasaaro github ka
+*.env
+
+# Credentials / keys
+serviceAccountKey.json
+#uploaded files
+uploads/
+
+# OS / editor
+.DS_Store
+.vscode/
