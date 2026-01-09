@@ -9,6 +9,8 @@ node_modules/
 serviceAccountKey.json
 #uploaded files
 uploads/
+data/
+config/data/
 
 # OS / editor
 .DS_Store
